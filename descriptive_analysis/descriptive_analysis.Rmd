@@ -111,16 +111,46 @@ colformat_double(j = c("Percent", "Average Stop Time (Mins)",'Median Stop Time (
 # for the rel_stopreason table, it seems like the reason why some people show up in multiple rows is because
 # there are different values for 'reason_for_stop_text' or 'reason_for_stop_detail' or 'reason_stop_explaination' BUT the 'reason_for_stop' value remains the same. Which is ultimately what we want for our analysis. So my goal is to create a flattened version of rel_stopreason that shows each person once for their stop reason. UNLESS a person shows up more than once because there is more than one unique stop reason
 
-test<-reason%>%
-  group_by(stop_id, person_id)%>%
-  mutate(count=n())
+# similarliy seeing now that rel_persons also has multiple rows for people who have more than 1 perceived age or gender
 
+# First, confirm that within each stop_id and person_id, the reason for stop is the same. And that the reason for multiple rows is because of the other colunm values
+
+test<-reason %>%
+  group_by(stop_id, person_id) %>% 
+  mutate(same = +(n_distinct(reason_for_stop) == 1)) %>% 
+  ungroup()
+
+table(test$same) # all 701063 rows return same==1 which means there are not any people who were stopped for different reason_for_stop
+
+# Now, work on flattening the reasons table so we get one person-one stop reason single row data
 
 reason_p<-person%>%
   left_join(reason%>%select(stop_id, person_id, reason_for_stop))%>%
   select(stop_id, person_id, reason_for_stop)%>%
   group_by(stop_id, person_id, reason_for_stop)%>%
-  slice(1)
+  slice(1)%>%
+  ungroup() #### I believe this gives us a single stop reason for each unique person
+
+# Calculate estimates
+
+reason_p<-reason_p%>%
+  mutate(Total=n())%>%
+  group_by(reason_for_stop)%>%
+    mutate(Count=n(),
+           Percent=Count/Total*100)%>%
+  slice(1)%>%
+   select(-c(stop_id, person_id))%>%
+  rename( 'Reason for stop'='reason_for_stop')%>%
+  arrange(-Percent)
+  
+
+# create table
+
+  flextable(reason_p) %>% 
+colformat_double(j = c("Percent"), digits = 1)%>% 
+  set_caption('Total and Rate of Stops by Stop Reason') %>% 
+  theme_vanilla() %>%
+  width(j=1,3.65,unit="in")
 
 
 ```
@@ -130,6 +160,12 @@ reason_p<-person%>%
 ## SDPD stops by age
 
 ## SDPD stops by race
+
+```{r}
+
+
+
+```
 
 ## SDPD stops that were searches and what searches resulted in (hit rates)
 
