@@ -51,7 +51,12 @@ con <- connect_to_db("rjs_pillars")
 
 # read in tables from postgres
 
-stops<-dbGetQuery(con, "SELECT * FROM rel_stops")
+stops<-dbGetQuery(con, "SELECT * FROM rel_stops") 
+
+# Add column just for year of stop to stops table
+stops$Year = substr(stops$date_stop, 1, 4)
+
+
 reason<-dbGetQuery(con, "SELECT * FROM rel_stopreason")
 person<-dbGetQuery(con, "SELECT * FROM rel_persons")
 
@@ -65,16 +70,19 @@ General counts and percents of stops by Gang Suppression Unit and Special Operat
 
 Quick map of stop counts by police beat and for Gang Suppression Unit/Special Operations Unit. 
 
-# SDPD Stop Level Exploration
+--combine all tables by 'all units' + 'just gang suppression unit' 
 
-## SDPD Calls for Service versus Officer-initiated
+# Calls for Service versus Officer-initiated
+
+Analysis cut by all unit types:
 
 ```{r}
 
 # prep data 
 
 cfs<-stops%>%
-  select(stop_id, stop_in_response_to_cfs, stopduration)%>%
+  select(stop_id, Year, stop_in_response_to_cfs, stopduration)%>%
+  filter(Year=='2022')%>%
   mutate(Total=n())%>%
   group_by(stop_in_response_to_cfs)%>%
   mutate(Count=n(),
@@ -88,7 +96,9 @@ cfs<-stops%>%
   slice(1)%>%
   select(-c(stop_id, stopduration))%>%
   mutate(stop_in_response_to_cfs=ifelse(stop_in_response_to_cfs %in% 0, 'No', 'Yes'))%>%
-  rename('Call for Service'='stop_in_response_to_cfs')
+  rename('Call for Service'='stop_in_response_to_cfs')%>%
+  mutate(Assignment = 'All units')%>%
+  relocate(Assignment, .after = Year)
          
 
 
@@ -97,14 +107,122 @@ cfs<-stops%>%
   flextable(cfs) %>% 
 colformat_double(j = c("Percent", "Average Stop Time (Mins)",'Median Stop Time (Mins)',
                        'Min Stop Time (Mins)','Max Stop Time (Mins)', 'Total Time (Mins)'), digits = 1)%>% 
-  set_caption('Stop Counts and Rates by Response to Service Call') %>% 
+  set_caption('Stop Counts and Rates by Response to Service Call for All Units') %>% 
   theme_vanilla() 
 
+```
+
+Analysis filtered for gang suppression unit:
+
+```{r}
+
+# prep data 
+
+cfs_gu<-stops%>%
+  select(stop_id, Year, assignment, stop_in_response_to_cfs, stopduration)%>%
+  filter(Year=='2022' & assignment =='Gang enforcement')%>%
+  mutate(Total=n())%>%
+  group_by(stop_in_response_to_cfs)%>%
+  mutate(Count=n(),
+         Percent=Count/Total*100,
+         'Average Stop Time (Mins)' = mean(stopduration, na.rm = FALSE),
+            'Median Stop Time (Mins)'=   median(stopduration,na.rm = FALSE),
+             'Min Stop Time (Mins)'=min(stopduration,na.rm = FALSE),
+            'Max Stop Time (Mins)'=max(stopduration,na.rm = FALSE),
+             'Total Time (Mins)'= sum(stopduration)
+         )%>%
+  slice(1)%>%
+  select(-c(stop_id, stopduration))%>%
+  mutate(stop_in_response_to_cfs=ifelse(stop_in_response_to_cfs %in% 0, 'No', 'Yes'))%>%
+  rename('Call for Service'='stop_in_response_to_cfs',
+         'Assignment'='assignment')
+         
+
+
+#create and style flextable
+
+  flextable(cfs_gu) %>% 
+colformat_double(j = c("Percent", "Average Stop Time (Mins)",'Median Stop Time (Mins)',
+                       'Min Stop Time (Mins)','Max Stop Time (Mins)', 'Total Time (Mins)'), digits = 1)%>% 
+  set_caption('Stop Counts and Rates by Response to Service Call for Gang Suppression Unit') %>% 
+  theme_vanilla() 
+
+```
+
+
+## Total Officer-Intiated Stops Over Time
+
+```{r}
+
+# calculate total number of officer initiated stops across all units
+
+count<-stops%>%
+  filter(stop_in_response_to_cfs==0)%>%
+  select(Year, stop_id)%>%
+  group_by(Year)%>%
+  mutate('All Units Total'=n())%>%
+  slice(1)%>%
+  select(-stop_id)
+
+# calculate total number of officer initiated stops for gang suppresion unit
+
+count_gu<-stops%>%
+  filter(stop_in_response_to_cfs==0 )%>%
+  filter(grepl('Gang enforcement', assignment))%>%
+  select(Year, stop_id)%>%
+  group_by(Year)%>%
+  mutate('Gang Suppression Unit Total'=n())%>%
+  slice(1)
+
+# combine both unit tables
+
+count<-count%>%
+  left_join(count_gu%>%select(Year, 'Gang Suppression Unit Total'))
+  
+  #create and style flextable
+
+  flextable(count) %>% 
+  set_caption('Total Count of Officer-Initiated Stops Over Time') %>% 
+  theme_vanilla() %>%
+  width(width=2,unit="in")
+  
+  
+```
+
+## Total Officer-Intiated Stops in 2022
+
+```{r}
+
+units22<-stops%>%
+  filter(stop_in_response_to_cfs==0)%>%
+  select(Year, stop_id, officer_assignment_key, assignment)%>%
+  group_by(Year)%>%
+  mutate(Total=n())%>%
+  group_by(Year, assignment)%>%
+  summarise(Total=Total,
+            Count=n(),
+            Percent=Count/Total*100)%>%
+  slice(1)%>%
+  arrange(-Percent)%>%
+  rename('Patrol Assignment'='assignment')%>%
+  filter(grepl('2022', Year))
+
+
+#create and style flextable
+
+  flextable(units22) %>% 
+colformat_double(j = c("Percent"), digits = 1)%>% 
+  set_caption('Total and Rate of Stops by Patrol Assignment Type in 2022') %>% 
+  theme_vanilla() %>%
+  width(j=2,2.5,unit="in")
 
 
 ```
 
-## SDPD stops by stop reason
+
+# Stop Reason and Rersults
+
+## Stops by stop reason
 
 ```{r}
 
@@ -113,23 +231,33 @@ colformat_double(j = c("Percent", "Average Stop Time (Mins)",'Median Stop Time (
 
 # similarliy seeing now that rel_persons also has multiple rows for people who have more than 1 perceived age or gender
 
-# First, confirm that within each stop_id and person_id, the reason for stop is the same. And that the reason for multiple rows is because of the other colunm values
 
-test<-reason %>%
+# Continuing analysis for now:
+
+reason_p<-person%>%
+  
+  # join stops table so we can filter for year / cfs
+  
+  left_join(stops%>%select(stop_id, Year, stop_in_response_to_cfs ))%>%
+  filter(Year=='2022' & stop_in_response_to_cfs == 0)%>%
+  
+  # left join reasons -filtered for year/cfs - to get stop reason
+  
+  left_join(reason%>%
+              left_join(stops%>%select(stop_id, Year, stop_in_response_to_cfs ))%>%
+              filter(Year=='2022' & stop_in_response_to_cfs == 0)%>%
+              select(stop_id, person_id, reason_for_stop))%>%
+  
+  select(Year, stop_id, person_id, reason_for_stop)
+
+# Run a quick test to see if one person/stop_id combo has more than 1 unique reason_for_stop
+
+test<-reason_p %>%
   group_by(stop_id, person_id) %>% 
   mutate(same = +(n_distinct(reason_for_stop) == 1)) %>% 
   ungroup()
 
-table(test$same) # all 701063 rows return same==1 which means there are not any people who were stopped for different reason_for_stop
-
-# Now, work on flattening the reasons table so we get one person-one stop reason single row data
-
-reason_p<-person%>%
-  left_join(reason%>%select(stop_id, person_id, reason_for_stop))%>%
-  select(stop_id, person_id, reason_for_stop)%>%
-  group_by(stop_id, person_id, reason_for_stop)%>%
-  slice(1)%>%
-  ungroup() #### I believe this gives us a single stop reason for each unique person
+ table(test$same) # all 701063 rows return same==1 which means there are not any people who were stopped for different reason_for_stop
 
 # Calculate estimates
 
@@ -155,11 +283,15 @@ colformat_double(j = c("Percent"), digits = 1)%>%
 
 ```
 
-## SDPD stops by stop result
+## Stops by stop result
 
-## SDPD stops by age
+## Hit Rates
 
-## SDPD stops by race
+# Demographics of Stops
+
+## Stops by age
+
+## Stops by race
 
 ```{r}
 
@@ -167,82 +299,6 @@ colformat_double(j = c("Percent"), digits = 1)%>%
 
 ```
 
-## SDPD stops that were searches and what searches resulted in (hit rates)
-
-# SDPD Gang Suppression Unit Comparisons
-
-## Count and rate of stops across different units
-
-```{r}
-
-units<-stops%>%
-  select(stop_id, officer_assignment_key, assignment)%>%
-  mutate(Total=n())%>%
-  group_by(assignment)%>%
-  summarise(Total=Total,
-            Count=n(),
-            Percent=Count/Total*100)%>%
-  slice(1)%>%
-  arrange(-Percent)%>%
-  rename('Patrol Assignment'='assignment')
-
-#create and style flextable
-
-  flextable(units) %>% 
-colformat_double(j = c("Percent"), digits = 1)%>% 
-  set_caption('Total and Rate of Stops by Patrol Assignment Type') %>% 
-  theme_vanilla() %>%
-  width(j=1,3.5,unit="in")
-
-
-```
-
-## Gang Suppression Unit Calls for service versus Officer-initiated
-
-```{r}
-
-# prep data 
-
-cfs_gang<-stops%>%
-  filter(assignment=='Gang enforcement')%>%
-  select(stop_id, stop_in_response_to_cfs, stopduration)%>%
-  mutate(Total=n())%>%
-  group_by(stop_in_response_to_cfs)%>%
-  mutate(Count=n(),
-         Percent=Count/Total*100,
-         'Average Stop Time (Mins)' = mean(stopduration, na.rm = FALSE),
-            'Median Stop Time (Mins)'=   median(stopduration,na.rm = FALSE),
-             'Min Stop Time (Mins)'=min(stopduration,na.rm = FALSE),
-            'Max Stop Time (Mins)'=max(stopduration,na.rm = FALSE),
-             'Total Time (Mins)'= sum(stopduration)
-         )%>%
-  slice(1)%>%
-  select(-c(stop_id, stopduration))%>%
-  mutate(stop_in_response_to_cfs=ifelse(stop_in_response_to_cfs %in% 0, 'No', 'Yes'))%>%
-  rename('Call for Service'='stop_in_response_to_cfs')
-         
-
-
-#create and style flextable
-
-  flextable(cfs_gang) %>% 
-colformat_double(j = c("Percent", "Average Stop Time (Mins)",'Median Stop Time (Mins)',
-                       'Min Stop Time (Mins)','Max Stop Time (Mins)', 'Total Time (Mins)'), digits = 1)%>% 
-  set_caption('Stop Counts and Rates by Response to Service Call from Gang Suppression Unit') %>% 
-  theme_vanilla() 
-
-
-
-
-```
-
-## Gang Suppression Unit stops by stop reason
-
-## Gang Suppression Unit stops by stop result
-
-## Gang Suppression Unit stops by age
-
-## Gang Suppression Unit stops by race
 
 # Map
 
