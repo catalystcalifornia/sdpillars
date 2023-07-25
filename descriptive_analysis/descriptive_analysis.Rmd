@@ -59,18 +59,19 @@ stops$Year = substr(stops$date_stop, 1, 4)
 
 reason<-dbGetQuery(con, "SELECT * FROM rel_stopreason")
 person<-dbGetQuery(con, "SELECT * FROM rel_persons")
+result<-dbGetQuery(con, "SELECT * FROM rel_stopresult")
+search<-dbGetQuery(con, "SELECT * FROM rel_basis_search")
+contra<-dbGetQuery(con, "SELECT * FROM rel_contrabands_evidences")
+race<-dbGetQuery(con, "SELECT * FROM rel_races_recode")
 
 ```
 
-Before engaging in detailed analysis regarding the project’s research questions, we will first run general frequencies of SDPD stops to get a sense of overall trends. This helps us determine if our expected findings are likely to show up in the data and allows us to identify any trends we did not expect. The analysis will include: 
+Before engaging in detailed analysis regarding the project’s research questions, we ran general frequencies of SDPD stops to get a sense of overall trends. This helps us determine if our expected findings are likely to show up in the data and allows us to identify any trends we did not expect. The analysis includes: 
 
 General counts and percents of SDPD stops by key fields in RIPA data, e.g., stop reason, stop result, calls for service, race, age, searches, officer assignment. 
 
 General counts and percents of stops by Gang Suppression Unit and Special Operations Unit (if available) by key fields in RIPA data, e.g., stop reason, stop result, calls for service, race, age, searches. 
 
-Quick map of stop counts by police beat and for Gang Suppression Unit/Special Operations Unit. 
-
---combine all tables by 'all units' + 'just gang suppression unit' 
 
 # Calls for Service versus Officer-initiated
 
@@ -314,16 +315,286 @@ colformat_double(j = c("Percent"), digits = 1)%>%
 
 ## Stops by stop result
 
+```{r}
+
+# calculate for all gang units
+
+result_p<-person%>%
+  
+  # join result table to person table so we can filter for year / cfs
+  
+  left_join(stops%>%select(stop_id, Year, stop_in_response_to_cfs ))%>%
+  filter(Year=='2022' & stop_in_response_to_cfs == 0)%>%
+  
+  # left join results -filtered for year/cfs - to get stop reason
+  
+  left_join(result%>%
+              left_join(stops%>%select(stop_id, Year, stop_in_response_to_cfs ))%>%
+              filter(Year=='2022' & stop_in_response_to_cfs == 0)%>%
+              select(stop_id, person_id, result))%>%
+  
+  select(Year, stop_id, person_id, result)%>%
+  mutate(Total=n())%>%
+  group_by(result)%>%
+    mutate(Count=n(),
+           Percent=Count/Total*100)%>%
+  slice(1)%>%
+   select(-c(stop_id, person_id))%>%
+  rename( 'Result of Stop'='result')%>%
+  arrange(-Percent)%>%
+  mutate(Assignment='All units')%>% 
+  relocate(Assignment, .after = Year)
+
+# repeat above steps for gang suppression unit
+
+result_p_gu<-person%>%
+  left_join(stops%>%select(stop_id, Year, stop_in_response_to_cfs, assignment ))%>%
+  filter(Year=='2022' & stop_in_response_to_cfs == 0 & assignment == 'Gang enforcement')%>%
+
+  left_join(result%>%
+              left_join(stops%>%select(stop_id, Year, stop_in_response_to_cfs,assignment ))%>%
+              filter(Year=='2022' & stop_in_response_to_cfs == 0 & assignment == 'Gang enforcement')%>%
+              select(stop_id, person_id, result))%>%
+  
+  select(Year, assignment, stop_id, person_id, result)%>%
+  mutate(Total=n())%>%
+  group_by(result)%>%
+    mutate(Count=n(),
+           Percent=Count/Total*100)%>%
+  slice(1)%>%
+   select(-c(stop_id, person_id))%>%
+  rename( 'Result of Stop'='result',
+          'Assignment' = 'assignment')%>%
+  arrange(-Percent)
+
+# final combine
+
+result_p<-result_p%>%
+  rbind(result_p_gu)
+
+# create table
+
+  flextable(result_p) %>% 
+colformat_double(j = c("Percent"), digits = 1)%>% 
+  set_caption('Total and Rate of Officer-Initiated Stops by Stop Result') %>% 
+  theme_vanilla() %>%
+  width(j=3,3.65,unit="in")
+
+
+
+
+
+```
+
 ## Hit Rates
+
+```{r, include=FALSE, eval=FALSE}
+
+# Take searches, filter for year and cf==0 and limit only to where searches took place
+
+search_p<- search%>%
+  left_join(stops%>%select(stop_id, Year, stop_in_response_to_cfs ))%>%
+  filter(Year=='2022' & stop_in_response_to_cfs == 0)%>%
+mutate_all(na_if,"")%>%
+  filter(!is.na(basis_for_search))%>%
+  select(Year, stop_id, person_id, basis_for_search)%>%
+  group_by(stop_id, person_id)%>%
+  mutate(did_search_occur=1)
+
+# Grab  contraband and filter for year and where cfs ==0
+
+contra_p<-contra%>%
+  left_join(stops%>%select(stop_id, Year, stop_in_response_to_cfs ))%>%
+  filter(Year=='2022' & stop_in_response_to_cfs == 0)%>%
+  select(Year, stop_id, person_id, contraband)
+
+# join both tables together
+
+hitrate<-full_join(search_p, contra_p)%>%
+  m
+
+  
+
+
+```
 
 # Demographics of Stops
 
 ## Stops by age
 
+Note that the numbers might be slightly inflated because there are some people that are indicated as having more than 1 perceived age. But for the purposes of this descriptive analysis we want to see general trends and are OK with some duplicates for the time being. 
+
+```{r}
+
+# take persons filter for year/cfs, and create age brackets out of perceived age
+
+person_age<-person%>%
+  left_join(stops%>%select(stop_id, Year, assignment, stop_in_response_to_cfs ))%>%
+  filter(Year=='2022' & stop_in_response_to_cfs == 0)%>%
+  select(stop_id, person_id, Year, assignment, perceived_age)%>%
+  mutate(age_bracket=ifelse(perceived_age <=18, '18 and under',
+                      ifelse(perceived_age <=24 & perceived_age>18, '19-24',
+                       ifelse(perceived_age <=34 & perceived_age>24, '25-34',
+                        ifelse(perceived_age <=44 & perceived_age>34, '35-44',
+                       ifelse(perceived_age <=54 & perceived_age>44, '45-54',
+                        ifelse(perceived_age <=64 & perceived_age>54, '55-64',
+                                ifelse(perceived_age >=65, '65 and older', 'Blank'))))))))
+
+# calculate rates for all units
+
+  person__age_allunit<-person_age%>%
+    mutate(Total=n())%>%
+    group_by(age_bracket)%>%
+      mutate(Count=n(),
+           Percent=Count/Total*100)%>%
+  slice(1)%>%
+   select(-c(stop_id, person_id, perceived_age, assignment))%>%
+  rename( 'Age'='age_bracket')%>%
+  # arrange(-Percent)%>%
+  mutate(Assignment='All units')%>% 
+  relocate(Assignment, .after = Year)
+  
+  # calculate rate for gang suppression unit only
+
+   person_age_gu<-person_age%>%
+     filter(assignment == 'Gang enforcement')%>%
+    mutate(Total=n())%>%
+    group_by(age_bracket)%>%
+      mutate(Count=n(),
+           Percent=Count/Total*100)%>%
+  slice(1)%>%
+   select(-c(stop_id, person_id, perceived_age))%>%
+  rename( 'Age'='age_bracket',
+          'Assignment'='assignment')
+  
+  
+# final combine
+   
+   df<-rbind(person__age_allunit, person_age_gu)
+   
+# create table
+
+  flextable(df) %>% 
+colformat_double(j = c("Percent"), digits = 1)%>% 
+  set_caption('Total and Rate of Officer-Initiated Stops by Age Group') %>% 
+  theme_vanilla() %>%
+  width(j=2,1.5,unit="in")
+
+
+
+```
+
 ## Stops by race
 
 ```{r}
 
+#### All Units level analysis ####
+
+# calculate rates for all units: nh_race 
+
+  race_allunit_nh<-race%>%
+  left_join(stops%>%select(stop_id, Year, assignment, stop_in_response_to_cfs ))%>%
+  filter(Year=='2022' & stop_in_response_to_cfs == 0)%>%
+  select(Year, nh_race)%>%
+    mutate(Total=n())%>%
+    group_by(nh_race)%>%
+      mutate(Count=n(),
+           Percent=Count/Total*100)%>%
+  slice(1)%>%
+  rename( 'Race'='nh_race')%>%
+  arrange(-Percent)%>%
+  mutate(Assignment='All units')%>% 
+  relocate(Assignment, .after = Year)%>%
+  filter(!grepl('nh_mesa|nh_aian|nh_nhpi', Race))%>%
+  drop_na(Race) # drop the row where nh_race = NA because that is for the people with 5+ perceived number of races who were recoded tonh_race = NULL
+
+# calculate rates for all units: mesa/aian/nhpi
+
+ race_allunit_other<-race%>%
+  left_join(stops%>%select(stop_id, Year, assignment, stop_in_response_to_cfs ))%>%
+  filter(Year=='2022' & stop_in_response_to_cfs == 0)%>%
+  select(Year, mesa_flag, aian_flag, nhpi_flag)%>%
+    mutate(Total=n())%>%
+  summarise(Year, 
+            Total,
+            mesa=sum(mesa_flag, na.rm=TRUE),
+            nhpi=sum(nhpi_flag, na.rm=TRUE),
+            aian=sum(aian_flag, na.rm=TRUE))%>%
+   pivot_longer(3:5, names_to = "Race", values_to="Count" )%>%
+   group_by(Race)%>%
+   slice(1)%>%
+   mutate(Percent=Count/Total*100)%>%
+   mutate(Assignment='All units')
+ 
+ 
+ # fix order of columns
+ race_allunit_other<-race_allunit_other[,c(1,6,3,2,4,5)]
+ 
+ # combine: 
+ 
+ race_allunit<-rbind(race_allunit_nh, race_allunit_other)%>%
+   arrange(-Percent)
+ 
+ #### Gang Suppression Unit only analysis ####
+ 
+ # calculate rate/count for nh_race only for gang suppression unit
+
+  race_gu_nh<-race%>%
+  left_join(stops%>%select(stop_id, Year, assignment, stop_in_response_to_cfs ))%>%
+  filter(Year=='2022' & stop_in_response_to_cfs == 0 & assignment == 'Gang enforcement')%>%
+  select(Year, nh_race, assignment)%>%
+    mutate(Total=n())%>%
+    group_by(nh_race)%>%
+      mutate(Count=n(),
+           Percent=Count/Total*100)%>%
+  slice(1)%>%
+  rename( 'Race'='nh_race')%>%
+  arrange(-Percent)%>%
+   rename('Assignment'='assignment')%>%
+     relocate(Assignment, .after = Year)%>%
+  filter(!grepl('nh_mesa|nh_aian|nh_nhpi', Race))%>%
+  drop_na(Race) # drop the row where nh_race = NA because that is for the people with 5+ perceived number of races who were recoded tonh_race = NULL
+ 
+ 
+ # calculate rates for all units: mesa/aian/nhpi
+
+ race_gu_other<-race%>%
+  left_join(stops%>%select(stop_id, Year, assignment, stop_in_response_to_cfs ))%>%
+ filter(Year=='2022' & stop_in_response_to_cfs == 0 & assignment == 'Gang enforcement')%>%  select(Year, assignment, mesa_flag, aian_flag, nhpi_flag)%>%
+    mutate(Total=n())%>%
+  summarise(Year, 
+            assignment,
+            Total,
+            mesa=sum(mesa_flag, na.rm=TRUE),
+            nhpi=sum(nhpi_flag, na.rm=TRUE),
+            aian=sum(aian_flag, na.rm=TRUE))%>%
+   pivot_longer(4:6, names_to = "Race", values_to="Count" )%>%
+   group_by(Race)%>%
+   slice(1)%>%
+   mutate(Percent=Count/Total*100)%>%
+   rename('Assignment'='assignment')
+ 
+  # fix order of columns
+ race_gu_other<-race_gu_other[,c(1,2,4,3,5,6)]
+ 
+ # combine:
+ 
+ race_gu<-rbind(race_gu_nh, race_gu_other)%>%
+   arrange(-Percent)
+ 
+ #### Final combine and visualize table ####
+ 
+ # combine all units + gang suppression unit tables
+ 
+ df<-rbind(race_allunit, race_gu)
+ 
+ # create table
+
+  flextable(df) %>% 
+colformat_double(j = c("Percent"), digits = 1)%>% 
+  set_caption('Total and Rate of Officer-Initiated Stops by Race') %>% 
+  theme_vanilla() %>%
+  width(j=2,1.5,unit="in")
 
 
 ```
@@ -331,3 +602,4 @@ colformat_double(j = c("Percent"), digits = 1)%>%
 
 # Map
 
+Map of stop counts by police beat and for Gang Suppression Unit/Special Operations Unit. 
