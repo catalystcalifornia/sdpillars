@@ -77,9 +77,6 @@ Before engaging in detailed analysis regarding the project’s research question
 
 General counts and percents of SDPD stops by key fields in RIPA data, e.g., stop reason, stop result, calls for service, race, age, searches, officer assignment. 
 
-General counts and percents of stops by Gang Suppression Unit and Special Operations Unit (if available) by key fields in RIPA data, e.g., stop reason, stop result, calls for service, race, age, searches. 
-
-
 # Calls for Service versus Officer-initiated
 
 Analysis cut by all unit types:
@@ -228,7 +225,7 @@ colformat_double(j = c("Percent"), digits = 1)%>%
 ```
 
 
-# Stop Reason and Rersults
+# Stop Reason and Results
 
 ## Stops by stop reason
 
@@ -395,6 +392,8 @@ colformat_double(j = c("Percent"), digits = 1)%>%
 
 ## Hit Rates
 
+Analyze, out of all stops that resulted in a search, what the resulting action of those stops were. Note there will be a slight over count because people can be searched for more than 1 search type, resulting in a double count. People who have been searched can also have more than one result. We are ok with the slight over count for now as we gauge general trends. 
+
 ```{r, include=FALSE, eval=FALSE}
 
 # Take searches, filter for year and cf==0 and limit only to where searches took place
@@ -403,22 +402,26 @@ search_p<- search%>%
   left_join(stops%>%select(stop_id, Year, stop_in_response_to_cfs ))%>%
   filter(Year=='2022' & stop_in_response_to_cfs == 0)%>%
 mutate_all(na_if,"")%>%
-  filter(!is.na(basis_for_search))%>%
+   filter(!is.na(basis_for_search))%>%
   select(Year, stop_id, person_id, basis_for_search)%>%
-  group_by(stop_id, person_id)%>%
-  mutate(did_search_occur=1)
+   # group_by(stop_id, person_id)%>%
+  mutate(did_search_occur=1)%>%
+  mutate(Total=sum(did_search_occur))
 
 # Grab  contraband and filter for year and where cfs ==0
 
 contra_p<-contra%>%
   left_join(stops%>%select(stop_id, Year, stop_in_response_to_cfs ))%>%
   filter(Year=='2022' & stop_in_response_to_cfs == 0)%>%
-  select(Year, stop_id, person_id, contraband)
+  select(Year, stop_id, person_id, contraband)%>%
+  mutate(search_total=21588)%>%
+  group_by(contraband)%>%
+  mutate(contra_count=n(),
+         rate=contra_count/search_total*100)
 
 # join both tables together
 
-hitrate<-full_join(search_p, contra_p)%>%
-  m
+hitrate<-left_join(search_p, contra_p)
 
   
 
