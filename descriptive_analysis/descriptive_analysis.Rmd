@@ -34,6 +34,10 @@ library(magrittr)
 #library(leaflegend) # customize legends to change shapes:: commenting out because not needed for high injury network maps for now
 library(flextable)
 library(htmlwidgets)
+library(sf)
+library(leaflet)
+library(sp)
+library(htmltools) # for html escape
 
 #add function that better fits the tables to the page    
     FitFlextableToPage <- function(ft, pgwidth = 6.5){
@@ -63,6 +67,9 @@ result<-dbGetQuery(con, "SELECT * FROM rel_stopresult")
 search<-dbGetQuery(con, "SELECT * FROM rel_basis_search")
 contra<-dbGetQuery(con, "SELECT * FROM rel_contrabands_evidences")
 race<-dbGetQuery(con, "SELECT * FROM rel_races_recode")
+beats<-st_read(con, query = "SELECT * FROM sangis_sdpd_beats_2023")%>%
+  mutate(beat=as.character(beat))
+
 
 ```
 
@@ -602,4 +609,54 @@ colformat_double(j = c("Percent"), digits = 1)%>%
 
 # Map
 
-Map of stop counts by police beat and for Gang Suppression Unit/Special Operations Unit. 
+Map of officer-initiated stop counts in 2022 by police beat and for Gang Suppression Unit/Special Operations Unit. 
+
+```{r}
+
+# first join stops data to police beats geom to create all-units layer
+
+beats_allunit<-stops%>%
+   filter(Year=='2022' & stop_in_response_to_cfs == 0)%>%
+  left_join(beats, by=c("beat"="beat"))%>%
+  select(-20)%>%
+  group_by(name)%>%
+  summarise(Year, name, count=n(),
+             geom)%>%
+  slice(1)
+
+# then create the gang suppression unit layer
+
+
+beats_gu<-stops%>%
+   filter(Year=='2022' & stop_in_response_to_cfs == 0 & assignment == 'Gang enforcement')%>%
+  left_join(beats, by=c("beat"="beat"))%>%
+  select(-20)
+
+# set palette
+cc_brand <- c("#E2D9FF", "#BDAFE9","#8E7ACA", "#362178","#211447")
+
+
+# set popups 
+
+
+
+# map
+
+
+leaflet(width = "100%", height = "600px") %>%
+  
+
+  #  all-units layer
+  addPolygons(data = beats_allunit,  label=~htmlEscape(paste0("Assignment: All units<br>Beat name: ", beats_allunit$name)), color = "#444444", weight = 2, smoothFactor = 0.5,  opacity = 1, fillOpacity = 0.5,  fillColor = ~pal_total(total_traffic_stop_rate),
+              popup = ~paste0(total_traffic_rate_popup), highlight = highlightOptions(color = "white", weight = 3, bringToFront = FALSE), group = "Council Districts") %>%
+  
+  # gang suppression unit layer
+  
+    addPolygons(data = beats_gu,  label=~htmlEscape(paste0("Council District ", council_num)), color = "#444444", weight = 2, smoothFactor = 0.5,  opacity = 1, fillOpacity = 0.5,  fillColor = ~pal_total(total_traffic_stop_rate),
+              popup = ~paste0(total_traffic_rate_popup), highlight = highlightOptions(color = "white", weight = 3, bringToFront = FALSE), group = "Council Districts") %>%
+  
+
+
+
+
+```
