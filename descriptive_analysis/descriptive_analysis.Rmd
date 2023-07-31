@@ -607,22 +607,31 @@ colformat_double(j = c("Percent"), digits = 1)%>%
 ```
 
 
-# Map
+# Map of Officer-Initiated Stops
 
-Map of officer-initiated stop counts in 2022 by police beat and for Gang Suppression Unit/Special Operations Unit. 
+Map of officer-initiated stop counts in 2022 by police beat and for All Units and for Gang Suppression Unit. 
 
 ```{r}
 
-# first join stops data to police beats geom to create all-units layer
+#### All Units Layer ####
+
+# first summarise count of stops per beat for all units
 
 beats_allunit<-stops%>%
    filter(Year=='2022' & stop_in_response_to_cfs == 0)%>%
   left_join(beats, by=c("beat"="beat"))%>%
   select(-20)%>%
   group_by(name)%>%
-  summarise(Year, name, count=n(),
-             geom)%>%
+  summarise(Year, name, count=n(), geom)%>%
   slice(1)
+
+# convert back to sf object and project for leafjet
+
+beats_allunit<-st_as_sf(beats_allunit)%>%
+  st_transform(4326)
+
+
+#### Gang suppression unit layer ####
 
 # then create the gang suppression unit layer
 
@@ -630,13 +639,49 @@ beats_allunit<-stops%>%
 beats_gu<-stops%>%
    filter(Year=='2022' & stop_in_response_to_cfs == 0 & assignment == 'Gang enforcement')%>%
   left_join(beats, by=c("beat"="beat"))%>%
-  select(-20)
+  select(-20)%>%
+   group_by(name)%>%
+  summarise(Year, name, count=n(),
+             geom)%>%
+  slice(1)
+
+# convert back to sf object and project for leafjet
+
+beats_gu<-st_as_sf(beats_gu)%>%
+  st_transform(4326)
+
+#### Map ####
 
 # set palette
 cc_brand <- c("#E2D9FF", "#BDAFE9","#8E7ACA", "#362178","#211447")
 
+#palette purples
+pal <- colorQuantile(cc_brand,beats_allunit$count, n = 5)
 
-# set popups 
+pal_allunit<-colorBin(
+  palette =cc_brand,
+  domain = beats_allunit$count,
+  bins=c(0,300,600,900,Inf),
+   na.color = NA
+)
+
+pal_gu<-colorBin(
+  palette =cc_brand,
+  domain = beats_gu$count,
+  bins=c(0,5,10,Inf),
+   na.color = NA
+)
+
+# popups
+
+popup_allunit<-paste0("Assignment: All Units","<br>","Beat Name: ",beats_allunit$name,"<br>","Stop count: ", beats_allunit$count)
+
+popup_gu<-paste0("Assignment: Gang Suppression Unit","<br>","Beat Name: ",beats_gu$name,"<br>","Stop count: ", beats_gu$count)
+
+# legend label
+
+labels_allunit<- c( "0-300", "300-600", "600-900", "Greater than 900")
+labels_gu<- c( "0-5", "5-10", "Greater than 10")
 
 
 
@@ -645,18 +690,46 @@ cc_brand <- c("#E2D9FF", "#BDAFE9","#8E7ACA", "#362178","#211447")
 
 leaflet(width = "100%", height = "600px") %>%
   
+  addMapPane("gu_pane", zIndex=485)%>%
+  addMapPane("allunit_pane", zIndex=485)%>%
+  
 
   #  all-units layer
-  addPolygons(data = beats_allunit,  label=~htmlEscape(paste0("Assignment: All units<br>Beat name: ", beats_allunit$name)), color = "#444444", weight = 2, smoothFactor = 0.5,  opacity = 1, fillOpacity = 0.5,  fillColor = ~pal_total(total_traffic_stop_rate),
-              popup = ~paste0(total_traffic_rate_popup), highlight = highlightOptions(color = "white", weight = 3, bringToFront = FALSE), group = "Council Districts") %>%
+  
+  addPolygons(data = beats_allunit,  label=~htmlEscape(paste0("Beat name: ", beats_allunit$name)), color = "#444444", weight = 1, smoothFactor = 0.5,  opacity = 1, fillOpacity =1,  fillColor = ~pal_allunit(beats_allunit$count),
+               popup = ~paste0(popup_allunit), 
+              highlight = highlightOptions(color = "white", weight = 3, bringToFront = FALSE), group = "All Units",
+               options = pathOptions(pane = "allunit_pane")) %>%
   
   # gang suppression unit layer
   
-    addPolygons(data = beats_gu,  label=~htmlEscape(paste0("Council District ", council_num)), color = "#444444", weight = 2, smoothFactor = 0.5,  opacity = 1, fillOpacity = 0.5,  fillColor = ~pal_total(total_traffic_stop_rate),
-              popup = ~paste0(total_traffic_rate_popup), highlight = highlightOptions(color = "white", weight = 3, bringToFront = FALSE), group = "Council Districts") %>%
+    addPolygons(data = beats_gu,  label=~htmlEscape(paste0("Beat name: ",beats_gu$name)), color = "#444444", weight = 1, smoothFactor = 0.5,  opacity = 1, fillOpacity =1,  fillColor = ~pal_gu(beats_gu$count),
+               popup = ~paste0(popup_gu),
+              highlight = highlightOptions(color = "white", weight = 3, bringToFront = FALSE), group = "Gang Suppression Unit",
+              options = pathOptions(pane = "gu_pane")) %>%
   
 
+ ## add legends for stop count for each layer
+  
+  addLegend(position = "bottomleft", pal = pal_allunit, values = beats_allunit$count, opacity = .5, title = "All Units", na.label = NA,
+            group="All Units",
+             labFormat= function(type, cuts, p) {  
+                                                  paste0(labels_allunit)
+                             }) %>%
 
+  addLegend(position = "bottomleft", pal = pal_gu, values = beats_gu$count, opacity = .5, title = "Gang Suppression Unit", na.label = NA, group="Gang Suppression Unit",
+             labFormat= function(type, cuts, p) {  
+                                                  paste0(labels_gu)
+                             }) %>%
 
+  # layer control
+  
+   addLayersControl(overlayGroups = c("All Units","Gang Suppression Unit"),
+                   options = layersControlOptions(collapsed = FALSE),
+                   position = 'topright')%>%
+  
+  #base and view
+  
+  addProviderTiles("CartoDB.Positron")
 
 ```
