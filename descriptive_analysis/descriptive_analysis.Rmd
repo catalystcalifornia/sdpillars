@@ -612,7 +612,7 @@ colformat_double(j = c("Percent"), digits = 1)%>%
 
 # Map of Officer-Initiated Stops
 
-Map of officer-initiated stop counts in 2022 by police beat and for All Units and for Gang Suppression Unit. 
+Map of officer-initiated stop counts in 2022 by police beat and for All Units and for Gang Enforcement Unit. 
 
 ```{r}
 
