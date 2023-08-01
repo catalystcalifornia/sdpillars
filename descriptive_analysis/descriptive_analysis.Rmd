@@ -69,6 +69,8 @@ contra<-dbGetQuery(con, "SELECT * FROM rel_contrabands_evidences")
 race<-dbGetQuery(con, "SELECT * FROM rel_races_recode")
 beats<-st_read(con, query = "SELECT * FROM sangis_sdpd_beats_2023")%>%
   mutate(beat=as.character(beat))
+div<-dbGetQuery(con, "SELECT * FROM sangis_sdpd_divisions_2023")%>%
+  select(-geom)
 
 
 ```
@@ -76,8 +78,6 @@ beats<-st_read(con, query = "SELECT * FROM sangis_sdpd_beats_2023")%>%
 Before engaging in detailed analysis regarding the project’s research questions, we ran general frequencies of SDPD stops to get a sense of overall trends. This helps us determine if our expected findings are likely to show up in the data and allows us to identify any trends we did not expect. The analysis includes: 
 
 General counts and percents of SDPD stops by key fields in RIPA data, e.g., stop reason, stop result, calls for service, race, age, searches, officer assignment. 
-
-It might be good to do another section that looks at differences by SDPD division for officer-initiated stops in 2022
 
 # Calls for Service versus Officer-initiated
 
@@ -156,6 +156,78 @@ colformat_double(j = c("Percent", "Average Stop Time (Mins)",'Median Stop Time (
 
 ```
 
+Analysis cut by SDPD division:
+
+```{r}
+
+# join divisions to the beats table just to get the full division name
+
+beats_div<-beats%>%
+  left_join(div%>%select(div_num, div_name), by=c("div"="div_num"))%>%
+  select(beat, name, div, div_name)%>%
+    as.data.frame()%>%
+  select(-geom)%>%
+  rename('beat_name' = 'name')%>%
+  group_by(beat, beat_name)%>%
+  slice(1)%>%
+  ungroup()
+
+# join updated beats-div crosswalk to stops data
+
+beats_stop<-stops%>%
+  left_join(beats_div%>%select(beat, div, div_name), by=c("beat"="beat"))
+
+# analyze data 
+
+# explore stops where div = NA. These look to be where beat = 999, Unknown 999 but lets confirm
+
+na<-beats_stop%>%
+  select(stop_id, Year, div_name, stop_in_response_to_cfs, stopduration)%>%
+  filter(Year=='2022')%>%
+  group_by(div_name)%>%
+  mutate(Total=n())%>%
+  group_by(div_name,stop_in_response_to_cfs)%>%
+  filter(is.na(div_name))%>%
+  left_join(stops%>%select(stop_id, beat))
+
+# table(na$beat) # there are mostly beat=999, which is unknown. There is also no beat=125 in the sdpd beats df. I think it is ok to recode these all to just 'unknown beat' 
+
+# move on to main analysis 
+
+df<-beats_stop%>%
+  select(stop_id, Year, div_name, stop_in_response_to_cfs, stopduration)%>%
+  filter(Year=='2022')%>%
+  group_by(div_name)%>%
+  mutate(Total=n())%>%
+  mutate(div_name=ifelse(is.na(div_name), 'UNKNOWN DIVISION', div_name))%>%
+  group_by(div_name,stop_in_response_to_cfs)%>%
+  mutate(Count=n(),
+         Percent=Count/Total*100,
+         'Average Stop Time (Mins)' = mean(stopduration, na.rm = FALSE),
+            'Median Stop Time (Mins)'=   median(stopduration,na.rm = FALSE),
+             'Min Stop Time (Mins)'=min(stopduration,na.rm = FALSE),
+            'Max Stop Time (Mins)'=max(stopduration,na.rm = FALSE),
+             'Total Time (Mins)'= sum(stopduration)
+         )%>%
+  slice(1)%>%
+  select(-c(stop_id, stopduration))%>%
+  mutate(stop_in_response_to_cfs=ifelse(stop_in_response_to_cfs %in% 0, 'No', 'Yes'))%>%
+  rename('Call for Service'='stop_in_response_to_cfs')%>%
+  rename('Division Name' = 'div_name')
+
+
+
+#create and style flextable
+
+  flextable(df) %>% 
+colformat_double(j = c("Percent", "Average Stop Time (Mins)",'Median Stop Time (Mins)',
+                       'Min Stop Time (Mins)','Max Stop Time (Mins)', 'Total Time (Mins)'), digits = 1)%>% 
+  set_caption('Stop Counts and Rates by Response to Service Call by Division') %>% 
+  theme_vanilla() 
+
+
+
+```
 
 ## Total Officer-Intiated Stops Over Time
 
@@ -196,7 +268,7 @@ count<-count%>%
   
 ```
 
-## Total Officer-Intiated Stops in 2022
+## Total Officer-Intiated Stops by Police Assignment
 
 ```{r}
 
@@ -222,6 +294,45 @@ colformat_double(j = c("Percent"), digits = 1)%>%
   set_caption('Total and Rate of Stops by Patrol Assignment Type in 2022') %>% 
   theme_vanilla() %>%
   width(j=2,2.5,unit="in")
+
+
+```
+
+## Total Officer-Intiated Stops by Police Division
+
+```{r}
+
+df<-beats_stop%>%
+  filter(Year == "2022")%>%
+  select(Year, stop_id, div_name, stop_in_response_to_cfs)%>%
+  group_by(div_name)%>%
+  mutate(Total=n())%>%
+  group_by(div_name, stop_in_response_to_cfs)%>%
+  summarise(Year,
+            Total=Total,
+            Count=n(),
+            Percent=Count/Total*100)%>%
+  slice(1)%>%
+    mutate(div_name=ifelse(is.na(div_name), 'UNKNOWN DIVISION', div_name))%>%
+  mutate(stop_in_response_to_cfs=ifelse(stop_in_response_to_cfs %in% 0, 'No', 'Yes'))%>%
+  rename('Call for Service'='stop_in_response_to_cfs')%>%
+  rename('Division Name'='div_name')%>%
+  relocate(Year, .before = "Division Name")
+
+
+#create and style flextable
+
+  flextable(df) %>% 
+colformat_double(j = c("Percent"), digits = 1)%>% 
+  set_caption('Total and Rate of Stops by Police Division in 2022') %>% 
+  theme_vanilla() %>%
+  width(j=2,2.3,unit="in")
+
+
+
+
+
+
 
 
 ```
