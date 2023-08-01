@@ -77,6 +77,8 @@ Before engaging in detailed analysis regarding the project’s research question
 
 General counts and percents of SDPD stops by key fields in RIPA data, e.g., stop reason, stop result, calls for service, race, age, searches, officer assignment. 
 
+It might be good to do another section that looks at differences by SDPD division for officer-initiated stops in 2022
+
 # Calls for Service versus Officer-initiated
 
 Analysis cut by all unit types:
@@ -225,7 +227,7 @@ colformat_double(j = c("Percent"), digits = 1)%>%
 ```
 
 
-# Stop Reason and Results
+# Stop Reasons and Results
 
 ## Stops by stop reason
 
@@ -392,9 +394,11 @@ colformat_double(j = c("Percent"), digits = 1)%>%
 
 ## Hit Rates
 
-Analyze, out of all stops that resulted in a search, what the resulting action of those stops were. Note there will be a slight over count because people can be searched for more than 1 search type, resulting in a double count. People who have been searched can also have more than one result. We are ok with the slight over count for now as we gauge general trends. 
+Analyze, out of all stops that resulted in a search, which searches resulted in at least one or more contraband being found, or no contraband being found at all.
 
-```{r, include=FALSE, eval=FALSE}
+```{r}
+
+#### All units analysis ####
 
 # Take searches, filter for year and cf==0 and limit only to where searches took place
 
@@ -404,26 +408,126 @@ search_p<- search%>%
 mutate_all(na_if,"")%>%
    filter(!is.na(basis_for_search))%>%
   select(Year, stop_id, person_id, basis_for_search)%>%
-   # group_by(stop_id, person_id)%>%
-  mutate(did_search_occur=1)%>%
-  mutate(Total=sum(did_search_occur))
+    group_by(stop_id, person_id)%>%
+  slice(1)%>%
+  ungroup()%>%
+  mutate(search_total=n())
 
-# Grab  contraband and filter for year and where cfs ==0
+# Grab  contraband and filter for year and where cfs ==0, and perform slice=1 to get only 1 person per row. So if person had multiple contraband found, have them only show up once
 
 contra_p<-contra%>%
   left_join(stops%>%select(stop_id, Year, stop_in_response_to_cfs ))%>%
   filter(Year=='2022' & stop_in_response_to_cfs == 0)%>%
   select(Year, stop_id, person_id, contraband)%>%
-  mutate(search_total=21588)%>%
-  group_by(contraband)%>%
-  mutate(contra_count=n(),
-         rate=contra_count/search_total*100)
+    group_by(stop_id, person_id)%>%
+slice(1)
 
+# now focus on those who had NO contraband found, need to join with search data because we need to exclude people who had no contraband found AND no search. We want to be left only with people who were searched + no contraband found
+
+contra_none<-contra_p%>%
+  filter(contraband=='None')%>%
+  left_join(search_p)%>%
+  filter(!is.na(basis_for_search))%>%
+  ungroup()%>%
+  mutate(Percent=n()/search_total*100)%>%
+  mutate(Year='2022',
+         Assignment='All units')%>%
+  rename('Contraband'='contraband',
+         'Search Total'='search_total') %>%
+  filter(row_number()==1)%>%
+  select(Year, Assignment, Contraband, 'Search Total', Percent)
+
+# Now lets focus on finding the rate of searches where 1 or more contraband were found
+
+# again, first join contraband to searches to remove instances where people were NOT searched but contraband was found
+
+contra_p<-contra_p%>%
+  filter(contraband!='None')%>%
+  left_join(search_p)%>%
+  filter(!is.na(basis_for_search))%>%
+  ungroup()%>%
+  mutate(Percent=n()/search_total*100)%>%
+  mutate(Year='2022',
+         Assignment='All units',
+         contraband=ifelse(contraband %in% 'Cell phone(s) or electronic device(s)', 'One or more contraband items', contraband))%>%
+  rename('Contraband'='contraband',
+         'Search Total'='search_total') %>%
+  filter(row_number()==1)%>%
+  select(Year, Assignment, Contraband, 'Search Total', Percent)
+  
 # join both tables together
 
-hitrate<-left_join(search_p, contra_p)
+hitrate_allunit<-rbind(contra_none, contra_p)
 
   
+#### Gang suppression unit ####
+
+# Take searches, filter for assignment,  year and cf==0 and limit only to where searches took place
+
+search_gu<- search%>%
+  left_join(stops%>%select(stop_id, Year, assignment, stop_in_response_to_cfs ))%>%
+  filter(Year=='2022' & stop_in_response_to_cfs == 0 & assignment == 'Gang enforcement')%>%
+mutate_all(na_if,"")%>%
+   filter(!is.na(basis_for_search))%>%
+  select(Year, stop_id, person_id, basis_for_search)%>%
+    group_by(stop_id, person_id)%>%
+  slice(1)%>%
+  ungroup()%>%
+  mutate(search_total=n())
+
+# Grab  contraband and filter for year and where cfs ==0, and perform slice=1 to get only 1 person per row. So if person had multiple contraband found, have them only show up once
+
+contra_gu<-contra%>%
+  left_join(stops%>%select(stop_id, Year, assignment, stop_in_response_to_cfs ))%>%
+  filter(Year=='2022' & stop_in_response_to_cfs == 0 & assignment == 'Gang enforcement')%>%
+  select(Year, assignment, stop_id, person_id, contraband)%>%
+    group_by(stop_id, person_id)%>%
+slice(1)
+
+# now focus on those who had NO contraband found, need to join with search data because we need to exclude people who had no contraband found AND no search. We want to be left only with people who were searched + no contraband found
+
+contra_none<-contra_gu%>%
+  filter(contraband=='None')%>%
+  left_join(search_gu)%>%
+  filter(!is.na(basis_for_search))%>%
+  ungroup()%>%
+  mutate(Percent=n()/search_total*100)%>%
+  rename('Contraband'='contraband',
+         'Search Total'='search_total',
+         'Assignment'='assignment') %>%
+  filter(row_number()==1)%>%
+  select(Year, Assignment, Contraband, 'Search Total', Percent)
+
+# Now lets focus on finding the rate of searches where 1 or more contraband were found
+
+# again, first join contraband to searches to remove instances where people were NOT searched but contraband was found
+
+contra_gu<-contra_gu%>%
+  filter(contraband!='None')%>%
+  left_join(search_gu)%>%
+  filter(!is.na(basis_for_search))%>%
+  ungroup()%>%
+  mutate(Percent=n()/search_total*100)%>%
+  mutate(contraband=ifelse(contraband %in% 'Firearm(s)',  'One or more contraband items', contraband))%>%
+  rename('Contraband'='contraband',
+         'Search Total'='search_total',
+         "Assignment"="assignment") %>%
+  filter(row_number()==1)%>%
+  select(Year, Assignment, Contraband, 'Search Total', Percent)
+  
+# join both tables together
+
+hitrate_gu<-rbind( contra_none, contra_gu)
+
+#### Final combine and visualize ####
+
+df<-rbind(hitrate_allunit, hitrate_gu)
+
+  flextable(df) %>% 
+colformat_double(j = c("Percent"), digits = 1)%>% 
+  set_caption('Hit Rate of Stops that Result in Searches') %>% 
+  theme_vanilla() %>%
+  width(j=3,2,unit="in")
 
 
 ```
