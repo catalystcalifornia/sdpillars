@@ -31,13 +31,13 @@ library(leaflet)
 library(sp)
 library(htmltools) # for html escape
 library(magrittr)
-#library(leaflegend) # customize legends to change shapes:: commenting out because not needed for high injury network maps for now
 library(flextable)
 library(htmlwidgets)
 library(sf)
 library(leaflet)
 library(sp)
 library(htmltools) # for html escape
+library(scales)
 
 #add function that better fits the tables to the page    
     FitFlextableToPage <- function(ft, pgwidth = 6.5){
@@ -78,6 +78,62 @@ div<-dbGetQuery(con, "SELECT * FROM sangis_sdpd_divisions_2023")%>%
 Before engaging in detailed analysis regarding the project’s research questions, we ran general frequencies of SDPD stops to get a sense of overall trends. This helps us determine if our expected findings are likely to show up in the data and allows us to identify any trends we did not expect. The analysis includes: 
 
 General counts and percents of SDPD stops by key fields in RIPA data, e.g., stop reason, stop result, calls for service, race, age, searches, officer assignment. 
+
+# Total Number of Stops and People Stopped
+
+In 2022, there were 86,632 unique stops. Of those stops, 79, 416 were officer-initiated stops. Gang enforcement made 420 unique stops in 2022. Of those stops, 397 were officer-initiated stops. 
+
+In 2022, 96,119 were stopped by SDPD. Gang enforcement stopped 508 people in 2022. 
+
+
+```{r}
+
+stop_tot<-stops%>%
+ filter(Year=='2022')%>%
+  group_by(stop_id)%>%
+  summarise(count=n())%>%
+  mutate(total=sum(count))
+
+stop_tot_cfs<-stops%>%
+ filter(Year=='2022' & stop_in_response_to_cfs == 0)%>%
+  group_by(stop_id)%>%
+  summarise(count=n())%>%
+  mutate(total=sum(count))
+
+stop_tot_gu<-stops%>%
+ filter(Year=='2022' & assignment =='Gang enforcement')%>%
+  group_by(stop_id)%>%
+  summarise(count=n())%>%
+  mutate(total=sum(count))
+
+
+stop_tot_gu_cfs<-stops%>%
+ filter(Year=='2022' & assignment =='Gang enforcement' & stop_in_response_to_cfs == 0)%>%
+  group_by(stop_id)%>%
+  summarise(count=n())%>%
+  mutate(total=sum(count))
+
+ppl_tot<-person%>%
+  # join stops table so we can filter for year / cfs
+  left_join(stops%>%select(stop_id, Year, stop_in_response_to_cfs, assignment ))%>%
+  filter(Year=='2022')%>%
+  group_by(stop_id, person_id)%>%
+  summarise(count=n())%>%
+  ungroup()%>%
+  mutate(total=sum(count))
+
+
+ppl_tot_gu<-person%>%
+  # join stops table so we can filter for year / cfs
+  left_join(stops%>%select(stop_id, Year, stop_in_response_to_cfs, assignment ))%>%
+  filter(Year=='2022' & assignment == 'Gang enforcement')%>%
+  group_by(stop_id, person_id)%>%
+  summarise(count=n())%>%
+  ungroup()%>%
+  mutate(total=sum(count))
+
+```
+
 
 # Calls for Service versus Officer-initiated
 
@@ -338,9 +394,9 @@ colformat_double(j = c("Percent"), digits = 1)%>%
 ```
 
 
-# Stop Reasons and Results
+# Stop Reasons
 
-## Stops by stop reason
+## Stop reason by police assignment
 
 ```{r}
 
@@ -430,11 +486,66 @@ colformat_double(j = c("Percent"), digits = 1)%>%
 
 ```
 
-## Stops by stop result
+## Stop reason by SDPD divisions
+
+```{r fig.height = 5, fig.width = 11.5}
+
+reason_div<-person%>%
+  
+  # join stops table so we can filter for year / cfs
+  
+  left_join(beats_stop%>%select(stop_id, Year, stop_in_response_to_cfs, div_name))%>%
+  filter(Year=='2022' & stop_in_response_to_cfs == 0)
+
+# double check the na division names
+
+na<-reason_div%>%
+  filter(is.na(div_name))%>%
+  left_join(stops%>%select(stop_id,  beat))
+
+# table(na$beat) # check what the beat numbers are that have NA division names
+
+# recode the NA division names and join to reasons table
+
+reason_div<-reason_div%>%
+  mutate(div_name=ifelse(is.na(div_name), 'UNKNOWN DIVISION', div_name)) %>%
+  
+  left_join(reason%>%
+              select(stop_id, person_id, reason_for_stop))
+
+# we can see that some people in reason_div show up more than once because, while the overarching stop_reason is the same there are unique details added. We said we are ok with keeping for now since it isn't that many and will be a slight overcount.
+
+df<-reason_div%>%
+  select(Year, div_name, reason_for_stop)%>%
+  group_by(div_name)%>%
+  mutate(Total=n())%>%
+  group_by(div_name, reason_for_stop)%>%
+  mutate(Count=n(),
+         Percent=Count/Total*100)%>%
+  arrange(-Percent)%>%
+  slice(1)%>%
+  filter(grepl('Traffic Violation|Reasonable Suspicion|Consensual Encounter resulting in a search', reason_for_stop))
+
+# graph
+
+ggplot(df, aes( x = reason_for_stop , y =  Percent) ) + 
+      geom_bar( stat = "identity", fill="#362178") + 
+  geom_text(aes( label = paste0(round(Percent, digits=1),"%" ),
+                 y= Percent),vjust = 1.4, size = 3, color = "white" )+
+      facet_wrap( ~ div_name, nrow=2) + 
+      xlab("")+
+    scale_x_discrete(labels = wrap_format(10))
+
+
+```
+
+# Stop Results
+
+## Stop result by police assignment
 
 ```{r}
 
-# calculate for all gang units
+# calculate for all units
 
 result_p<-person%>%
   
@@ -502,6 +613,8 @@ colformat_double(j = c("Percent"), digits = 1)%>%
 
 
 ```
+
+## Stop result by SDPD divisions
 
 ## Hit Rates
 
@@ -709,6 +822,9 @@ colformat_double(j = c("Percent"), digits = 1)%>%
 
 ```
 
+## Stops by age across SDPD divisions
+
+
 ## Stops by race
 
 ```{r}
@@ -824,6 +940,7 @@ colformat_double(j = c("Percent"), digits = 1)%>%
 
 ```
 
+## Stops by race across SDPD divisions
 
 # Map of Officer-Initiated Stops
 
