@@ -81,9 +81,9 @@ General counts and percents of SDPD stops by key fields in RIPA data, e.g., stop
 
 # Total Number of Stops and People Stopped
 
-In 2022, there were 86,632 unique stops. Of those stops, 79, 416 were officer-initiated stops. Gang enforcement made 420 unique stops in 2022. Of those stops, 397 were officer-initiated stops. 
+In 2022, there were __86,632 unique stops__. Of those stops, 79, 416 were officer-initiated stops. Gang enforcement made 420 unique stops in 2022. Of those stops, 397 were officer-initiated stops. 
 
-In 2022, 96,119 were stopped by SDPD. Gang enforcement stopped 508 people in 2022. 
+In 2022, __96,119 people__ were stopped by SDPD. Gang enforcement stopped 508 people in 2022. 
 
 
 ```{r}
