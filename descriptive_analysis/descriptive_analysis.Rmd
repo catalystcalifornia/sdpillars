@@ -83,7 +83,7 @@ General counts and percents of SDPD stops by key fields in RIPA data, e.g., stop
 
 In 2022, there were __86,632 unique stops__. Of those stops, 79, 416 were officer-initiated stops. Gang enforcement made 420 unique stops in 2022. Of those stops, 397 were officer-initiated stops. 
 
-In 2022, __96,119 people__ were stopped by SDPD. Gang enforcement stopped 508 people in 2022. 
+In 2022, __96,119 people__ were stopped by SDPD, __88,099__ of which were stopped for an officer-initiated stop. Gang enforcement stopped __508 people__ in 2022. Gang enforcement stopped __484 people__ for an officer-initiated stop.  
 
 
 ```{r}
@@ -122,11 +122,30 @@ ppl_tot<-person%>%
   ungroup()%>%
   mutate(total=sum(count))
 
+ppl_tot_offit<-person%>%
+  # join stops table so we can filter for year / cfs
+  left_join(stops%>%select(stop_id, Year, stop_in_response_to_cfs, assignment ))%>%
+  filter(Year=='2022' & stop_in_response_to_cfs==0)%>%
+  group_by(stop_id, person_id)%>%
+  summarise(count=n())%>%
+  ungroup()%>%
+  mutate(total=sum(count))
+
 
 ppl_tot_gu<-person%>%
   # join stops table so we can filter for year / cfs
   left_join(stops%>%select(stop_id, Year, stop_in_response_to_cfs, assignment ))%>%
   filter(Year=='2022' & assignment == 'Gang enforcement')%>%
+  group_by(stop_id, person_id)%>%
+  summarise(count=n())%>%
+  ungroup()%>%
+  mutate(total=sum(count))
+
+
+ppl_tot_gu_offit<-person%>%
+  # join stops table so we can filter for year / cfs
+  left_join(stops%>%select(stop_id, Year, stop_in_response_to_cfs, assignment ))%>%
+  filter(Year=='2022' & assignment == 'Gang enforcement' & stop_in_response_to_cfs==0)%>%
   group_by(stop_id, person_id)%>%
   summarise(count=n())%>%
   ungroup()%>%
@@ -224,8 +243,9 @@ beats_div<-beats%>%
     as.data.frame()%>%
   select(-geom)%>%
   rename('beat_name' = 'name')%>%
-  group_by(beat, beat_name)%>%
+  group_by(beat)%>%
   slice(1)%>%
+  mutate(beat_name=ifelse(beat %in% "511", 'BARRIO LOGAN', beat_name))%>% # there was a data entry error where beat=511 showed up twice, once with the beat_name included, and once where beat_name was NA. So I manually re-added the beat_name
   ungroup()
 
 # join updated beats-div crosswalk to stops data
@@ -242,7 +262,6 @@ na<-beats_stop%>%
   filter(Year=='2022')%>%
   group_by(div_name)%>%
   mutate(Total=n())%>%
-  group_by(div_name,stop_in_response_to_cfs)%>%
   filter(is.na(div_name))%>%
   left_join(stops%>%select(stop_id, beat))
 
@@ -488,11 +507,15 @@ colformat_double(j = c("Percent"), digits = 1)%>%
 
 ## Stop reason by SDPD divisions
 
-```{r fig.height = 5, fig.width = 11.5}
+The majority of SDPD divisions conduct officer-initiated stops for traffic violations, with the second most common officer-initiated stop being for reasonable suspicions. All SDPD divisions stop for consensual encounter resulting in a search less than 1% of the time. 
+
+Notably, the Southeastern division disproportionately stops for traffic violations relative to reasonable suspicion, along with the Northwestern and Northeastern divisions. 
+
+```{r fig.height = 7, fig.width = 13}
 
 reason_div<-person%>%
   
-  # join stops table so we can filter for year / cfs
+  # join person table  to beats/stop data so we can filter for year / cfs
   
   left_join(beats_stop%>%select(stop_id, Year, stop_in_response_to_cfs, div_name))%>%
   filter(Year=='2022' & stop_in_response_to_cfs == 0)
@@ -522,7 +545,7 @@ df<-reason_div%>%
   group_by(div_name, reason_for_stop)%>%
   mutate(Count=n(),
          Percent=Count/Total*100)%>%
-  arrange(-Percent)%>%
+  arrange(-Percent,  .by_group = TRUE)%>%
   slice(1)%>%
   filter(grepl('Traffic Violation|Reasonable Suspicion|Consensual Encounter resulting in a search', reason_for_stop))
 
@@ -531,10 +554,19 @@ df<-reason_div%>%
 ggplot(df, aes( x = reason_for_stop , y =  Percent) ) + 
       geom_bar( stat = "identity", fill="#362178") + 
   geom_text(aes( label = paste0(round(Percent, digits=1),"%" ),
-                 y= Percent),vjust = 1.4, size = 3, color = "white" )+
+                 y= Percent),vjust = 1.4, size = 4, color = "white",
+            fontface = "bold")+
       facet_wrap( ~ div_name, nrow=2) + 
       xlab("")+
-    scale_x_discrete(labels = wrap_format(10))
+  ylab("Percent of Officer-Initiated Stops (%)")+
+    scale_x_discrete(labels = wrap_format(10))+
+  theme_bw()+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size=12),
+        strip.background = element_rect(fill = "#362178"),
+        strip.text = element_text(color = "white", size=12, face="bold"),
+        panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+panel.background = element_blank())
 
 
 ```
@@ -615,6 +647,68 @@ colformat_double(j = c("Percent"), digits = 1)%>%
 ```
 
 ## Stop result by SDPD divisions
+
+```{r fig.height = 7, fig.width = 13}
+
+result_div<-person%>%
+  
+  # join person table to beats/stops data so we can filter for year / cfs
+  
+  left_join(beats_stop%>%select(stop_id, Year, stop_in_response_to_cfs, div_name))%>%
+  filter(Year=='2022' & stop_in_response_to_cfs == 0)
+
+# double check the na division names
+
+na<-result_div%>%
+  filter(is.na(div_name))%>%
+  left_join(stops%>%select(stop_id,  beat))
+
+# table(na$beat) # check what the beat numbers are that have NA division names
+
+# recode the NA division names and join to reasons table. We know that some people show up more than once (multiple rows) when joining the person-results table together because they are stopped and there was more than one result. Example: stop_id=504045. We are OK for now with the slight overcount. You can see that instead of 88,099 rows after joining the results table you get 95,543 because of the multiple results per person for some. 
+
+result_div<-result_div%>%
+  mutate(div_name=ifelse(is.na(div_name), 'UNKNOWN DIVISION', div_name)) %>%
+  
+  left_join(result%>%
+              select(stop_id, person_id, result))
+
+# analyze
+
+df<-result_div%>%
+  select(Year, div_name, result)%>%
+  group_by(div_name)%>%
+  mutate(Total=n())%>%
+  group_by(div_name, result)%>%
+  mutate(Count=n(),
+         Percent=Count/Total*100)%>%
+  arrange(-Percent,  .by_group = TRUE)%>%
+  slice(1)%>%
+  mutate(result=ifelse(result %in% 'Warning (verbal or written)','Warning',result))%>% # lets make the warning label shorter
+  filter(grepl('No Action|Field interview card completed|Citation for infraction|Warning', result))
+
+# graph
+
+ggplot(df, aes( x = result , y =  Percent) ) + 
+      geom_bar( stat = "identity", fill="#362178") + 
+  geom_text(aes( label = paste0(round(Percent, digits=1),"%" ),
+                 y= Percent),vjust = 1.4, size = 4, color = "white",
+             fontface = "bold")+
+      facet_wrap( ~ div_name, nrow=2) + 
+      xlab("")+
+  ylab("Percent of Officer-Initiated Stops (%)")+
+    scale_x_discrete(labels = wrap_format(20))+
+  theme_bw()+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size=15),
+        strip.background = element_rect(fill = "#362178"),
+        strip.text = element_text(color = "white", size=12, face="bold"),
+        panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+panel.background = element_blank())
+
+
+
+```
 
 ## Hit Rates
 
@@ -756,9 +850,9 @@ colformat_double(j = c("Percent"), digits = 1)%>%
 
 ```
 
-# Demographics of Stops
+# Age Demographics
 
-## Stops by age
+## Stops by age by poliice assignment 
 
 Note that the numbers might be slightly inflated because there are some people that are indicated as having more than 1 perceived age. But for the purposes of this descriptive analysis we want to see general trends and are OK with some duplicates for the time being. 
 
@@ -822,10 +916,52 @@ colformat_double(j = c("Percent"), digits = 1)%>%
 
 ```
 
-## Stops by age across SDPD divisions
+## Stops by age by SDPD divisions
 
+```{r fig.height = 7, fig.width = 13}
 
-## Stops by race
+# take the person_age table made in the previous code chunk already filtered for year/cfs and recoded age labels. Join to beats_stops to get division names
+
+age_div<-person_age%>%
+  left_join(beats_stop%>%select(stop_id, Year, stop_in_response_to_cfs, div_name))
+  
+# calculate rates 
+
+  df<-age_div%>%
+    group_by(div_name)%>%
+    mutate(Total=n())%>%
+    group_by(div_name, age_bracket)%>%
+      mutate(Count=n(),
+           Percent=Count/Total*100)%>%
+  slice(1)
+  
+# graph
+
+ggplot(df, aes( x = age_bracket , y =  Percent) ) + 
+      geom_bar( stat = "identity", fill="#362178") + 
+  geom_text(aes( label = paste0(round(Percent, digits=1),"%" ),
+                 y= Percent),vjust = 1.4, size = 3, color = "white",
+             fontface = "bold")+
+      facet_wrap( ~ div_name, nrow=2) + 
+      xlab("")+
+  ylab("Percent of Officer-Initiated Stops (%)")+
+    scale_x_discrete(labels = wrap_format(10))+
+  theme_bw()+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size=15),
+        strip.background = element_rect(fill = "#362178"),
+        strip.text = element_text(color = "white", size=12, face="bold"),
+        panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+panel.background = element_blank())
+
+  
+  
+
+```
+
+# Race/Ethnicity Demographics
+
+## Stops by race by police assignment
 
 ```{r}
 
@@ -940,7 +1076,97 @@ colformat_double(j = c("Percent"), digits = 1)%>%
 
 ```
 
-## Stops by race across SDPD divisions
+## Stops by race by SDPD divisions
+
+```{r fig.height = 7, fig.width = 13}
+
+# calculate rates for nh_race 
+
+  div_race_nh<-race%>%
+  left_join(beats_stop%>%select(stop_id, Year, beat, div_name, stop_in_response_to_cfs ))%>%
+  filter(Year=='2022' & stop_in_response_to_cfs == 0)
+
+# explore NA div names
+
+na<-div_race_nh%>%
+  filter(is.na(div_name))
+
+# table(na$beat) # what we've been seeing consistently
+
+# continue analysis and recode NA div names
+
+div_race_nh<-div_race_nh%>%
+  select(div_name, nh_race)%>%
+  mutate(div_name=ifelse(is.na(div_name), "UNKNOWN DIVISION", div_name))%>%
+  group_by(div_name)%>%
+    mutate(Total=n())%>%
+    group_by(div_name, nh_race)%>%
+      mutate(Count=n(),
+           Percent=Count/Total*100)%>%
+  slice(1)%>%
+  rename( 'Race'='nh_race')%>%
+  filter(!grepl('nh_mesa|nh_aian|nh_nhpi', Race))%>%
+  drop_na(Race) # drop the row where nh_race = NA because that is for the people with 5+ perceived number of races who were recoded to nh_race = NULL
+
+
+# calculate rates for: mesa/aian/nhpi
+
+ div_race_other<-race%>%
+  left_join(beats_stop%>%select(stop_id, Year, div_name, stop_in_response_to_cfs ))%>%
+  filter(Year=='2022' & stop_in_response_to_cfs == 0)%>%
+  select(div_name, mesa_flag, aian_flag, nhpi_flag)%>%
+     mutate(div_name=ifelse(is.na(div_name), "UNKNOWN DIVISION", div_name))%>%
+   group_by(div_name)%>%
+    mutate(Total=n())%>%
+  summarise( Total,
+            mesa=sum(mesa_flag, na.rm=TRUE),
+            nhpi=sum(nhpi_flag, na.rm=TRUE),
+            aian=sum(aian_flag, na.rm=TRUE))%>%
+   pivot_longer(3:5, names_to = "Race", values_to="Count" )%>%
+   group_by(div_name, Race)%>%
+   slice(1)%>%
+   mutate(Percent=Count/Total*100)
+ 
+
+ 
+ # combine: 
+ 
+ df<-rbind(div_race_nh, div_race_other)%>%
+   arrange(-Percent)
+ 
+ # modify race labels for graphing
+ 
+ df<-df%>%
+   mutate(Race=ifelse(Race %in% "nh_white", "White NH",
+                 ifelse(Race %in% "nh_black", "Black NH",   
+                        ifelse(Race %in% "latinx", "Latinx",
+                               ifelse(Race %in% "nh_asian", "Asian NH",
+                                      ifelse(Race %in% "mesa", "SSWANA",
+                                             ifelse(Race %in% "aian", "AIAN",
+                                                    ifelse(Race %in% "nhpi", "NHPI", "Multiracial"))))))))
+
+ # graph
+ 
+ ggplot(df, aes( x = Race , y =  Percent) ) + 
+      geom_bar( stat = "identity", fill="#362178") + 
+  geom_text(aes( label = paste0(round(Percent, digits=1),"%" ),
+                 y= Percent),vjust = -0.4, size = 4, color ="black", fontface="bold")+
+      facet_wrap( ~ div_name, nrow=2) + 
+      xlab("")+
+  ylab("Percent of Officer-Initiated Stops (%)")+
+    scale_x_discrete(labels = wrap_format(10))+
+  theme_bw()+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size=15),
+        strip.background = element_rect(fill = "#362178"),
+        strip.text = element_text(color = "white", size=15, face="bold"),
+        panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+panel.background = element_blank())
+
+ 
+
+
+```
 
 # Map of Officer-Initiated Stops
 
