@@ -75,15 +75,15 @@ div<-dbGetQuery(con, "SELECT * FROM sangis_sdpd_divisions_2023")%>%
 
 ```
 
-Before engaging in detailed analysis regarding the project’s research questions, we ran general frequencies of SDPD stops to get a sense of overall trends. This helps us determine if our expected findings are likely to show up in the data and allows us to identify any trends we did not expect. The analysis includes: 
+Before engaging in a detailed analysis of SDPD patrol activity as outlined in the research plan, we created this descriptive analysis to explore overall trends in the SDPD RIPA data. This helps us determine if our expected findings are likely to show up in the data and allows us to identify any trends we did not expect. The analysis includes: 
 
 General counts and percents of SDPD stops by key fields in RIPA data, e.g., stop reason, stop result, calls for service, race, age, searches, officer assignment. 
 
 # Total Number of Stops and People Stopped
 
-In 2022, there were __86,632 unique stops__. Of those stops, __79, 416 were officer-initiated stops.__ Gang enforcement made __420 unique stops__ in 2022. Of those stops, __397 were officer-initiated stops__. 
+In 2022, there were __86,632 unique police stops__. Of those stops, __79, 416 were officer-initiated stops.__ Gang enforcement made __420 unique stops__ in 2022. Of those stops, __397 were officer-initiated stops__. 
 
-In 2022, __96,119 people__ were stopped by SDPD, __88,099__ of which were stopped for an officer-initiated stop. Gang enforcement stopped __508 people__ in 2022. Gang enforcement stopped __484 people__ for an officer-initiated stop.  
+In 2022, __96,119 people__ were stopped by SDPD, __88,099__ of which were stopped for an officer-initiated stop. Gang enforcement stopped __508 people__ in 2022; __484 people__ were stopped for an officer-initiated stop.  
 
 
 ```{r}
@@ -155,6 +155,8 @@ ppl_tot_gu_offit<-person%>%
 
 
 # Calls for Service versus Officer-initiated
+
+The majority of officer time is spent on officer-initiated stops rather than calls for service. This is true across all officer unit types, as well as for the gang enforcement unit.
 
 Analysis cut by all unit types:
 
@@ -233,6 +235,8 @@ colformat_double(j = c("Percent", "Average Stop Time (Mins)",'Median Stop Time (
 
 Analysis cut by SDPD division:
 
+All SDPD divisions spent more than 90% of its time on officer-initiated stops, with the exception of Mid-City and Eastern which spent over 87% of patrol time on officer-initiated stops.
+
 ```{r}
 
 # join divisions to the beats table just to get the full division name
@@ -306,6 +310,10 @@ colformat_double(j = c("Percent", "Average Stop Time (Mins)",'Median Stop Time (
 
 ## Total Officer-Intiated Stops Over Time
 
+The number of officer-initiated stops across all police unit types peaked in 2019, with a slight decrease in 2020-2022. The COVID-19 pandemic directly impacted police activity, making it unsurprising that there were less stops conducted overall.
+
+The gang suppression unit has conducted less officer-initiated stops overtime, with a steep drop-off between 2021-2022. Notably, the gang enforcement unit made more officer-initiated stops in 2020 than in 2021 and 2022 combined. This suggests that the numbers are not driven by the COVID-19 pandemic but other reasons. Officers making gang enforcement stops might be doing it under the guise of a different unit assignment, resulting in the gang enforcement stops being under-counted. 
+
 ```{r}
 
 # calculate total number of officer initiated stops across all units
@@ -345,6 +353,8 @@ count<-count%>%
 
 ## Total Officer-Intiated Stops by Police Assignment
 
+Patrol, traffic enforcement, and field operations conduct the majority of officer-initiated stops, followed by the 'Other' unit category. While gang enforcement has the third highest rate of officer-initiated stops the overall count is low. This is most likely due to gang enforcement stops being conducted under a different unit assignment.
+
 ```{r}
 
 units22<-stops%>%
@@ -374,6 +384,8 @@ colformat_double(j = c("Percent"), digits = 1)%>%
 ```
 
 ## Total Officer-Intiated Stops by Police Division
+
+High rates of officer-initiated stops are consistent across all police divisions. 
 
 ```{r}
 
@@ -414,6 +426,8 @@ colformat_double(j = c("Percent"), digits = 1)%>%
 
 
 # Stop Reasons
+
+Traffic Violation is the most common stop reason for officer-initiated stops, followed by Reasonable Suspicion, across all police units and for the gang enforcement unit. However, nearly 70% of all officer-initiated stops conducted by the gang enforcement unit are for Traffic Violation, with only 24% being conducted for Reasonable Suspicion. Traffic Violation stops are a more significant majority of all gang enforcement stops. 
 
 ## Stop reason by police assignment
 
@@ -507,9 +521,9 @@ colformat_double(j = c("Percent"), digits = 1)%>%
 
 ## Stop reason by SDPD divisions
 
-The majority of SDPD divisions conduct officer-initiated stops for traffic violations, with the second most common officer-initiated stop being for reasonable suspicions. All SDPD divisions stop for consensual encounter resulting in a search less than 1% of the time. 
+The majority of SDPD divisions conduct officer-initiated stops for Traffic Violation, with the second most common officer-initiated stop being for Reasonable Suspicions. There is no third stop reason that has a rate comparable to Traffic Violation or Reasonable Suspicion.
 
-Notably, the Southeastern division disproportionately stops for traffic violations relative to reasonable suspicion, along with the Northwestern and Northeastern divisions. 
+Notably, the Southeastern division disproportionately stops for Traffic Violation relative to Reasonable Suspicion, along with the Northwestern and Northeastern divisions. 
 
 ```{r fig.height = 7, fig.width = 13}
 
@@ -574,6 +588,10 @@ panel.background = element_blank())
 # Stop Results
 
 ## Stop result by police assignment
+
+Across all police units, Citation for Infraction and Warning (verbal or written) are the most common stop results, at 27.5% and 25.8% respectively. These two stop results make up approximately half of all stop results. 
+
+The gang enforcement unit stop results do not mirror the trends across all police units. The most common stop result for a gang enforcement stop is Field Interview Card Completed, comprising of 40.2% of all stop results. Warning (verbal or written) has the second highest rate at 20.6%. 
 
 ```{r}
 
@@ -648,6 +666,8 @@ colformat_double(j = c("Percent"), digits = 1)%>%
 
 ## Stop result by SDPD divisions
 
+Stop result trends vary across SDPD divisions. 
+
 ```{r fig.height = 7, fig.width = 13}
 
 result_div<-person%>%
@@ -712,7 +732,7 @@ panel.background = element_blank())
 
 ## Hit Rates
 
-Analyze, out of all stops that resulted in a search, which searches resulted in at least one or more contraband being found, or no contraband being found at all.
+This analysis looks at what percentage of stops that resulted in a search produced contraband. Approximately 70% of all stops that result in a search do not produce any contraband across all police units and for gang enforcement stops. 
 
 ```{r}
 
@@ -854,9 +874,11 @@ colformat_double(j = c("Percent"), digits = 1)%>%
 
 ## Stops by age by poliice assignment 
 
-Note that the numbers might be slightly inflated because there are some people that are indicated as having more than 1 perceived age. But for the purposes of this descriptive analysis we want to see general trends and are OK with some duplicates for the time being. 
+The gang enforcement unit stops more individuals between the age of 18-34 compared to all police units. 
 
 ```{r}
+# Note that the numbers might be slightly inflated because there are some people that are indicated as having more than 1 perceived age. But for the purposes of this descriptive analysis we want to see general trends and are OK with some duplicates for the time being. 
+
 
 # take persons filter for year/cfs, and create age brackets out of perceived age
 
@@ -918,6 +940,8 @@ colformat_double(j = c("Percent"), digits = 1)%>%
 
 ## Stops by age by SDPD divisions
 
+The Southeastern and Northern divisions disproportionately stops individuals age 25-34 relative to other age groups. 
+
 ```{r fig.height = 7, fig.width = 13}
 
 # take the person_age table made in the previous code chunk already filtered for year/cfs and recoded age labels. Join to beats_stops to get division names
@@ -962,6 +986,8 @@ panel.background = element_blank())
 # Race/Ethnicity Demographics
 
 ## Stops by race by police assignment
+
+The gang enforcement unit disproportionately stops Black and Latinx individuals. 
 
 ```{r}
 
@@ -1061,9 +1087,16 @@ panel.background = element_blank())
  
  #### Final combine and visualize table ####
  
- # combine all units + gang suppression unit tables
+ # combine all units + gang suppression unit tables and create race labels
  
- df<-rbind(race_allunit, race_gu)
+ df<-rbind(race_allunit, race_gu)%>%
+   mutate(Race=ifelse(Race %in% "nh_white", "White NH",
+                 ifelse(Race %in% "nh_black", "Black NH",   
+                        ifelse(Race %in% "latinx", "Latinx",
+                               ifelse(Race %in% "nh_asian", "Asian NH",
+                                      ifelse(Race %in% "mesa", "SSWANA",
+                                             ifelse(Race %in% "aian", "AIAN",
+                                                    ifelse(Race %in% "nhpi", "NHPI", "Multiracial"))))))))
  
  # create table
 
@@ -1077,6 +1110,8 @@ colformat_double(j = c("Percent"), digits = 1)%>%
 ```
 
 ## Stops by race by SDPD divisions
+
+The Southeastern division disproportionately stops Black and Latinx individuals relative to other racial groups. The Souther division disproportionately stops Latinx individuals relative to other racial groups. 
 
 ```{r fig.height = 7, fig.width = 13}
 
@@ -1170,7 +1205,7 @@ panel.background = element_blank())
 
 # Map of Officer-Initiated Stops
 
-Map of officer-initiated stop counts in 2022 by police beat and for All Units and for Gang Enforcement Unit. 
+This map shows the count of officer-initiated stops in 2022 by police beat for all police units and for the gang enforcement unit.
 
 ```{r}
 
@@ -1186,7 +1221,7 @@ beats_allunit<-stops%>%
   summarise(Year, name, count=n(), geom)%>%
   slice(1)
 
-# convert back to sf object and project for leafjet
+# convert back to sf object and project for leaflet
 
 beats_allunit<-st_as_sf(beats_allunit)%>%
   st_transform(4326)
@@ -1210,6 +1245,18 @@ beats_gu<-stops%>%
 
 beats_gu<-st_as_sf(beats_gu)%>%
   st_transform(4326)
+
+
+### Divisional overlay ####
+
+# pull in divisional layer to create an overlay
+
+  
+div<-st_read(con, query = "SELECT * FROM sangis_sdpd_divisions_2023")
+
+# transform for leaflet
+
+div<- st_transform(div,4326)
 
 #### Map ####
 
@@ -1239,6 +1286,8 @@ popup_allunit<-paste0("Assignment: All Units","<br>","Beat Name: ",beats_allunit
 
 popup_gu<-paste0("Assignment: Gang Suppression Unit","<br>","Beat Name: ",beats_gu$name,"<br>","Stop count: ", beats_gu$count)
 
+div_popup<-paste0(div$div_name)
+
 # legend label
 
 labels_allunit<- c( "0-300", "300-600", "600-900", "Greater than 900")
@@ -1253,6 +1302,8 @@ leaflet(width = "100%", height = "600px") %>%
   
   addMapPane("gu_pane", zIndex=485)%>%
   addMapPane("allunit_pane", zIndex=485)%>%
+    addMapPane("div_pane", zIndex=485)%>%
+
   
 
   #  all-units layer
@@ -1269,6 +1320,14 @@ leaflet(width = "100%", height = "600px") %>%
               highlight = highlightOptions(color = "white", weight = 3, bringToFront = FALSE), group = "Gang Suppression Unit",
               options = pathOptions(pane = "gu_pane")) %>%
   
+  # divisional overlay
+  
+   addPolygons(data=div, color="#CEEA01", weight = 1.5, smoothFactor = 0.5,
+                label=~htmlEscape(paste0("Division name: ",div_popup)),
+  
+                           opacity = 1.0, fillOpacity = 0, group="SDPD Divisions",
+               options = pathOptions(pane = "div_pane"))%>%
+
 
  ## add legends for stop count for each layer
   
@@ -1285,9 +1344,13 @@ leaflet(width = "100%", height = "600px") %>%
 
   # layer control
   
-   addLayersControl(overlayGroups = c("All Units","Gang Suppression Unit"),
+   addLayersControl(overlayGroups = c("All Units","Gang Suppression Unit", "SDPD Divisions"),
                    options = layersControlOptions(collapsed = FALSE),
                    position = 'topright')%>%
+  
+  
+  #hide supervisorial districts by default
+  hideGroup( "SDPD Divisions")%>%
   
   #base and view
   
