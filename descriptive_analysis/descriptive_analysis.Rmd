@@ -733,13 +733,12 @@ panel.background = element_blank())
 
 ```
 
-## Hit Rates
+# Hit Rates
 
+## By police assignment
 This analysis looks at what percentage of stops that resulted in a search produced contraband. Approximately 70% of all stops that result in a search do not produce any contraband across all police units and for gang enforcement stops. 
 
 ```{r}
-
-#### All units analysis ####
 
 # bring in action table to filter for searches, while officers are supposed to record the basis for the search, this doesn't happen reliably
 actions<-dbGetQuery(con, "SELECT * FROM rel_actions")
@@ -793,6 +792,8 @@ search_contra_p<- search_contra_p%>%
   mutate(contraband_found=ifelse(count_contra<1,"None","One or more items found"))%>%
   ungroup()
 
+#### All units analysis ####
+
 # calculate hit rates for all units first
 contra_all<-search_contra_p%>%
   mutate(search_total=n())%>%
@@ -803,94 +804,26 @@ contra_all<-search_contra_p%>%
          Assignment='All units')%>%
   rename('Contraband'='contraband_found',
          'Search Total'='search_total') %>%
-  # filter(row_number()==1)%>%
   select(Year, Assignment, Contraband, 'Search Total', Percent)
 
-# Now lets focus on finding the rate of searches where 1 or more contraband were found
-
-# again, first join contraband to searches to remove instances where people were NOT searched but contraband was found
-
-contra_p<-contra_p%>%
-  filter(contraband!='None')%>%
-  left_join(search_p)%>%
-  filter(!is.na(basis_for_search))%>%
-  ungroup()%>%
-  mutate(Percent=n()/search_total*100)%>%
-  mutate(Year='2022',
-         Assignment='All units',
-         contraband=ifelse(contraband %in% 'Cell phone(s) or electronic device(s)', 'One or more contraband items', contraband))%>%
-  rename('Contraband'='contraband',
-         'Search Total'='search_total') %>%
-  filter(row_number()==1)%>%
-  select(Year, Assignment, Contraband, 'Search Total', Percent)
-  
-# join both tables together
-
-hitrate_allunit<-rbind(contra_none, contra_p)
-
-  
 #### Gang suppression unit ####
 
-# Take searches, filter for assignment,  year and cf==0 and limit only to where searches took place
-
-search_gu<- search%>%
-  left_join(stops%>%select(stop_id, Year, assignment, stop_in_response_to_cfs ))%>%
-  filter(Year=='2022' & stop_in_response_to_cfs == 0 & assignment == 'Gang enforcement')%>%
-mutate_all(na_if,"")%>%
-   filter(!is.na(basis_for_search))%>%
-  select(Year, stop_id, person_id, basis_for_search)%>%
-    group_by(stop_id, person_id)%>%
-  slice(1)%>%
-  ungroup()%>%
-  mutate(search_total=n())
-
-# Grab  contraband and filter for year and where cfs ==0, and perform slice=1 to get only 1 person per row. So if person had multiple contraband found, have them only show up once
-
-contra_gu<-contra%>%
-  left_join(stops%>%select(stop_id, Year, assignment, stop_in_response_to_cfs ))%>%
-  filter(Year=='2022' & stop_in_response_to_cfs == 0 & assignment == 'Gang enforcement')%>%
-  select(Year, assignment, stop_id, person_id, contraband)%>%
-    group_by(stop_id, person_id)%>%
-slice(1)
-
-# now focus on those who had NO contraband found, need to join with search data because we need to exclude people who had no contraband found AND no search. We want to be left only with people who were searched + no contraband found
-
-contra_none<-contra_gu%>%
-  filter(contraband=='None')%>%
-  left_join(search_gu)%>%
-  filter(!is.na(basis_for_search))%>%
-  ungroup()%>%
-  mutate(Percent=n()/search_total*100)%>%
-  rename('Contraband'='contraband',
-         'Search Total'='search_total',
-         'Assignment'='assignment') %>%
-  filter(row_number()==1)%>%
+# calculate hit rates for gang enforcement next
+contra_gu<-search_contra_p%>%
+  filter(assignment=='Gang enforcement')%>%
+  mutate(search_total=n())%>%
+  group_by(contraband_found)%>%
+  summarise(Percent=n()/min(search_total)*100,
+            search_total=min(search_total))%>%
+  mutate(Year='2022',
+         Assignment='Gang enforcement')%>%
+  rename('Contraband'='contraband_found',
+         'Search Total'='search_total') %>%
   select(Year, Assignment, Contraband, 'Search Total', Percent)
-
-# Now lets focus on finding the rate of searches where 1 or more contraband were found
-
-# again, first join contraband to searches to remove instances where people were NOT searched but contraband was found
-
-contra_gu<-contra_gu%>%
-  filter(contraband!='None')%>%
-  left_join(search_gu)%>%
-  filter(!is.na(basis_for_search))%>%
-  ungroup()%>%
-  mutate(Percent=n()/search_total*100)%>%
-  mutate(contraband=ifelse(contraband %in% 'Firearm(s)',  'One or more contraband items', contraband))%>%
-  rename('Contraband'='contraband',
-         'Search Total'='search_total',
-         "Assignment"="assignment") %>%
-  filter(row_number()==1)%>%
-  select(Year, Assignment, Contraband, 'Search Total', Percent)
-  
-# join both tables together
-
-hitrate_gu<-rbind( contra_none, contra_gu)
 
 #### Final combine and visualize ####
 
-df<-rbind(hitrate_allunit, hitrate_gu)
+df<-rbind(contra_all, contra_gu)
 
   flextable(df) %>% 
 colformat_double(j = c("Percent"), digits = 1)%>% 
@@ -901,6 +834,41 @@ colformat_double(j = c("Percent"), digits = 1)%>%
 
 ```
 
+## By SDPD division
+
+```{r}
+
+# calculate rates by division
+contra_div<-search_contra_p%>%
+  group_by(div_name)%>%
+  mutate(search_total=n())%>%
+  group_by(div_name,contraband_found)%>%
+  mutate(Count=n(),
+    Percent=Count/search_total*100)%>%
+arrange(-Percent,  .by_group = TRUE)%>%
+  slice(1)%>%
+  select(div_name,contraband_found,Percent)%>%
+  mutate(div_name=ifelse(is.na(div_name),"UNKNOWN DIVISION",div_name))
+
+# graph
+
+ggplot(contra_div, aes( x = contraband_found , y =  Percent) ) + 
+      geom_bar( stat = "identity", fill="#362178") + 
+  geom_text(aes( label = paste0(round(Percent, digits=1),"%" ),
+                 y= Percent),vjust = 1.4, size = 4, color = "white",
+             fontface = "bold")+
+      facet_wrap( ~ div_name, nrow=2) + 
+      xlab("")+
+  ylab("Percent of Searches by Contraband Found (%)")+
+    scale_x_discrete(labels = wrap_format(20))+
+  theme_bw()+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size=15),
+        strip.background = element_rect(fill = "#362178"),
+        strip.text = element_text(color = "white", size=12, face="bold"),
+        panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+panel.background = element_blank())
+```
 # Age Demographics
 
 ## Stops by age by poliice assignment 
