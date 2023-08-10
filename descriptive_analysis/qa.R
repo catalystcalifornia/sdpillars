@@ -51,3 +51,66 @@ reason_p%>%filter(is.na(reason_for_stop))%>%nrow()
 reason_p_dedup<-reason_p%>%
   group_by(stop_id,person_id,reason_for_stop,assignment)%>%
   summarise(duplicates=n())
+
+result_p_qa<-person%>%
+  
+  # join result table to person table so we can filter for year / cfs
+  
+  left_join(beats_stop%>%select(stop_id, Year, stop_in_response_to_cfs,assignment,div_name))%>%
+  filter(Year=='2022' & stop_in_response_to_cfs == 0)%>%
+  
+  # left join results -filtered for year/cfs - to get stop reason
+  
+  left_join(result%>%select(stop_id, person_id, result),by=c("stop_id","person_id"))%>%
+  
+  select(Year, stop_id, person_id, result,assignment,div_name)
+
+qa_total<-result_p_qa%>%
+  group_by(div_name)%>%
+  summarise(Total=n())
+
+qa<-result_p_qa%>%
+  left_join(qa_total,by=c("div_name"))%>%
+  group_by(result,div_name)%>%
+  summarise(Count=n(),
+            Percent=Count/min(Total)*100)
+
+# bring in action table
+actions<-dbGetQuery(con, "SELECT * FROM rel_actions")
+
+# filter for search actions
+actions_search<-actions%>%
+  filter(grepl('search|Search', action))
+
+search_dedup<-search%>%
+  mutate_all(na_if,"")%>%
+  filter(!is.na(basis_for_search))%>%
+  group_by(stop_id,person_id)%>%
+  summarise(count_basis=n())
+# a person can have more than 1 basis for a search
+
+#dedup search actions
+actions_search_dedup<-actions_search%>%
+  filter(consented!="N")%>%
+  group_by(stop_id,person_id)%>%
+  summarise(count_searches=n())
+
+#join to basis for the search, is it always captured?
+actions_basis<-actions_search_dedup%>%
+  full_join(search_dedup, by=c("stop_id","person_id"))
+
+sum(is.na(actions_basis$count_searches)) # 5 nulls based on actions of searches
+sum(is.na(actions_basis$count_basis)) # 9561 based on basis
+
+# nulls for count basis are people where consent was provided but no search was recorded--do they show up in contraband?
+
+contra_p<-contra%>%
+  filter(contraband!="None")%>%
+  group_by(stop_id, person_id)%>%
+  summarise(count_contra=n())
+
+actions_basis_contra<-actions_basis%>%
+  left_join(contra_p)
+
+actions_basis_contra%>%filter(is.na(count_basis) & !is.na(count_contra))%>%nrow()
+#1684 where contraband found but no search basis reported, use actions taken not basis for search

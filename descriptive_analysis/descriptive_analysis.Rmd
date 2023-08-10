@@ -741,41 +741,69 @@ This analysis looks at what percentage of stops that resulted in a search produc
 
 #### All units analysis ####
 
-# Take searches, filter for year and cf==0 and limit only to where searches took place
+# bring in action table to filter for searches, while officers are supposed to record the basis for the search, this doesn't happen reliably
+actions<-dbGetQuery(con, "SELECT * FROM rel_actions")
 
-search_p<- search%>%
-  left_join(stops%>%select(stop_id, Year, stop_in_response_to_cfs ))%>%
-  filter(Year=='2022' & stop_in_response_to_cfs == 0)%>%
-mutate_all(na_if,"")%>%
-   filter(!is.na(basis_for_search))%>%
-  select(Year, stop_id, person_id, basis_for_search)%>%
-    group_by(stop_id, person_id)%>%
-  slice(1)%>%
-  ungroup()%>%
-  mutate(search_total=n())
+# filter for search actions
+actions_search<-actions%>%
+  filter(grepl('search|Search', action))
 
-# Grab  contraband and filter for year and where cfs ==0, and perform slice=1 to get only 1 person per row. So if person had multiple contraband found, have them only show up once
+# dedup search actions
+actions_search_p<-actions_search%>%
+  filter(consented!="N")%>% # take out people where they were asked for a search but no consent provided
+  group_by(stop_id,person_id)%>%
+  summarise(count_searches=n())
 
-contra_p<-contra%>%
-  left_join(stops%>%select(stop_id, Year, stop_in_response_to_cfs ))%>%
-  filter(Year=='2022' & stop_in_response_to_cfs == 0)%>%
-  select(Year, stop_id, person_id, contraband)%>%
-    group_by(stop_id, person_id)%>%
-slice(1)
-
-# now focus on those who had NO contraband found, need to join with search data because we need to exclude people who had no contraband found AND no search. We want to be left only with people who were searched + no contraband found
-
-contra_none<-contra_p%>%
-  filter(contraband=='None')%>%
-  left_join(search_p)%>%
+# dedup basis for the search
+search_p<-search%>%
+  mutate_all(na_if,"")%>%
   filter(!is.na(basis_for_search))%>%
-  ungroup()%>%
-  mutate(Percent=n()/search_total*100)%>%
+  group_by(stop_id,person_id)%>%
+  summarise(count_basis=n())
+
+#join to basis for the search, is it always captured?
+actions_search_p<-actions_search_p%>%
+  full_join(search_p, by=c("stop_id","person_id"))
+
+sum(is.na(actions_search_p$count_searches)) # 5 nulls based on actions of searches
+sum(is.na(actions_search_p$count_basis)) # 9561 based on basis
+# use actions for search
+
+actions_search_p<-actions_search_p%>%
+  filter(!is.na(count_searches))
+
+# dedup contraband
+contra_p<-contra%>%
+  filter(contraband!="None")%>%
+  group_by(stop_id, person_id)%>%
+  summarise(count_contra=n())
+
+# join searches to contraband
+search_contra_p<-actions_search_p%>%
+  left_join(contra_p)
+
+# make NAs in contraband 0
+search_contra_p <- search_contra_p %>% 
+          mutate(count_contra = coalesce(count_contra, 0))
+
+# Take searches, filter for year and cf==0 and bring in assignment and division data
+search_contra_p<- search_contra_p%>%
+  left_join(beats_stop%>%select(stop_id, Year, stop_in_response_to_cfs,assignment,div_name))%>%
+  filter(Year=='2022' & stop_in_response_to_cfs == 0)%>%
+  mutate(contraband_found=ifelse(count_contra<1,"None","One or more items found"))%>%
+  ungroup()
+
+# calculate hit rates for all units first
+contra_all<-search_contra_p%>%
+  mutate(search_total=n())%>%
+  group_by(contraband_found)%>%
+  summarise(Percent=n()/min(search_total)*100,
+            search_total=min(search_total))%>%
   mutate(Year='2022',
          Assignment='All units')%>%
-  rename('Contraband'='contraband',
+  rename('Contraband'='contraband_found',
          'Search Total'='search_total') %>%
-  filter(row_number()==1)%>%
+  # filter(row_number()==1)%>%
   select(Year, Assignment, Contraband, 'Search Total', Percent)
 
 # Now lets focus on finding the rate of searches where 1 or more contraband were found
