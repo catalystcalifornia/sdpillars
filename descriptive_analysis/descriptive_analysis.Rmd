@@ -534,33 +534,28 @@ Notably, the Southeastern division disproportionately stops for Traffic Violatio
 
 ```{r fig.height = 7, fig.width = 13}
 
-reason_div<-person%>%
+reason_p_div<-reason_p_dedup%>%
   
-  # join person table  to beats/stop data so we can filter for year / cfs
+  # join unique person reason table  to beats and div
   
-  left_join(beats_stop%>%select(stop_id, Year, stop_in_response_to_cfs, div_name))%>%
-  filter(Year=='2022' & stop_in_response_to_cfs == 0)
+  left_join(beats_stop%>%select(stop_id,stop_in_response_to_cfs, div_name),by="stop_id")
 
 # double check the na division names
 
-na<-reason_div%>%
+na<-reason_p_div%>%
   filter(is.na(div_name))%>%
   left_join(stops%>%select(stop_id,  beat))
 
 # table(na$beat) # check what the beat numbers are that have NA division names
+# only 4 stops coded to 125 beat in Torrey Pines, consider adding these to Northern division later for now recode the NA division names and join to reasons table
 
-# recode the NA division names and join to reasons table
+reason_p_div<-reason_p_div%>%
+  mutate(div_name=ifelse(is.na(div_name), 'UNKNOWN DIVISION', div_name))
 
-reason_div<-reason_div%>%
-  mutate(div_name=ifelse(is.na(div_name), 'UNKNOWN DIVISION', div_name)) %>%
-  
-  left_join(reason%>%
-              select(stop_id, person_id, reason_for_stop))
+qa<-reason_p_div%>%filter(is.na(div_name))%>%nrow() # test it worked
 
-# we can see that some people in reason_div show up more than once because, while the overarching stop_reason is the same there are unique details added. We said we are ok with keeping for now since it isn't that many and will be a slight overcount.
-
-df<-reason_div%>%
-  select(Year, div_name, reason_for_stop)%>%
+df<-reason_p_div%>%
+  select(Year,div_name,reason_for_stop)%>%
   group_by(div_name)%>%
   mutate(Total=n())%>%
   group_by(div_name, reason_for_stop)%>%
@@ -568,7 +563,8 @@ df<-reason_div%>%
          Percent=Count/Total*100)%>%
   arrange(-Percent,  .by_group = TRUE)%>%
   slice(1)%>%
-  filter(grepl('Traffic Violation|Reasonable Suspicion|Consensual Encounter resulting in a search', reason_for_stop))
+  filter(grepl('Traffic Violation|Reasonable Suspicion|Knowledge of outstanding arrest warrant/wanted person', reason_for_stop))%>% # replace consent search with knowledge of arrest warrant given higher prevalence in the data
+  mutate(reason_for_stop=ifelse(reason_for_stop=='Knowledge of outstanding arrest warrant/wanted person', 'Knowledge of outstanding warrant',reason_for_stop))
 
 # graph
 
