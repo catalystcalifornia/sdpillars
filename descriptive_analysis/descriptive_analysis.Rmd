@@ -1007,7 +1007,7 @@ The gang enforcement unit disproportionately stops Black and Latinx individuals.
   arrange(-Percent)%>%
   mutate(Assignment='All units')%>% 
   relocate(Assignment, .after = Year)%>%
-  filter(!grepl('nh_mesa|nh_aian|nh_nhpi', Race))%>%
+  filter(!grepl('nh_sswana|nh_aian|nh_nhpi', Race))%>%
   drop_na(Race) # drop the row where nh_race = NA because that is for the people with 5+ perceived number of races who were recoded tonh_race = NULL
 
 # calculate rates for all units: mesa/aian/nhpi
@@ -1015,11 +1015,11 @@ The gang enforcement unit disproportionately stops Black and Latinx individuals.
  race_allunit_other<-race%>%
   left_join(stops%>%select(stop_id, Year, assignment, stop_in_response_to_cfs ))%>%
   filter(Year=='2022' & stop_in_response_to_cfs == 0)%>%
-  select(Year, mesa_flag, aian_flag, nhpi_flag)%>%
+  select(Year, sswana_flag, aian_flag, nhpi_flag)%>%
     mutate(Total=n())%>%
   summarise(Year, 
             Total,
-            mesa=sum(mesa_flag, na.rm=TRUE),
+            mesa=sum(sswana_flag, na.rm=TRUE),
             nhpi=sum(nhpi_flag, na.rm=TRUE),
             aian=sum(aian_flag, na.rm=TRUE))%>%
    pivot_longer(3:5, names_to = "Race", values_to="Count" )%>%
@@ -1054,7 +1054,7 @@ The gang enforcement unit disproportionately stops Black and Latinx individuals.
   arrange(-Percent)%>%
    rename('Assignment'='assignment')%>%
      relocate(Assignment, .after = Year)%>%
-  filter(!grepl('nh_mesa|nh_aian|nh_nhpi', Race))%>%
+  filter(!grepl('nh_sswana|nh_aian|nh_nhpi', Race))%>%
   drop_na(Race) # drop the row where nh_race = NA because that is for the people with 5+ perceived number of races who were recoded tonh_race = NULL
  
  
@@ -1062,12 +1062,12 @@ The gang enforcement unit disproportionately stops Black and Latinx individuals.
 
  race_gu_other<-race%>%
   left_join(stops%>%select(stop_id, Year, assignment, stop_in_response_to_cfs ))%>%
- filter(Year=='2022' & stop_in_response_to_cfs == 0 & assignment == 'Gang enforcement')%>%  select(Year, assignment, mesa_flag, aian_flag, nhpi_flag)%>%
+ filter(Year=='2022' & stop_in_response_to_cfs == 0 & assignment == 'Gang enforcement')%>%  select(Year, assignment, sswana_flag, aian_flag, nhpi_flag)%>%
     mutate(Total=n())%>%
   summarise(Year, 
             assignment,
             Total,
-            mesa=sum(mesa_flag, na.rm=TRUE),
+            mesa=sum(sswana_flag, na.rm=TRUE),
             nhpi=sum(nhpi_flag, na.rm=TRUE),
             aian=sum(aian_flag, na.rm=TRUE))%>%
    pivot_longer(4:6, names_to = "Race", values_to="Count" )%>%
@@ -1208,20 +1208,24 @@ This map shows the count of officer-initiated stops in 2022 by police beat for a
 
 ```{r}
 
+# prep beats sf so one feature per beat as to not duplicate/double counts per beat later
+beats_dissolve<-beats%>%
+  mutate(name=ifelse(beat=='511','BARRIO LOGAN',name))%>%
+  group_by(beat,name)%>%
+  summarise()
+  
 #### All Units Layer ####
 
 # first summarise count of stops per beat for all units
-
 beats_allunit<-stops%>%
    filter(Year=='2022' & stop_in_response_to_cfs == 0)%>%
-  left_join(beats, by=c("beat"="beat"))%>%
-  select(-20)%>%
-  group_by(name)%>%
-  summarise(Year, name, count=n(), geom)%>%
-  slice(1)
+  group_by(beat,beat_name)%>%
+  summarise(count=n())%>%
+  inner_join(beats_dissolve, by=c("beat"="beat"))%>%
+  ungroup
+# there are 2 beats in the beat sf (0,9) that have no stops assigned, and 2 beats in the stop data that have no spatial object La Jolla Village and La Playa
 
-# convert back to sf object and project for leaflet
-
+# convert for leaflet
 beats_allunit<-st_as_sf(beats_allunit)%>%
   st_transform(4326)
 
@@ -1229,26 +1233,36 @@ beats_allunit<-st_as_sf(beats_allunit)%>%
 #### Gang suppression unit layer ####
 
 # then create the gang suppression unit layer
-
-
 beats_gu<-stops%>%
    filter(Year=='2022' & stop_in_response_to_cfs == 0 & assignment == 'Gang enforcement')%>%
-  left_join(beats, by=c("beat"="beat"))%>%
-  select(-20)%>%
-   group_by(name)%>%
-  summarise(Year, name, count=n(),
-             geom)%>%
-  slice(1)
+  group_by(beat,beat_name)%>%
+  summarise(count=n())%>%
+  inner_join(beats_dissolve, by=c("beat"="beat"))%>%
+  ungroup
+# there are 2 beats in the beat sf (0,9) that have no stops assigned, and 2 beats in the stop data that have no spatial object La Jolla Village and La Playa
 
-# convert back to sf object and project for leafjet
-
+# convert for leaflet
 beats_gu<-st_as_sf(beats_gu)%>%
   st_transform(4326)
 
-
-### Divisional overlay ####
-
-# pull in divisional layer to create an overlay
+# beats_gu<-stops%>%
+#    filter(Year=='2022' & stop_in_response_to_cfs == 0 & assignment == 'Gang enforcement')%>%
+#   left_join(beats, by=c("beat"="beat"))%>%
+#   select(-20)%>%
+#    group_by(name)%>%
+#   summarise(Year, name, count=n(),
+#              geom)%>%
+#   slice(1)
+# 
+# # convert back to sf object and project for leafjet
+# 
+# beats_gu<-st_as_sf(beats_gu)%>%
+#   st_transform(4326)
+# 
+# 
+# ### Divisional overlay ####
+# 
+# # pull in divisional layer to create an overlay
 
   
 div<-st_read(con, query = "SELECT * FROM sangis_sdpd_divisions_2023")
@@ -1349,7 +1363,7 @@ leaflet(width = "100%", height = "600px") %>%
   
   
   #hide supervisorial districts by default
-  hideGroup( "SDPD Divisions")%>%
+  hideGroup( "SDPD Divisions","Gang Suppression Unit")%>%
   
   #base and view
   

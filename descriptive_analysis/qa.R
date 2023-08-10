@@ -114,3 +114,58 @@ actions_basis_contra<-actions_basis%>%
 
 actions_basis_contra%>%filter(is.na(count_basis) & !is.na(count_contra))%>%nrow()
 #1684 where contraband found but no search basis reported, use actions taken not basis for search
+
+actions_basis_contra%>%filter(is.na(count_searches) & !is.na(count_contra))%>%nrow()
+
+person_age%>%filter(is.na(perceived_age))
+
+min(person_age$perceived_age)
+
+max(person_age$perceived_age)
+
+median(person_age$perceived_age)
+
+View(person_age[c("perceived_age", "age_bracket")])
+
+qa_race<-race%>%
+  left_join(beats_stop, by="stop_id")%>%
+  filter(Year=='2022' & stop_in_response_to_cfs == 0)
+
+qa_all<-qa_race%>%
+  mutate(Total=n())%>%
+  group_by(nh_race)%>%
+  summarise(Percent=n()/min(Total)*100)
+
+qa_gu<-qa_race%>%filter(assignment=="Gang enforcement")%>%
+  mutate(Total=n())%>%
+  group_by(nh_race)%>%
+  summarise(Percent=n()/min(Total)*100)
+
+qa_all<-qa_race%>%
+  summarise(NHPI=sum(nhpi_flag,na.rm=TRUE),
+            SSWANA=sum(sswana_flag,na.rm=TRUE),
+            AIAN=sum(aian_flag,na.rm=TRUE))
+
+qa_gu<-qa_race%>%filter(assignment=="Gang enforcement")%>%
+  summarise(NHPI=sum(nhpi_flag,na.rm=TRUE),
+            SSWANA=sum(sswana_flag,na.rm=TRUE),
+            AIAN=sum(aian_flag,na.rm=TRUE))
+
+div_total<-qa_race%>%group_by(div_name)%>%
+  summarise(Total=n())
+
+qa<-qa_race%>%group_by(div_name)%>%
+  summarise(NHPI=sum(nhpi_flag,na.rm=TRUE),
+            SSWANA=sum(sswana_flag,na.rm=TRUE),
+            AIAN=sum(aian_flag,na.rm=TRUE))%>%
+  left_join(div_total, by="div_name")%>%
+  mutate(NHPI_rate=NHPI/Total,
+         SSWANA_rate=SSWANA/Total,
+        AIAN_rate=AIAN/Total,
+         )
+
+
+qa<-qa_race%>%group_by(div_name,nh_race)%>%
+  summarise(Count=n())%>%
+  left_join(div_total, by="div_name")%>%
+  mutate(Percent=Count/Total*100)
