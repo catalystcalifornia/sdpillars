@@ -445,7 +445,7 @@ reason_p<-person%>%
   
   # join stops table so we can filter for year / cfs
   
-  left_join(stops%>%select(stop_id, Year, stop_in_response_to_cfs ))%>%
+  left_join(stops%>%select(stop_id, Year, stop_in_response_to_cfs,assignment))%>%
   filter(Year=='2022' & stop_in_response_to_cfs == 0)%>%
   
   # left join reasons -filtered for year/cfs - to get stop reason
@@ -455,7 +455,7 @@ reason_p<-person%>%
               filter(Year=='2022' & stop_in_response_to_cfs == 0)%>%
               select(stop_id, person_id, reason_for_stop))%>%
   
-  select(Year, stop_id, person_id, reason_for_stop)
+  select(Year, stop_id, person_id, reason_for_stop,assignment)
 
 # Run a quick test to see if one person/stop_id combo has more than 1 unique reason_for_stop
 
@@ -464,11 +464,25 @@ test<-reason_p %>%
   mutate(same = +(n_distinct(reason_for_stop) == 1)) %>% 
   ungroup()
 
- # table(test$same) # all 90777 rows return same==1 which means there are not any people who were stopped for different reason_for_stop
+ # while everyone stopped for same reason and just the details vary there are duplicates in the data frame, # 90777 observations, how many unique people?
+
+qa<-reason_p %>%
+  group_by(stop_id, person_id) %>% 
+  summarise(count=n())%>%
+  nrow()
+
+#88099 unique people, let's de-deduplicate the data frame and use it moving forward for reason calcs
+reason_p_dedup<-reason_p%>%
+  group_by(stop_id,person_id,reason_for_stop,assignment,Year)%>%
+  summarise(duplicates=n())%>%
+  select(stop_id,person_id,assignment,Year,reason_for_stop,)%>%
+  ungroup()
+
 
 # Calculate estimates -all units
 
-reason_p<-reason_p%>%
+reason_p_all<-reason_p_dedup%>%
+  select(stop_id,person_id,Year,reason_for_stop,)%>%
   mutate(Total=n())%>%
   group_by(reason_for_stop)%>%
     mutate(Count=n(),
@@ -482,16 +496,9 @@ reason_p<-reason_p%>%
 
 # Calculate estimates -gang suppression unit only
 
-reason_p_gu<-person%>%
-  left_join(stops%>%select(stop_id, Year, stop_in_response_to_cfs, assignment ))%>%
-  filter(Year=='2022' & stop_in_response_to_cfs == 0 & assignment == 'Gang enforcement')%>%
-
-  left_join(reason%>%
-              left_join(stops%>%select(stop_id, Year, stop_in_response_to_cfs,assignment ))%>%
-              filter(Year=='2022' & stop_in_response_to_cfs == 0 & assignment == 'Gang enforcement')%>%
-              select(stop_id, person_id, reason_for_stop))%>%
-  
+reason_p_gu<-reason_p_dedup%>%
   select(Year, assignment, stop_id, person_id, reason_for_stop)%>%
+  filter(assignment=='Gang enforcement')%>%
   mutate(Total=n())%>%
   group_by(reason_for_stop)%>%
     mutate(Count=n(),
@@ -504,13 +511,13 @@ reason_p_gu<-person%>%
 
 # final combine
 
-reason_p<-reason_p%>%
+reason_p_table<-reason_p_all%>%
   rbind(reason_p_gu)
 
 
 # create table
 
-  flextable(reason_p) %>% 
+  flextable(reason_p_table) %>% 
 colformat_double(j = c("Percent"), digits = 1)%>% 
   set_caption('Total and Rate of Officer-Initiated Stops by Stop Reason') %>% 
   theme_vanilla() %>%
