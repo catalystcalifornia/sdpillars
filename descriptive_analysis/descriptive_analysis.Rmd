@@ -111,10 +111,10 @@ Before engaging in a detailed analysis of SDPD patrol activity as outlined in th
 
 * [Officer-initiated stops](#Number of Officer-Initiated Stops)
 * [Time spent on stops by calls for service or officer-initiated stops](#Time Spent on Calls for Service versus Officer-initiated)
-* Officer-initiated stops by stop reason
-* Officer-initiated stops by stop result
-* Officer-initiated stops by hit rates
-* Officer-initiated stops by age
+* [Officer-initiated stops by stop reason](#Stop Reasons)
+* [Officer-initiated stops by stop result](#Stop Results)
+* [Hit rates among officer-initiated stops](#Hit Rates)
+* [Officer-initiated stops by age](#Age Demographics)
 * Officer-initiated stops by race
 * Officer-initiated stops by police beat
 
@@ -201,7 +201,8 @@ The following takes a closer look at officer-initiated stops, including trends o
 
 The number of officer-initiated stops across all units peaked in 2019, decreasing between 2020-2022. The COVID-19 pandemic directly impacted police activity, making it unsurprising that there were less stops conducted overall.
 
-SDPD stops under gang enforcement have decreased overtime, with a steep drop-off between 2021-2022. Notably, more officer-initiated stops under gang enforcement were made in 2020 than in 2021 and 2022 combined. The low number of gang enforcement stops could be explained by how agencies are required to record this data under RIPA regulations. Agencies are required to report the assignment of the officer at the time of the stop, not their unit. Gang suppression unit stops are likely under-counted and being made under a different assignment. 
+SDPD stops under gang enforcement have decreased overtime, with a steep drop-off between 2021-2022. Notably, more officer-initiated stops under gang enforcement were made in 2020 than in 2021 and 2022 combined. The low number of gang enforcement stops could be explained by how agencies are required to record this data under RIPA regulations. Agencies are required to report the assignment of the officer at the time of the stop, not their unit. Gang suppression unit stops are likely under-counted and being made under a different assignment.
+
 ```{r}
 
 # calculate total number of officer initiated stops across all units
@@ -273,7 +274,7 @@ colformat_double(j = c("Percent"), digits = 1)%>%
 
 ## By SDPD Division
 
-High rates of officer-initiated stops are consistent across all police divisions. The highest number of officer-initiated stops occurs in the __Central Division__ while the highest percent of stops in the __Northwestern Division__ are made for officer-initiated reasons. These numbers do not control for the total population in each division.
+High rates of officer-initiated stops are consistent across all police divisions. The highest number of officer-initiated stops occurs in the __Central division__ while the highest percent of stops in the __Northwestern division__ are made for officer-initiated reasons. These numbers do not control for the total population in each division.
 
 ```{r}
 
@@ -405,7 +406,7 @@ colformat_double(j = c("Count Mins","Percent Mins", "Average Stop Time (Mins)",'
 
 ## By SDPD Division
 
-All SDPD divisions spend more than 75% of its time on __officer-initiated stops__ with a median time of 10-15 minutes spent per stop. The __Central and Northwestern Divisions__ spend over 85% of their time on officer-initiated stops. For stops with unknown divisions, 96.4% of minutes spent on these stops are for officer-initiated stops. There is more variation in the median time spent on stops made for calls for service. Divisions spend a median time of anywhere between 20 and 60 minutes on stops made for calls for service.
+More than 75% of officer patrol time is spent on __officer-initiated stops__ across all SDPD divisions with a median time of 10-15 minutes spent per stop. Officers who made stops in the __Central and Northwestern divisions__ spent over 85% of their time on officer-initiated stops. For stops with unknown divisions, 96.4% of minutes spent on these stops are for officer-initiated stops. There is more variation in the median time spent on stops made for calls for service. Across divisions, a median time between 20 and 60 minutes is spent on stops made for calls for service.
 
 ```{r}
 df<-beats_stop%>%
@@ -545,9 +546,9 @@ colformat_double(j = c("Percent"), digits = 1)%>%
 
 ## By SDPD Division
 
-The majority of SDPD divisions conduct officer-initiated stops for __traffic violations__, with the second most common officer-initiated stop being for __reasonable suspicion__. There is no third stop reason that has a rate comparable to traffic Violations or reasonable suspicion.
+The majority of officer-initiated stops across SDPD divisions are for __traffic violations__, with the second most common officer-initiated stop being for __reasonable suspicion__. There is no third stop reason that has a rate comparable to traffic Violations or reasonable suspicion.
 
-Notably, the __Southeastern Division__ disproportionately stops for traffic violations relative to reasonable suspicion, along with the __Northwestern, Northeastern, and unknown divisions__. The __Central and Western divisions__ have the highest rates of stops for reasonable suspicion at over 50% of stops made for reasonable suspicion.
+Notably, the __Southeastern division__ disproportionately includes stops for traffic violations relative to reasonable suspicion, along with the __Northwestern, Northeastern, and unknown divisions__. The __Central and Western divisions__ have the highest rates of stops for reasonable suspicion at over 50% of stops made for reasonable suspicion.
 
 ```{r fig.height = 7, fig.width = 13}
 
@@ -607,11 +608,13 @@ panel.background = element_blank())
 
 # Stop Results
 
-## Stop result by police assignment
+The following explores how officer-initiated stops concluded in 2022, or the result of the stop. This analysis does not control for instances where a stop concluded in more than one result. Controlling for unique person and stop will subsequently slightly change these trends. 
 
-Across all police units, Citation for Infraction and Warning (verbal or written) are the most common stop results, at 27.5% and 25.8% respectively. These two stop results make up approximately half of all stop results. 
+## By Police Assignment
 
-The gang enforcement unit stop results do not mirror the trends across all police units. The most common stop result for a gang enforcement stop is Field Interview Card Completed, comprising of 40.2% of all stop results. Warning (verbal or written) has the second highest rate at 20.6%. 
+Across all police units, __Citation for Infraction and Warning__ (verbal or written) are the most common stop results, at 27.5% and 25.8% respectively. These two stop results make up approximately half of all stop results. 
+
+Results from gang enforcement stops do not mirror the trends across all police units. The most common stop result for a gang enforcement stop is __Field Interview Card Completed__, comprising of 40.2% of all stop results. __Warning (verbal or written)__ has the second highest rate at 20.6%. 
 
 ```{r}
 
@@ -684,9 +687,9 @@ colformat_double(j = c("Percent"), digits = 1)%>%
 
 ```
 
-## Stop result by SDPD divisions
+## By SDPD Division
 
-Stop result trends vary across SDPD divisions. 
+Stop result trends vary across SDPD divisions. A higher percentage of results in the __Southeastern division__ are for __No Action__, or no result. Results in the __Northeastern and Northern divisions__ are more likely to include __Citation for Infraction__. Results in the __Central division___ are most likely to include a __Field Interview Card Completed__. And stops in the Northwestern, Mid-City, and Southeastern division are more likely to result in a Warning. 
 
 ```{r fig.height = 7, fig.width = 13}
 
@@ -752,8 +755,11 @@ panel.background = element_blank())
 
 # Hit Rates
 
-## By police assignment
-This analysis looks at what percentage of stops that resulted in a search produced contraband. Approximately 70% of all stops that result in a search do not produce any contraband across all police units and for gang enforcement stops. 
+This analysis looks at what percentage of stops that resulted in a search produced contraband, also known as the hit rate.
+
+## By Police Assignment
+
+In approximately 70% of people searched, SDPD police found no contraband. This rate is similar across all units and gang enforcement stops.
 
 ```{r}
 
@@ -844,14 +850,14 @@ df<-rbind(contra_all, contra_gu)
 
   flextable(df) %>% 
 colformat_double(j = c("Percent"), digits = 1)%>% 
-  set_caption('Hit Rate of Stops that Result in Searches') %>% 
+  set_caption('Hit Rate of Stops Where A Search Took Place') %>% 
   theme_vanilla() %>%
   width(j=3,2,unit="in")
 
 
 ```
 
-## By SDPD division
+## By SDPD Division
 
 ```{r}
 
@@ -886,11 +892,14 @@ ggplot(contra_div, aes( x = contraband_found , y =  Percent) ) +
         panel.grid.minor = element_blank(),
 panel.background = element_blank())
 ```
+
 # Age Demographics
 
-## Stops by age by poliice assignment 
+The following looks at the age distribution of people stopped in officer-initiated stops in 2022.
 
-The gang enforcement unit stops more individuals between the age of 18-34 compared to all police units. 
+## By Police Assignment 
+
+Gang enforcement stops target more individuals under 18 and between the ages of 18-34 compared to all police units.Over 2.5 times the rate of people under 18 are stopped under gang enforcement compared to all units.
 
 ```{r}
 # Note that the numbers might be slightly inflated because there are some people that are indicated as having more than 1 perceived age. But for the purposes of this descriptive analysis we want to see general trends and are OK with some duplicates for the time being. 
@@ -954,9 +963,9 @@ colformat_double(j = c("Percent"), digits = 1)%>%
 
 ```
 
-## Stops by age by SDPD divisions
+## By SDPD Division
 
-The Southeastern and Northern divisions disproportionately stops individuals age 25-34 relative to other age groups. 
+In the Northwestern, Southeastern, and Southern divisions, a higher percentage of people under 18 are stopped than people 65 and older. While all divisions follow a similar age distribution in people stopped, the Southeastern division has the highest percentage of people stopped in the 25-34 and 19-24 age brackets other than stops in unknown divisions. 
 
 ```{r fig.height = 7, fig.width = 13}
 
@@ -973,7 +982,8 @@ age_div<-person_age%>%
     group_by(div_name, age_bracket)%>%
       mutate(Count=n(),
            Percent=Count/Total*100)%>%
-  slice(1)
+  slice(1)%>%
+    mutate(div_name=ifelse(is.na(div_name),"Unknown Division", div_name))
   
 # graph
 
@@ -1001,9 +1011,11 @@ panel.background = element_blank())
 
 # Race/Ethnicity Demographics
 
-## Stops by race by police assignment
+The following analyzes the distribution of people stopped by race as perceived by officers. All groups are exclusive of Latinx other than Latinx, South Asian/Southwest Asian/North African (SSWANA), Native Hawaiian or Pacific Islander (NHPI), and American Indian or Alaska Native (AIAN).SSWANA, NHPI, and AIAN include people who were perceived as each of these groups alone or in combination with another race or Latinx.
 
-The gang enforcement unit disproportionately stops Black and Latinx individuals. 
+## By Police Assignment
+
+The gang enforcement assignment disproportionately targets Black and Latinx individuals. Stops made under this assignment also result in half the percentage of people perceived as White compared to all units.
 
 ```{r}
 
@@ -1125,9 +1137,9 @@ colformat_double(j = c("Percent"), digits = 1)%>%
 
 ```
 
-## Stops by race by SDPD divisions
+## By SDPD Division
 
-The Southeastern division disproportionately stops Black and Latinx individuals relative to other racial groups. The Souther division disproportionately stops Latinx individuals relative to other racial groups. 
+Stops made in the Southeastern division disproportionately include Black and Latinx individuals relative to other racial groups. Stops in the Southern division have the highest percentage of people perceived as Latinx stopped. Stops in the Southeastern division have the highest percentage of people perceived as Black stopped, and second highest percentage of people perceived as Latinx stopped.
 
 ```{r fig.height = 7, fig.width = 13}
 
@@ -1221,7 +1233,7 @@ panel.background = element_blank())
 
 # Map of Officer-Initiated Stops
 
-This map shows the count of officer-initiated stops in 2022 by police beat for all police units and for the gang enforcement unit.
+This map shows the count of officer-initiated stops in 2022 by police beat for all police units and for the gang enforcement unit. This map does not control for total population in each police beat. 
 
 ```{r}
 
