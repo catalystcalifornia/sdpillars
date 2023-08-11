@@ -72,19 +72,59 @@ beats<-st_read(con, query = "SELECT * FROM sangis_sdpd_beats_2023")%>%
 div<-dbGetQuery(con, "SELECT * FROM sangis_sdpd_divisions_2023")%>%
   select(-geom)
 
+# Prep beats and stop crosswalk
+
+# join divisions to the beats table just to get the full division name
+beats_div<-beats%>%
+  left_join(div%>%select(div_num, div_name), by=c("div"="div_num"))%>%
+  select(beat, name, div, div_name)%>%
+    as.data.frame()%>%
+  select(-geom)%>%
+  rename('beat_name' = 'name')%>%
+  group_by(beat)%>%
+  slice(1)%>%
+  mutate(beat_name=ifelse(beat %in% "511", 'BARRIO LOGAN', beat_name))%>% # there was a data entry error where beat=511 showed up twice, once with the beat_name included, and once where beat_name was NA. So I manually re-added the beat_name
+  ungroup()
+
+# join updated beats-div crosswalk to stops data
+
+beats_stop<-stops%>%
+  left_join(beats_div%>%select(beat, div, div_name), by=c("beat"="beat"))
+
+# analyze data 
+
+# explore stops where div = NA. These look to be where beat = 999, Unknown 999 but lets confirm
+
+na<-beats_stop%>%
+  select(stop_id, Year, div_name, stop_in_response_to_cfs, stopduration)%>%
+  filter(Year=='2022')%>%
+  group_by(div_name)%>%
+  mutate(Total=n())%>%
+  filter(is.na(div_name))%>%
+  left_join(stops%>%select(stop_id, beat))
+
+# table(na$beat) # there are mostly beat=999, which is unknown. There is also no beat=125 in the sdpd beats df. I think it is ok to recode these all to just 'unknown beat' 
 
 ```
 
-Before engaging in a detailed analysis of SDPD patrol activity as outlined in the research plan, we created this descriptive analysis to explore overall trends in the SDPD RIPA data. This helps us determine if our expected findings are likely to show up in the data and allows us to identify any trends we did not expect. The analysis includes: 
+Before engaging in a detailed analysis of SDPD patrol activity as outlined in the research plan, we created this descriptive analysis to explore overall trends in the SDPD RIPA data. This helps us determine if our expected findings are likely to show up in the data and allows us to identify any trends we did not expect. We include basis tallies on each of the following:
 
-General counts and percents of SDPD stops by key fields in RIPA data, e.g., stop reason, stop result, calls for service, race, age, searches, officer assignment. 
+* [Officer-initiated stops](#Number of Officer-Initiated Stops)
+* [Time spent on stops by calls for service or officer-initiated stops](#Time Spent on Calls for Service versus Officer-initiated)
+* Officer-initiated stops by stop reason
+* Officer-initiated stops by stop result
+* Officer-initiated stops by hit rates
+* Officer-initiated stops by age
+* Officer-initiated stops by race
+* Officer-initiated stops by police beat
+
+For each, we analyze SDPD stops overall and, where applicable, by assignment (gang enforcement) and SDPD division. Other than one analysis about stops over time, we focus on stops made in 2022. The numbers included in this analysis are preliminary and subject to change based on further analysis and review. Particularly, the reported time spent on stops will change as we complete outlier analysis to account for errors in the data.
 
 # Total Number of Stops and People Stopped
 
 In 2022, there were __86,632 unique police stops__. Of those stops, __79, 416 were officer-initiated stops.__ Gang enforcement made __420 unique stops__ in 2022. Of those stops, __397 were officer-initiated stops__. 
 
 In 2022, __96,119 people__ were stopped by SDPD, __88,099__ of which were stopped for an officer-initiated stop. Gang enforcement stopped __508 people__ in 2022; __484 people__ were stopped for an officer-initiated stop.  
-
 
 ```{r}
 
@@ -153,167 +193,15 @@ ppl_tot_gu_offit<-person%>%
 
 ```
 
+# Number of Officer-Initiated Stops
 
-# Calls for Service versus Officer-initiated
+The following takes a closer look at officer-initiated stops, including trends over time, by police assignment, and by division.
 
-The majority of officer time is spent on officer-initiated stops rather than calls for service. This is true across all officer unit types, as well as for the gang enforcement unit.
+## Over Time
 
-Analysis cut by all unit types:
+The number of officer-initiated stops across all units peaked in 2019, decreasing between 2020-2022. The COVID-19 pandemic directly impacted police activity, making it unsurprising that there were less stops conducted overall.
 
-```{r}
-
-# prep data 
-
-cfs<-stops%>%
-  select(stop_id, Year, stop_in_response_to_cfs, stopduration)%>%
-  filter(Year=='2022')%>%
-  mutate(Total=n())%>%
-  group_by(stop_in_response_to_cfs)%>%
-  mutate(Count=n(),
-         Percent=Count/Total*100,
-         'Average Stop Time (Mins)' = mean(stopduration, na.rm = FALSE),
-            'Median Stop Time (Mins)'=   median(stopduration,na.rm = FALSE),
-             'Min Stop Time (Mins)'=min(stopduration,na.rm = FALSE),
-            'Max Stop Time (Mins)'=max(stopduration,na.rm = FALSE),
-             'Total Time (Mins)'= sum(stopduration)
-         )%>%
-  slice(1)%>%
-  select(-c(stop_id, stopduration))%>%
-  mutate(stop_in_response_to_cfs=ifelse(stop_in_response_to_cfs %in% 0, 'No', 'Yes'))%>%
-  rename('Call for Service'='stop_in_response_to_cfs')%>%
-  mutate(Assignment = 'All units')%>%
-  relocate(Assignment, .after = Year)
-         
-
-
-#create and style flextable
-
-  flextable(cfs) %>% 
-colformat_double(j = c("Percent", "Average Stop Time (Mins)",'Median Stop Time (Mins)',
-                       'Min Stop Time (Mins)','Max Stop Time (Mins)', 'Total Time (Mins)'), digits = 1)%>% 
-  set_caption('Stop Counts and Rates by Response to Service Call for All Units') %>% 
-  theme_vanilla() 
-
-```
-
-Analysis filtered for gang suppression unit:
-
-```{r}
-
-# prep data 
-
-cfs_gu<-stops%>%
-  select(stop_id, Year, assignment, stop_in_response_to_cfs, stopduration)%>%
-  filter(Year=='2022' & assignment =='Gang enforcement')%>%
-  mutate(Total=n())%>%
-  group_by(stop_in_response_to_cfs)%>%
-  mutate(Count=n(),
-         Percent=Count/Total*100,
-         'Average Stop Time (Mins)' = mean(stopduration, na.rm = FALSE),
-            'Median Stop Time (Mins)'=   median(stopduration,na.rm = FALSE),
-             'Min Stop Time (Mins)'=min(stopduration,na.rm = FALSE),
-            'Max Stop Time (Mins)'=max(stopduration,na.rm = FALSE),
-             'Total Time (Mins)'= sum(stopduration)
-         )%>%
-  slice(1)%>%
-  select(-c(stop_id, stopduration))%>%
-  mutate(stop_in_response_to_cfs=ifelse(stop_in_response_to_cfs %in% 0, 'No', 'Yes'))%>%
-  rename('Call for Service'='stop_in_response_to_cfs',
-         'Assignment'='assignment')
-         
-
-
-#create and style flextable
-
-  flextable(cfs_gu) %>% 
-colformat_double(j = c("Percent", "Average Stop Time (Mins)",'Median Stop Time (Mins)',
-                       'Min Stop Time (Mins)','Max Stop Time (Mins)', 'Total Time (Mins)'), digits = 1)%>% 
-  set_caption('Stop Counts and Rates by Response to Service Call for Gang Suppression Unit') %>% 
-  theme_vanilla() 
-
-```
-
-Analysis cut by SDPD division:
-
-All SDPD divisions spent more than 90% of its time on officer-initiated stops, with the exception of Mid-City and Eastern which spent over 87% of patrol time on officer-initiated stops.
-
-```{r}
-
-# join divisions to the beats table just to get the full division name
-
-beats_div<-beats%>%
-  left_join(div%>%select(div_num, div_name), by=c("div"="div_num"))%>%
-  select(beat, name, div, div_name)%>%
-    as.data.frame()%>%
-  select(-geom)%>%
-  rename('beat_name' = 'name')%>%
-  group_by(beat)%>%
-  slice(1)%>%
-  mutate(beat_name=ifelse(beat %in% "511", 'BARRIO LOGAN', beat_name))%>% # there was a data entry error where beat=511 showed up twice, once with the beat_name included, and once where beat_name was NA. So I manually re-added the beat_name
-  ungroup()
-
-# join updated beats-div crosswalk to stops data
-
-beats_stop<-stops%>%
-  left_join(beats_div%>%select(beat, div, div_name), by=c("beat"="beat"))
-
-# analyze data 
-
-# explore stops where div = NA. These look to be where beat = 999, Unknown 999 but lets confirm
-
-na<-beats_stop%>%
-  select(stop_id, Year, div_name, stop_in_response_to_cfs, stopduration)%>%
-  filter(Year=='2022')%>%
-  group_by(div_name)%>%
-  mutate(Total=n())%>%
-  filter(is.na(div_name))%>%
-  left_join(stops%>%select(stop_id, beat))
-
-# table(na$beat) # there are mostly beat=999, which is unknown. There is also no beat=125 in the sdpd beats df. I think it is ok to recode these all to just 'unknown beat' 
-
-# move on to main analysis 
-
-df<-beats_stop%>%
-  select(stop_id, Year, div_name, stop_in_response_to_cfs, stopduration)%>%
-  filter(Year=='2022')%>%
-  group_by(div_name)%>%
-  mutate(Total=n())%>%
-  mutate(div_name=ifelse(is.na(div_name), 'UNKNOWN DIVISION', div_name))%>%
-  group_by(div_name,stop_in_response_to_cfs)%>%
-  mutate(Count=n(),
-         Percent=Count/Total*100,
-         'Average Stop Time (Mins)' = mean(stopduration, na.rm = FALSE),
-            'Median Stop Time (Mins)'=   median(stopduration,na.rm = FALSE),
-             'Min Stop Time (Mins)'=min(stopduration,na.rm = FALSE),
-            'Max Stop Time (Mins)'=max(stopduration,na.rm = FALSE),
-             'Total Time (Mins)'= sum(stopduration)
-         )%>%
-  slice(1)%>%
-  select(-c(stop_id, stopduration))%>%
-  mutate(stop_in_response_to_cfs=ifelse(stop_in_response_to_cfs %in% 0, 'No', 'Yes'))%>%
-  rename('Call for Service'='stop_in_response_to_cfs')%>%
-  rename('Division Name' = 'div_name')
-
-
-
-#create and style flextable
-
-  flextable(df) %>% 
-colformat_double(j = c("Percent", "Average Stop Time (Mins)",'Median Stop Time (Mins)',
-                       'Min Stop Time (Mins)','Max Stop Time (Mins)', 'Total Time (Mins)'), digits = 1)%>% 
-  set_caption('Stop Counts and Rates by Response to Service Call by Division') %>% 
-  theme_vanilla() 
-
-
-
-```
-
-## Total Officer-Intiated Stops Over Time
-
-The number of officer-initiated stops across all police unit types peaked in 2019, with a slight decrease in 2020-2022. The COVID-19 pandemic directly impacted police activity, making it unsurprising that there were less stops conducted overall.
-
-The gang suppression unit has conducted less officer-initiated stops overtime, with a steep drop-off between 2021-2022. Notably, the gang enforcement unit made more officer-initiated stops in 2020 than in 2021 and 2022 combined. This suggests that the numbers are not driven by the COVID-19 pandemic but other reasons. Officers making gang enforcement stops might be doing it under the guise of a different unit assignment, resulting in the gang enforcement stops being under-counted. 
-
+SDPD stops under gang enforcement have decreased overtime, with a steep drop-off between 2021-2022. Notably, more officer-initiated stops under gang enforcement were made in 2020 than in 2021 and 2022 combined. The low number of gang enforcement stops could be explained by how agencies are required to record this data under RIPA regulations. Agencies are required to report the assignment of the officer at the time of the stop, not their unit. Gang suppression unit stops are likely under-counted and being made under a different assignment. 
 ```{r}
 
 # calculate total number of officer initiated stops across all units
@@ -333,13 +221,13 @@ count_gu<-stops%>%
   filter(grepl('Gang enforcement', assignment))%>%
   select(Year, stop_id)%>%
   group_by(Year)%>%
-  mutate('Gang Suppression Unit Total'=n())%>%
+  mutate('Gang Enforcement Total'=n())%>%
   slice(1)
 
 # combine both unit tables
 
 count<-count%>%
-  left_join(count_gu%>%select(Year, 'Gang Suppression Unit Total'))
+  left_join(count_gu%>%select(Year, 'Gang Enforcement Total'))
   
   #create and style flextable
 
@@ -351,9 +239,9 @@ count<-count%>%
   
 ```
 
-## Total Officer-Intiated Stops by Police Assignment
+## By Police Assignment
 
-Patrol, traffic enforcement, and field operations conduct the majority of officer-initiated stops, followed by the 'Other' unit category. While gang enforcement has the third highest rate of officer-initiated stops the overall count is low. This is most likely due to gang enforcement stops being conducted under a different unit assignment.
+__Patrol, traffic enforcement, and field operations__ conduct the majority of officer-initiated stops, followed by the 'Other' unit category. While gang enforcement has the third highest rate of officer-initiated stops the overall count is low. This is most likely due to gang enforcement stops being conducted under a different unit assignment.
 
 ```{r}
 
@@ -383,9 +271,9 @@ colformat_double(j = c("Percent"), digits = 1)%>%
 
 ```
 
-## Total Officer-Intiated Stops by Police Division
+## By SDPD Division
 
-High rates of officer-initiated stops are consistent across all police divisions. 
+High rates of officer-initiated stops are consistent across all police divisions. The highest number of officer-initiated stops occurs in the __Central Division__ while the highest percent of stops in the __Northwestern Division__ are made for officer-initiated reasons. These numbers do not control for the total population in each division.
 
 ```{r}
 
@@ -401,35 +289,164 @@ df<-beats_stop%>%
             Percent=Count/Total*100)%>%
   slice(1)%>%
     mutate(div_name=ifelse(is.na(div_name), 'UNKNOWN DIVISION', div_name))%>%
+  mutate(stop_in_response_to_cfs=ifelse(stop_in_response_to_cfs %in% 0, 'No', 'Yes'))
+# %>%
+#   rename('Call for Service'='stop_in_response_to_cfs')%>%
+#   rename('Division Name'='div_name')%>%
+#   relocate(Year, .before = "Division Name")
+
+
+# #create and style flextable
+# 
+#   flextable(df) %>% 
+# colformat_double(j = c("Percent"), digits = 1)%>% 
+#   set_caption('Total and Rate of Stops by Police Division in 2022') %>% 
+#   theme_vanilla() %>%
+#   width(j=2,2.3,unit="in")
+  
+  ggplot(df, aes( x = stop_in_response_to_cfs , y =  Count) ) + 
+      geom_bar( stat = "identity", fill="#362178") + 
+  geom_text(aes( label = paste0(Count),
+                 y= Count),vjust = 1.4, size = 3, color = "white",
+             fontface = "bold")+
+      facet_wrap( ~ div_name, nrow=2) + 
+      xlab("")+
+  ylab("Count of Stops by Call for Service")+
+    scale_x_discrete(labels = wrap_format(20))+
+  theme_bw()+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size=15),
+        strip.background = element_rect(fill = "#362178"),
+        strip.text = element_text(color = "white", size=12, face="bold"),
+        panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+panel.background = element_blank())
+
+```
+
+# Time Spent on Calls for Service versus Officer-initiated
+
+The majority of officer time is spent on __officer-initiated stops__ rather than calls for service with officers spending over 80% of their minutes on officer-initiated stops. This is true across all units, as well as for gang enforcement. __Gang enforcement__ spends more time per stop on average especially for calls for service-an average time of 123.9 minutes compared to 59.3 minutes across all units. The median time gang enforcement spends on officer-initiated stops is slightly higher than the median time all units spend, 15 minutes versus 10 minutes respectively.
+
+## All Units
+
+```{r}
+
+# prep data 
+
+cfs<-stops%>%
+  select(stop_id, Year, stop_in_response_to_cfs, stopduration)%>%
+  filter(Year=='2022')%>%
+  mutate(Total=sum(stopduration,na.rm=TRUE))%>%
+  group_by(stop_in_response_to_cfs)%>%
+  mutate(Count=sum(stopduration,na.rm=TRUE),
+         'Percent Mins'=Count/Total*100,
+         'Average Stop Time (Mins)' = mean(stopduration, na.rm = FALSE),
+            'Median Stop Time (Mins)'=   median(stopduration,na.rm = FALSE),
+             'Min Stop Time (Mins)'=min(stopduration,na.rm = FALSE),
+            'Max Stop Time (Mins)'=max(stopduration,na.rm = FALSE),
+             'Total Time (Mins)'= Total,
+         'Count Mins'=Count
+         )%>%
+  slice(1)%>%
+  select(-c(stop_id, stopduration,Count,Total))%>%
   mutate(stop_in_response_to_cfs=ifelse(stop_in_response_to_cfs %in% 0, 'No', 'Yes'))%>%
   rename('Call for Service'='stop_in_response_to_cfs')%>%
-  rename('Division Name'='div_name')%>%
-  relocate(Year, .before = "Division Name")
+  mutate(Assignment = 'All units')%>%
+  relocate(Assignment, .after = Year)%>%
+   relocate('Count Mins', .after = 'Call for Service')
+         
+#create and style flextable
 
+  flextable(cfs) %>% 
+colformat_double(j = c("Count Mins", "Percent Mins", "Average Stop Time (Mins)",'Median Stop Time (Mins)',
+                       'Min Stop Time (Mins)','Max Stop Time (Mins)', 'Total Time (Mins)'), digits = 1)%>% 
+  set_caption('Stop Time by Response to Service Call for All Units') %>% 
+  theme_vanilla() 
+
+```
+
+## Gang Enforcement
+
+```{r}
+
+# prep data 
+
+cfs_gu<-stops%>%
+  select(stop_id, Year, assignment, stop_in_response_to_cfs, stopduration)%>%
+  filter(Year=='2022' & assignment =='Gang enforcement')%>%
+ mutate(Total=sum(stopduration,na.rm=TRUE))%>%
+  group_by(stop_in_response_to_cfs)%>%
+  mutate(Count=sum(stopduration,na.rm=TRUE),
+         'Percent Mins'=Count/Total*100,
+         'Average Stop Time (Mins)' = mean(stopduration, na.rm = FALSE),
+            'Median Stop Time (Mins)'=   median(stopduration,na.rm = FALSE),
+             'Min Stop Time (Mins)'=min(stopduration,na.rm = FALSE),
+            'Max Stop Time (Mins)'=max(stopduration,na.rm = FALSE),
+             'Total Time (Mins)'= Total,
+         'Count Mins'=Count
+         )%>%
+  slice(1)%>%
+  select(-c(stop_id, stopduration,Count,Total,assignment))%>%
+  mutate(stop_in_response_to_cfs=ifelse(stop_in_response_to_cfs %in% 0, 'No', 'Yes'))%>%
+  rename('Call for Service'='stop_in_response_to_cfs')%>%
+  mutate(Assignment = 'Gang enforcement')%>%
+    relocate(Assignment, .after = Year)%>%
+   relocate('Count Mins', .after = 'Call for Service')
 
 #create and style flextable
 
-  flextable(df) %>% 
-colformat_double(j = c("Percent"), digits = 1)%>% 
-  set_caption('Total and Rate of Stops by Police Division in 2022') %>% 
-  theme_vanilla() %>%
-  width(j=2,2.3,unit="in")
+  flextable(cfs_gu) %>% 
+colformat_double(j = c("Count Mins","Percent Mins", "Average Stop Time (Mins)",'Median Stop Time (Mins)',
+                       'Min Stop Time (Mins)','Max Stop Time (Mins)', 'Total Time (Mins)'), digits = 1)%>% 
+  set_caption('Stop Counts and Rates by Response to Service Call for Gang Enforcement') %>% 
+  theme_vanilla() 
 
+```
 
+## By SDPD Division
 
+All SDPD divisions spend more than 75% of its time on __officer-initiated stops__ with a median time of 10-15 minutes spent per stop. The __Central and Northwestern Divisions__ spend over 85% of their time on officer-initiated stops. For stops with unknown divisions, 96.4% of minutes spent on these stops are for officer-initiated stops. There is more variation in the median time spent on stops made for calls for service. Divisions spend a median time of anywhere between 20 and 60 minutes on stops made for calls for service.
 
+```{r}
+df<-beats_stop%>%
+  select(stop_id, Year, div_name, stop_in_response_to_cfs, stopduration)%>%
+  filter(Year=='2022')%>%
+  group_by(div_name)%>%
+  mutate(Total=sum(stopduration,na.rm=TRUE))%>%  
+  mutate(div_name=ifelse(is.na(div_name), 'UNKNOWN DIVISION', div_name))%>%
+  group_by(div_name,stop_in_response_to_cfs)%>%
+  mutate(Count=sum(stopduration,na.rm=TRUE),
+         'Percent Mins'=Count/Total*100,
+         'Average Stop Time (Mins)' = mean(stopduration, na.rm = FALSE),
+            'Median Stop Time (Mins)'=   median(stopduration,na.rm = FALSE),
+             'Min Stop Time (Mins)'=min(stopduration,na.rm = FALSE),
+            'Max Stop Time (Mins)'=max(stopduration,na.rm = FALSE),
+            'Total Time (Mins)'= Total,
+         'Count Mins'=Count
+         )%>%
+  slice(1)%>%
+select(-c(stop_id, stopduration,Count,Total))%>%  mutate(stop_in_response_to_cfs=ifelse(stop_in_response_to_cfs %in% 0, 'No', 'Yes'))%>%
+  rename('Call for Service'='stop_in_response_to_cfs')%>%
+  rename('Division Name' = 'div_name')
 
+#create and style flextable
 
-
+  flextable(df) %>%
+colformat_double(j = c("Count Mins", "Percent Mins", "Average Stop Time (Mins)",'Median Stop Time (Mins)',
+                       'Min Stop Time (Mins)','Max Stop Time (Mins)', 'Total Time (Mins)'), digits = 1)%>%
+  set_caption('Stop Counts and Rates by Response to Service Call by Division') %>%
+  theme_vanilla()
 
 ```
 
 
 # Stop Reasons
 
-Traffic Violation is the most common stop reason for officer-initiated stops, followed by Reasonable Suspicion, across all police units and for the gang enforcement unit. However, nearly 70% of all officer-initiated stops conducted by the gang enforcement unit are for Traffic Violation, with only 24% being conducted for Reasonable Suspicion. Traffic Violation stops are a more significant majority of all gang enforcement stops. 
+The following explores the most common reasons for officer-initiated stops in 2022. Traffic violations and reasonable suspicion are the most common stop reasons as is common in other local law enforcement agencies.
 
-## Stop reason by police assignment
+## By Police Assignment
+
+__Traffic violations__ are the most common stop reason for officer-initiated stops, followed by __reasonable suspicion__, across all police units and for gang enforcement. However, nearly 70% of all officer-initiated stops conducted under gang enforcement are for traffic violations, with only 24% being conducted for reasonable suspicion. Traffic violation stops are a more significant majority of all gang enforcement stops. 
 
 ```{r}
 
@@ -526,11 +543,11 @@ colformat_double(j = c("Percent"), digits = 1)%>%
 
 ```
 
-## Stop reason by SDPD divisions
+## By SDPD Division
 
-The majority of SDPD divisions conduct officer-initiated stops for Traffic Violation, with the second most common officer-initiated stop being for Reasonable Suspicions. There is no third stop reason that has a rate comparable to Traffic Violation or Reasonable Suspicion.
+The majority of SDPD divisions conduct officer-initiated stops for __traffic violations__, with the second most common officer-initiated stop being for __reasonable suspicion__. There is no third stop reason that has a rate comparable to traffic Violations or reasonable suspicion.
 
-Notably, the Southeastern division disproportionately stops for Traffic Violation relative to Reasonable Suspicion, along with the Northwestern and Northeastern divisions. 
+Notably, the __Southeastern Division__ disproportionately stops for traffic violations relative to reasonable suspicion, along with the __Northwestern, Northeastern, and unknown divisions__. The __Central and Western divisions__ have the highest rates of stops for reasonable suspicion at over 50% of stops made for reasonable suspicion.
 
 ```{r fig.height = 7, fig.width = 13}
 
@@ -1245,24 +1262,9 @@ beats_gu<-stops%>%
 beats_gu<-st_as_sf(beats_gu)%>%
   st_transform(4326)
 
-# beats_gu<-stops%>%
-#    filter(Year=='2022' & stop_in_response_to_cfs == 0 & assignment == 'Gang enforcement')%>%
-#   left_join(beats, by=c("beat"="beat"))%>%
-#   select(-20)%>%
-#    group_by(name)%>%
-#   summarise(Year, name, count=n(),
-#              geom)%>%
-#   slice(1)
-# 
-# # convert back to sf object and project for leafjet
-# 
-# beats_gu<-st_as_sf(beats_gu)%>%
-#   st_transform(4326)
-# 
-# 
-# ### Divisional overlay ####
-# 
-# # pull in divisional layer to create an overlay
+### Divisional overlay ####
+
+# pull in divisional layer to create an overlay
 
   
 div<-st_read(con, query = "SELECT * FROM sangis_sdpd_divisions_2023")

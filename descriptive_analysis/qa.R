@@ -169,3 +169,15 @@ qa<-qa_race%>%group_by(div_name,nh_race)%>%
   summarise(Count=n())%>%
   left_join(div_total, by="div_name")%>%
   mutate(Percent=Count/Total*100)
+
+qa<-beats_stop%>%
+  filter(Year=='2022' & stop_in_response_to_cfs == 0)%>%
+  group_by(beat_name)%>%
+  summarise(count=n())
+
+qa_gu<-beats_stop%>%
+  filter(Year=='2022' & stop_in_response_to_cfs == 0 & assignment=='Gang enforcement')%>%
+  group_by(beat_name)%>%
+  summarise(count=n())
+
+quantile(x)
