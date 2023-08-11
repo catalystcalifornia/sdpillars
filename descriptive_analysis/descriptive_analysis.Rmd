@@ -109,14 +109,14 @@ na<-beats_stop%>%
 
 Before engaging in a detailed analysis of SDPD patrol activity as outlined in the research plan, we created this descriptive analysis to explore overall trends in the SDPD RIPA data. This helps us determine if our expected findings are likely to show up in the data and allows us to identify any trends we did not expect. We include basis tallies on each of the following:
 
-* [Officer-initiated stops](#Number of Officer-Initiated Stops)
-* [Time spent on stops by calls for service or officer-initiated stops](#Time Spent on Calls for Service versus Officer-initiated)
-* [Officer-initiated stops by stop reason](#Stop Reasons)
-* [Officer-initiated stops by stop result](#Stop Results)
-* [Hit rates among officer-initiated stops](#Hit Rates)
-* [Officer-initiated stops by age](#Age Demographics)
-* Officer-initiated stops by race
-* Officer-initiated stops by police beat
+* [Officer-initiated stops](#Number-of-Officer-Initiated-Stops)
+* [Time spent on stops by calls for service or officer-initiated stops](#Time-Spent-on-Calls-for-Service-versus-Officer-initiated)
+* [Officer-initiated stops by stop reason](#Stop-Reasons)
+* [Officer-initiated stops by stop result](#Stop-Results)
+* [Hit rates among officer-initiated stops](#Hit-Rates)
+* [Officer-initiated stops by age](#Age-Demographics)
+* [Officer-initiated stops by race](#Race/Ethnicity-Demographics)
+* [Officer-initiated stops by police beat](#Map-of-Officer-Initiated-Stops)
 
 For each, we analyze SDPD stops overall and, where applicable, by assignment (gang enforcement) and SDPD division. Other than one analysis about stops over time, we focus on stops made in 2022. The numbers included in this analysis are preliminary and subject to change based on further analysis and review. Particularly, the reported time spent on stops will change as we complete outlier analysis to account for errors in the data.
 
@@ -276,7 +276,7 @@ colformat_double(j = c("Percent"), digits = 1)%>%
 
 High rates of officer-initiated stops are consistent across all police divisions. The highest number of officer-initiated stops occurs in the __Central division__ while the highest percent of stops in the __Northwestern division__ are made for officer-initiated reasons. These numbers do not control for the total population in each division.
 
-```{r}
+```{r fig.height = 7, fig.width = 13}
 
 df<-beats_stop%>%
   filter(Year == "2022")%>%
@@ -787,8 +787,8 @@ search_p<-search%>%
 actions_search_p<-actions_search_p%>%
   full_join(search_p, by=c("stop_id","person_id"))
 
-sum(is.na(actions_search_p$count_searches)) # 5 nulls based on actions of searches
-sum(is.na(actions_search_p$count_basis)) # 9561 based on basis
+# sum(is.na(actions_search_p$count_searches)) # 5 nulls based on actions of searches
+# sum(is.na(actions_search_p$count_basis)) # 9561 based on basis
 # use actions for search
 
 actions_search_p<-actions_search_p%>%
@@ -859,7 +859,9 @@ colformat_double(j = c("Percent"), digits = 1)%>%
 
 ## By SDPD Division
 
-```{r}
+Across divisions, other than unknown divisions, more than 70% of stops where a search took place result in no evidence or contraband found. Stops where a search took place in the Eastern division have the highest hit rates (29.6%). The Southeastern division has the second highest hit rate (27.7%), not including unknown divisions.
+
+```{r fig.height = 7, fig.width = 13}
 
 # calculate rates by division
 contra_div<-search_contra_p%>%
@@ -882,7 +884,7 @@ ggplot(contra_div, aes( x = contraband_found , y =  Percent) ) +
              fontface = "bold")+
       facet_wrap( ~ div_name, nrow=2) + 
       xlab("")+
-  ylab("Percent of Searches by Contraband Found (%)")+
+  ylab("Searches by Contraband Found (%)")+
     scale_x_discrete(labels = wrap_format(20))+
   theme_bw()+
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size=15),
@@ -1177,12 +1179,12 @@ div_race_nh<-div_race_nh%>%
  div_race_other<-race%>%
   left_join(beats_stop%>%select(stop_id, Year, div_name, stop_in_response_to_cfs ))%>%
   filter(Year=='2022' & stop_in_response_to_cfs == 0)%>%
-  select(div_name, mesa_flag, aian_flag, nhpi_flag)%>%
+  select(div_name, sswana_flag, aian_flag, nhpi_flag)%>%
      mutate(div_name=ifelse(is.na(div_name), "UNKNOWN DIVISION", div_name))%>%
    group_by(div_name)%>%
     mutate(Total=n())%>%
   summarise( Total,
-            mesa=sum(mesa_flag, na.rm=TRUE),
+            mesa=sum(sswana_flag, na.rm=TRUE),
             nhpi=sum(nhpi_flag, na.rm=TRUE),
             aian=sum(aian_flag, na.rm=TRUE))%>%
    pivot_longer(3:5, names_to = "Race", values_to="Count" )%>%
@@ -1234,6 +1236,8 @@ panel.background = element_blank())
 # Map of Officer-Initiated Stops
 
 This map shows the count of officer-initiated stops in 2022 by police beat for all police units and for the gang enforcement unit. This map does not control for total population in each police beat. 
+
+There is a highest density of stops in several police beats in the Northern, Southern, and Northwestern divisions.There are relatively few stops for the gang enforcement assignment. Several police beats in the Northern and Southeastern divisions have a higher density of gang enforcement stops.
 
 ```{r}
 
@@ -1311,7 +1315,7 @@ pal_gu<-colorBin(
 
 popup_allunit<-paste0("Assignment: All Units","<br>","Beat Name: ",beats_allunit$name,"<br>","Stop count: ", beats_allunit$count)
 
-popup_gu<-paste0("Assignment: Gang Suppression Unit","<br>","Beat Name: ",beats_gu$name,"<br>","Stop count: ", beats_gu$count)
+popup_gu<-paste0("Assignment: Gang Enforcement","<br>","Beat Name: ",beats_gu$name,"<br>","Stop count: ", beats_gu$count)
 
 div_popup<-paste0(div$div_name)
 
@@ -1344,7 +1348,7 @@ leaflet(width = "100%", height = "600px") %>%
   
     addPolygons(data = beats_gu,  label=~htmlEscape(paste0("Beat name: ",beats_gu$name)), color = "#444444", weight = 1, smoothFactor = 0.5,  opacity = 1, fillOpacity =1,  fillColor = ~pal_gu(beats_gu$count),
                popup = ~paste0(popup_gu),
-              highlight = highlightOptions(color = "white", weight = 3, bringToFront = FALSE), group = "Gang Suppression Unit",
+              highlight = highlightOptions(color = "white", weight = 3, bringToFront = FALSE), group = "Gang Enforcement",
               options = pathOptions(pane = "gu_pane")) %>%
   
   # divisional overlay
@@ -1364,20 +1368,20 @@ leaflet(width = "100%", height = "600px") %>%
                                                   paste0(labels_allunit)
                              }) %>%
 
-  addLegend(position = "bottomleft", pal = pal_gu, values = beats_gu$count, opacity = .5, title = "Gang Suppression Unit", na.label = NA, group="Gang Suppression Unit",
+  addLegend(position = "bottomleft", pal = pal_gu, values = beats_gu$count, opacity = .5, title = "Gang Enforcement", na.label = NA, group="Gang Enforcement",
              labFormat= function(type, cuts, p) {  
                                                   paste0(labels_gu)
                              }) %>%
 
   # layer control
   
-   addLayersControl(overlayGroups = c("All Units","Gang Suppression Unit", "SDPD Divisions"),
+   addLayersControl(overlayGroups = c("All Units","Gang Enforcement", "SDPD Divisions"),
                    options = layersControlOptions(collapsed = FALSE),
                    position = 'topright')%>%
   
   
   #hide supervisorial districts by default
-  hideGroup( "SDPD Divisions","Gang Suppression Unit")%>%
+  hideGroup(c( "SDPD Divisions","Gang Enforcement"))%>%
   
   #base and view
   
