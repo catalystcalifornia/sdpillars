@@ -115,12 +115,12 @@ Before engaging in a detailed analysis of SDPD patrol activity as outlined in th
 * [Officer-initiated stops by stop result](#Stop-Results)
 * [Hit rates among officer-initiated stops](#Hit-Rates)
 * [Officer-initiated stops by age](#Age-Demographics)
-* [Officer-initiated stops by race](#Race/Ethnicity-Demographics)
+* [Officer-initiated stops by race](#Race-Ethnicity-Demographics)
 * [Officer-initiated stops by police beat](#Map-of-Officer-Initiated-Stops)
 
 For each, we analyze SDPD stops overall and, where applicable, by assignment (gang enforcement) and SDPD division. Other than one analysis about stops over time, we focus on stops made in 2022. The numbers included in this analysis are preliminary and subject to change based on further analysis and review. Particularly, the reported time spent on stops will change as we complete outlier analysis to account for errors in the data.
 
-# Total Number of Stops and People Stopped
+# Total Number of Stops and People Stopped 
 
 In 2022, there were __86,632 unique police stops__. Of those stops, __79, 416 were officer-initiated stops.__ Gang enforcement made __420 unique stops__ in 2022. Of those stops, __397 were officer-initiated stops__. 
 
@@ -193,7 +193,7 @@ ppl_tot_gu_offit<-person%>%
 
 ```
 
-# Number of Officer-Initiated Stops
+# Number of Officer-Initiated Stops {#Number-of-Officer-Initiated-Stops}
 
 The following takes a closer look at officer-initiated stops, including trends over time, by police assignment, and by division.
 
@@ -307,11 +307,12 @@ df<-beats_stop%>%
   
   ggplot(df, aes( x = stop_in_response_to_cfs , y =  Count) ) + 
       geom_bar( stat = "identity", fill="#362178") + 
-  geom_text(aes( label = paste0(Count),
+  geom_text(aes( label = paste0(format(Count, big.mark=",")),
                  y= Count),vjust = 1.4, size = 3, color = "white",
              fontface = "bold")+
       facet_wrap( ~ div_name, nrow=2) + 
       xlab("")+
+     scale_y_continuous(labels=function(x) format(x, big.mark = ","))+
   ylab("Count of Stops by Call for Service")+
     scale_x_discrete(labels = wrap_format(20))+
   theme_bw()+
@@ -324,7 +325,7 @@ panel.background = element_blank())
 
 ```
 
-# Time Spent on Calls for Service versus Officer-initiated
+# Time Spent on Calls for Service versus Officer-initiated {#Time-Spent-on-Calls-for-Service-versus-Officer-initiated}
 
 The majority of officer time is spent on __officer-initiated stops__ rather than calls for service with officers spending over 80% of their minutes on officer-initiated stops. This is true across all units, as well as for gang enforcement. __Gang enforcement__ spends more time per stop on average especially for calls for service-an average time of 123.9 minutes compared to 59.3 minutes across all units. The median time gang enforcement spends on officer-initiated stops is slightly higher than the median time all units spend, 15 minutes versus 10 minutes respectively.
 
@@ -441,7 +442,7 @@ colformat_double(j = c("Count Mins", "Percent Mins", "Average Stop Time (Mins)",
 ```
 
 
-# Stop Reasons
+# Stop Reasons {#Stop-Reasons}
 
 The following explores the most common reasons for officer-initiated stops in 2022. Traffic violations and reasonable suspicion are the most common stop reasons as is common in other local law enforcement agencies.
 
@@ -606,7 +607,7 @@ panel.background = element_blank())
 
 ```
 
-# Stop Results
+# Stop Results {#Stop-Results}
 
 The following explores how officer-initiated stops concluded in 2022, or the result of the stop. This analysis does not control for instances where a stop concluded in more than one result. Controlling for unique person and stop will subsequently slightly change these trends. 
 
@@ -753,7 +754,7 @@ panel.background = element_blank())
 
 ```
 
-# Hit Rates
+# Hit Rates {#Hit-Rates}
 
 This analysis looks at what percentage of stops that resulted in a search produced contraband, also known as the hit rate.
 
@@ -803,6 +804,8 @@ contra_p<-contra%>%
 # join searches to contraband
 search_contra_p<-actions_search_p%>%
   left_join(contra_p)
+
+# sum(is.na(search_contra_p$count_contra)) #115239
 
 # make NAs in contraband 0
 search_contra_p <- search_contra_p %>% 
@@ -895,7 +898,7 @@ ggplot(contra_div, aes( x = contraband_found , y =  Percent) ) +
 panel.background = element_blank())
 ```
 
-# Age Demographics
+# Age Demographics {#Age-Demographics}
 
 The following looks at the age distribution of people stopped in officer-initiated stops in 2022.
 
@@ -1011,7 +1014,7 @@ panel.background = element_blank())
 
 ```
 
-# Race/Ethnicity Demographics
+# Race/Ethnicity Demographics {#Race-Ethnicity-Demographics}
 
 The following analyzes the distribution of people stopped by race as perceived by officers. All groups are exclusive of Latinx other than Latinx, South Asian/Southwest Asian/North African (SSWANA), Native Hawaiian or Pacific Islander (NHPI), and American Indian or Alaska Native (AIAN).SSWANA, NHPI, and AIAN include people who were perceived as each of these groups alone or in combination with another race or Latinx.
 
@@ -1233,7 +1236,7 @@ panel.background = element_blank())
 
 ```
 
-# Map of Officer-Initiated Stops
+# Map of Officer-Initiated Stops {#Map-of-Officer-Initiated-Stops}
 
 This map shows the count of officer-initiated stops in 2022 by police beat for all police units and for the gang enforcement unit. This map does not control for total population in each police beat. 
 
