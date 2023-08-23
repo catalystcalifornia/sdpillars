@@ -62,7 +62,9 @@ stops$Year = substr(stops$date_stop, 1, 4)
 
 
 reason<-dbGetQuery(con, "SELECT * FROM rel_stopreason")
+person_reason<-dbGetQuery(con, "SELECT * FROM rel_persons_reason")
 person<-dbGetQuery(con, "SELECT * FROM rel_persons")
+person_result<-dbGetQuery(con, "SELECT * FROM  rel_persons_result")
 result<-dbGetQuery(con, "SELECT * FROM rel_stopresult")
 search<-dbGetQuery(con, "SELECT * FROM rel_basis_search")
 contra<-dbGetQuery(con, "SELECT * FROM rel_contrabands_evidences")
@@ -758,6 +760,7 @@ panel.background = element_blank())
 
 This analysis looks at what percentage of stops that resulted in a search produced contraband, also known as the hit rate.
 
+
 ## By Police Assignment
 
 In approximately 70% of people searched, SDPD police found no contraband. This rate is similar across all units and gang enforcement stops.
@@ -897,6 +900,170 @@ ggplot(contra_div, aes( x = contraband_found , y =  Percent) ) +
         panel.grid.minor = element_blank(),
 panel.background = element_blank())
 ```
+
+
+# Field interview card completed
+
+This section focuses on stops that resulted in a field interview card being completed.
+
+Look at:  maybe total time spent on them where only result was a fi card?, stop reason for original stop, race, age, stops by police beat
+
+## Total Number of Officer-Initiated Stops
+
+In 2022, __10,663__ officer-initiated stops resulted in a field interview card.  This accounts for 12.1% of all officer-initiated stops in 2022 across all police units. There were __1,407__ officer-initiated stops that resulted in a field interview card and a warning. 
+
+Interestingly, there were 0 calls for service that resulted in a field interview card being completed. This only results from an officer-initiated stop. 
+
+```{r}
+
+field<-stops%>%
+ filter(Year=='2022' & stop_in_response_to_cfs == 0)%>%
+  left_join(person_result)
+
+df<-field%>%
+    mutate(Total=n())%>%
+  group_by(result_simple)%>%
+  mutate(Count=n(),
+         Percent=Count/Total*100)%>%
+  slice(1)%>%
+  arrange(-Percent)%>%
+  select(result_simple, Total, Count, Percent)
+  
+df<-field%>%
+  filter(grepl('Field interview',result_list))
+
+tbl<-as.data.frame(table(df$result_list))
+
+
+
+```
+
+## Time Spent
+
+Time spent on stops where the only result was a field interview card. Note that this is currently using the raw stop duration times, and can be replaced with the stop duration times with outliers capped. 
+
+```{r}
+
+# prep data 
+
+df<-field%>%
+  filter(result_simple=='Field interview card completed')%>%
+  select(stop_id, Year, result_simple, stopduration)%>%
+  filter(Year=='2022')%>%
+  group_by(result_simple)%>%
+  mutate( 'Total Time (Mins)'= sum(stopduration),
+         'Average Stop Time (Mins)' = mean(stopduration, na.rm = FALSE),
+            'Median Stop Time (Mins)'=   median(stopduration,na.rm = FALSE),
+             'Min Stop Time (Mins)'=min(stopduration,na.rm = FALSE),
+            'Max Stop Time (Mins)'=max(stopduration,na.rm = FALSE)
+                     )%>%
+  slice(1)%>%
+  select(-c(stop_id, stopduration))%>%
+  rename('Stop Result'='result_simple')%>%
+  mutate(Assignment = 'All units')%>%
+  relocate(Assignment, .after = Year)
+         
+#create and style flextable
+
+  flextable(df) %>% 
+colformat_double(j = c("Average Stop Time (Mins)",'Median Stop Time (Mins)',
+                       'Min Stop Time (Mins)','Max Stop Time (Mins)', 'Total Time (Mins)'), digits = 1)%>% 
+  set_caption('Time Spent on Stops that Resulted in Field Card Interview for All Units') %>% 
+  theme_vanilla() 
+
+
+```
+
+
+## Stop reasons
+
+Most common stop reasons that resulted in a field interview card being completed 
+
+```{r}
+
+df<-field%>%
+  left_join(person_reason)%>%
+  group_by(reason_simple)%>%
+  mutate(Total=n())%>%
+  filter(result_list %in% c("Field interview card completed","Field interview card completed, Warning (verbal or written)"))%>%
+  group_by(reason_simple, result_list)%>%
+  mutate(Count=n(),
+         Percent=Count/Total*100)%>%
+  mutate(Year='2022',
+         Assignment='All units')%>%
+  select(Year, Assignment, reason_simple, result_list, Total, Count, Percent)%>%
+  slice(1)%>%
+  rename('Stop Result'='result_list',
+         'Stop Reason'='reason_simple')%>% 
+  arrange(-Percent)
+
+# create table
+
+  flextable(df) %>% 
+colformat_double(j = c("Total", "Count", "Percent"), digits = 1)%>% 
+  set_caption('Stop Reasons that Result in Field Interview Card Alone or in Combination with Warning') %>% 
+  theme_vanilla()%>%
+      width(j=3,2,unit="in")%>%
+          width(j=4,2,unit="in")
+
+
+```
+
+## Police assignment
+
+Police assignment of officers that most commonly conduct stops that resulted in a field interview card being completed 
+
+```{r}
+
+
+df<-field%>%
+  group_by(assignment)%>%
+  mutate(Total=n())%>%
+  filter(result_list %in% c("Field interview card completed","Field interview card completed, Warning (verbal or written)"))%>%
+  group_by(assignment, result_list)%>%
+  mutate(Count=n(),
+         Percent=Count/Total*100)%>%
+  mutate(Year='2022')%>%
+  select(Year, assignment, result_list, Total, Count, Percent)%>%
+  slice(1)%>%
+  rename('Assignment'='assignment')%>% 
+  arrange(result_list, -Percent)
+
+# create table
+
+  flextable(df) %>% 
+colformat_double(j = c("Total", "Count", "Percent"), digits = 1)%>% 
+  set_caption('Officer Assignments that make Stops Resultinh in a Field Interview Card Alone or in Combination with Warning') %>% 
+  theme_vanilla()%>%
+          width(j=3,2,unit="in")
+
+
+```
+
+## Age
+
+Age of people stopped that resulted in a field interview card
+
+```{r}
+
+
+```
+
+## Race
+
+Race of people stopped that resulted in a field interview card
+
+```{r}
+
+
+```
+
+## Map by police beat
+
+```{r}
+
+```
+
 
 # Age Demographics {#Age-Demographics}
 
