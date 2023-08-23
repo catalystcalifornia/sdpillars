@@ -904,9 +904,9 @@ panel.background = element_blank())
 
 # Field interview card completed
 
-This section focuses on stops that resulted in a field interview card being completed.
+This section focuses on stops that resulted in a field interview card being completed either alone or in combination with a warning result.
 
-Look at:  maybe total time spent on them where only result was a fi card?, stop reason for original stop, race, age, stops by police beat
+Look at: race, age, stops by police beat
 
 ## Total Number of Officer-Initiated Stops
 
@@ -1033,9 +1033,9 @@ df<-field%>%
 
   flextable(df) %>% 
 colformat_double(j = c("Total", "Count", "Percent"), digits = 1)%>% 
-  set_caption('Officer Assignments that make Stops Resultinh in a Field Interview Card Alone or in Combination with Warning') %>% 
+  set_caption('Officer Assignments that make Stops Resulting in a Field Interview Card Alone or in Combination with Warning') %>% 
   theme_vanilla()%>%
-          width(j=3,2,unit="in")
+          width(j=3,3,unit="in")
 
 
 ```
@@ -1046,6 +1046,35 @@ Age of people stopped that resulted in a field interview card
 
 ```{r}
 
+df<-field%>%
+  left_join(person%>%select(stop_id, person_id, perceived_age))%>%
+  mutate(age_bracket=ifelse(perceived_age <=18, '18 and under',
+                      ifelse(perceived_age <=24 & perceived_age>18, '19-24',
+                       ifelse(perceived_age <=34 & perceived_age>24, '25-34',
+                        ifelse(perceived_age <=44 & perceived_age>34, '35-44',
+                       ifelse(perceived_age <=54 & perceived_age>44, '45-54',
+                        ifelse(perceived_age <=64 & perceived_age>54, '55-64',
+                                ifelse(perceived_age >=65, '65 and older', 'Blank'))))))))%>%
+  group_by(age_bracket)%>%
+  mutate(Total=n())%>%
+  filter(result_list %in% c("Field interview card completed","Field interview card completed, Warning (verbal or written)"))%>%
+  group_by(age_bracket, result_list)%>%
+  mutate(Count=n(),
+         Percent=Count/Total*100)%>%
+  mutate(Year='2022')%>%
+  select(Year, age_bracket, result_list, Total, Count, Percent)%>%
+  slice(1)%>%
+  rename('Age'='age_bracket')%>% 
+  arrange(result_list)
+
+# create table
+
+  flextable(df) %>% 
+colformat_double(j = c("Total", "Count", "Percent"), digits = 1)%>% 
+  set_caption('Age of People Stopped and Receiving a Field Interview Card Alone or in Combination with Warning') %>% 
+  theme_vanilla()%>%
+          width(j=3,3,unit="in")
+  
 
 ```
 
@@ -1055,12 +1084,227 @@ Race of people stopped that resulted in a field interview card
 
 ```{r}
 
+# focus on just nh_race 
+
+df<-field%>%
+  left_join(race)%>%
+  group_by(nh_race)%>%
+  filter(!grepl("nh_sswana|nh_nhpi|nh_aian", nh_race))%>%
+  mutate(Total=n())%>%
+  filter(result_list %in% c("Field interview card completed","Field interview card completed, Warning (verbal or written)"))%>%
+  group_by(nh_race, result_list)%>%
+  mutate(Count=n(),
+         Percent=Count/Total*100)%>%
+  mutate(Year='2022')%>%
+  select(Year, nh_race, result_list, Total, Count, Percent)%>%
+  slice(1)%>%
+  rename('Race'='nh_race')%>% 
+  arrange(-Percent)
+
+# focus on sswana/aian/nhpi
+
+df1<-field%>%
+  left_join(race)%>%
+  select(Year, sswana_flag, aian_flag, nhpi_flag)%>%
+  summarise(Year,
+            sswana=sum(sswana_flag, na.rm=TRUE),
+            nhpi=sum(nhpi_flag, na.rm=TRUE),
+            aian=sum(aian_flag, na.rm=TRUE))%>%
+   pivot_longer(2:4, names_to = "Race", values_to="Total" )%>%
+   group_by(Race)%>%
+  slice(1)
+
+
+df2<-field%>%
+  left_join(race)%>%
+  select(Year, result_list, sswana_flag, aian_flag, nhpi_flag)%>%
+   filter(result_list %in% c("Field interview card completed","Field interview card completed, Warning (verbal or written)"))%>%
+  group_by()
+  mutate(Count=n())%>%
+   mutate(Percent=Count/Total*100)%>%
+   mutate(Assignment='All units')
+ 
+ 
+ # fix order of columns
+ race_allunit_other<-race_allunit_other[,c(1,6,3,2,4,5)]
+ 
+
+
+# create table
+
+  flextable(df) %>% 
+colformat_double(j = c("Total", "Count", "Percent"), digits = 1)%>% 
+  set_caption('Age of People Stopped and Receiving a Field Interview Card Alone or in Combination with Warning') %>% 
+  theme_vanilla()%>%
+          width(j=3,3,unit="in")
+  
+
 
 ```
 
 ## Map by police beat
 
+Map looking at officer-initiated stops that result in a field interview alone or in combination with a warning across SDPD police beats.
+
 ```{r}
+
+# prep beats sf so one feature per beat as to not duplicate/double counts per beat later
+beats_dissolve<-beats%>%
+  mutate(name=ifelse(beat=='511','BARRIO LOGAN',name))%>%
+  group_by(beat,name)%>%
+  summarise()
+  
+#### Field interview ONLY Layer ####
+
+# first summarise count of stops that result in a field interview per beat 
+
+field_alone<-field%>%
+  group_by(beat_name)%>%
+  mutate(Total=n())%>%
+  group_by(beat_name, result_list)%>%
+filter(result_list =="Field interview card completed")%>%
+   mutate(Count=n(),
+          Percent=Count/Total*100)%>%
+  inner_join(beats_dissolve, by=c("beat"="beat"))%>%
+  slice(1)%>%
+  select(beat_name, result_list, Count, Total, Percent, geom)%>%
+  ungroup()
+
+
+# convert for leaflet
+
+field_alone<-st_as_sf(field_alone)%>%
+  st_transform(4326)
+
+#### Field interview alone OR IN COMBINATION with a warning layer ####
+
+field_warning<-field%>%
+  group_by(beat_name)%>%
+  mutate(Total=n())%>%
+  group_by(beat_name, result_list)%>%
+filter(result_list =="Field interview card completed, Warning (verbal or written)")%>%
+   mutate(Count=n(),
+          Percent=Count/Total*100)%>%
+  inner_join(beats_dissolve, by=c("beat"="beat"))%>%
+  slice(1)%>%
+  select(beat_name, result_list, Count, Total, Percent, geom)%>%
+  ungroup()
+
+
+# convert for leaflet
+
+field_warning<-st_as_sf(field_warning)%>%
+  st_transform(4326)
+
+### Divisional overlay ####
+
+# pull in divisional layer to create an overlay
+
+div<-st_read(con, query = "SELECT * FROM sangis_sdpd_divisions_2023")
+
+# transform for leaflet
+
+div<- st_transform(div,4326)
+
+#### Map ####
+
+# set palette
+cc_brand <- c("#E2D9FF", "#BDAFE9","#8E7ACA", "#362178","#211447")
+
+#palette purples
+
+pal <- colorQuantile(cc_brand,beats_allunit$count, n = 5)
+
+pal_alone<-colorBin(
+  palette =cc_brand,
+  domain = field_alone$Percent,
+  bins=c(0,5,10,15,20, Inf),
+   na.color = NA
+)
+
+pal_warning<-colorBin(
+  palette =cc_brand,
+  domain = field_warning$Percent,
+  bins=c(0,1.5,3,Inf),
+   na.color = NA
+)
+
+# popups
+
+popup_alone<-paste0("Assignment: All Units","<br>","Beat Name: ",field_alone$beat_name,"<br>","Stop count: ", field_alone$Count,"<br>","Stop percent: ", percent(field_alone$Percent/100,.1))
+
+popup_warning<-paste0("Assignment: All Units","<br>","Beat Name: ",field_warning$beat_name,"<br>","Stop count: ", field_warning$Count,"<br>","Stop percent: ", percent(field_warning$Percent/100,.1))
+
+div_popup<-paste0(div$div_name)
+
+# legend label
+
+labels_alone<- c( "0%-5%", "5%-10%", "10%-15%", "15%-20%", "Greater than 20%")
+labels_warning<- c( "0%-1.5%", "1.5%-3%", "Greater than 3%")
+
+
+# map
+
+  
+leaflet(width = "100%", height = "600px") %>%
+  
+  addMapPane("alone_pane", zIndex=485)%>%
+  addMapPane("warning_pane", zIndex=485)%>%
+    addMapPane("div_pane", zIndex=485)%>%
+
+  #  field alone layer
+  
+  addPolygons(data = field_alone,  label=~htmlEscape(paste0("Beat name: ", field_alone$beat_name)), color = "#444444", weight = 1, smoothFactor = 0.5,  opacity = 1, fillOpacity =1,  fillColor = ~pal_alone(field_alone$Percent),
+               popup = ~paste0(popup_alone), 
+              highlight = highlightOptions(color = "white", weight = 3, bringToFront = FALSE), group = "Field Interview Card (Alone)",
+               options = pathOptions(pane = "alone_pane")) %>%
+  
+  # Field interview + warning layer
+  
+    addPolygons(data = field_warning,  label=~htmlEscape(paste0("Beat name: ",field_warning$beat_name)), color = "#444444", weight = 1, smoothFactor = 0.5,  opacity = 1, fillOpacity =1,  fillColor = ~pal_warning(field_warning$Percent),
+               popup = ~paste0(popup_warning),
+              highlight = highlightOptions(color = "white", weight = 3, bringToFront = FALSE), group = "Field Interview Card and Warning",
+              options = pathOptions(pane = "warning_pane")) %>%
+  
+  # divisional overlay
+  
+   addPolygons(data=div, color="#CEEA01", weight = 1.5, smoothFactor = 0.5,
+                label=~htmlEscape(paste0("Division name: ",div_popup)),
+  
+                           opacity = 1.0, fillOpacity = 0, group="SDPD Divisions",
+               options = pathOptions(pane = "div_pane"))%>%
+
+
+ ## add legends for stop count for each layer
+  
+  addLegend(position = "bottomleft", pal = pal_alone, values = field_alone$Percent, opacity = 1,
+            title = "Field Interview Card (Alone)", na.label = NA,
+            group="Field Interview Card (Alone)",
+             labFormat= function(type, cuts, p) {  
+                                                  paste0(labels_alone)
+                             }) %>%
+
+  addLegend(position = "bottomleft", pal = pal_warning, values = field_alone$Percent, opacity = 1,
+            title = "Field Interview Card and Warning", 
+            na.label = NA, 
+            group="Field Interview Card and Warning",
+             labFormat= function(type, cuts, p) {  
+                                                  paste0(labels_warning)
+                             }) %>%
+
+  # layer control
+  
+   addLayersControl(overlayGroups = c("Field Interview Card (Alone)","Field Interview Card and Warning", "SDPD Divisions"),
+                   options = layersControlOptions(collapsed = FALSE),
+                   position = 'topright')%>%
+  
+  
+  #hide supervisorial districts by default
+  hideGroup(c( "SDPD Divisions","Field Interview Card and Warning"))%>%
+  
+  #base and view
+  
+  addProviderTiles("CartoDB.Positron")
 
 ```
 
@@ -1211,7 +1455,7 @@ The gang enforcement assignment disproportionately targets Black and Latinx indi
   filter(!grepl('nh_sswana|nh_aian|nh_nhpi', Race))%>%
   drop_na(Race) # drop the row where nh_race = NA because that is for the people with 5+ perceived number of races who were recoded tonh_race = NULL
 
-# calculate rates for all units: mesa/aian/nhpi
+# calculate rates for all units: sswana/aian/nhpi
 
  race_allunit_other<-race%>%
   left_join(stops%>%select(stop_id, Year, assignment, stop_in_response_to_cfs ))%>%
