@@ -906,13 +906,9 @@ panel.background = element_blank())
 
 This section focuses on stops that resulted in a field interview card being completed either alone or in combination with a warning result.
 
-Look at: race, age, stops by police beat
-
 ## Total Number of Officer-Initiated Stops
 
-In 2022, __10,663__ officer-initiated stops resulted in a field interview card.  This accounts for 12.1% of all officer-initiated stops in 2022 across all police units. There were __1,407__ officer-initiated stops that resulted in a field interview card and a warning. 
-
-Interestingly, there were 0 calls for service that resulted in a field interview card being completed. This only results from an officer-initiated stop. 
+In 2022, __10,663__ officer-initiated stops resulted in a field interview card.  This accounts for 12.1% of all officer-initiated stops across all police units. There were __1,407__ officer-initiated stops that resulted in a field interview card and a warning. There were 0 calls for service that resulted in a field interview card being completed. 
 
 ```{r}
 
@@ -940,7 +936,7 @@ tbl<-as.data.frame(table(df$result_list))
 
 ## Time Spent
 
-Time spent on stops where the only result was a field interview card. Note that this is currently using the raw stop duration times, and can be replaced with the stop duration times with outliers capped. 
+In 2022, SDPD officers across all units spent __215,920 minutes__ (approximately 3,599 hours) on stops where the only result was a field interview card. Note that this analysis is currently using the raw stop duration times found in the SD RIPA dataset. This analysis can be repeated using stop duration times with an outlier cap implemented.  
 
 ```{r}
 
@@ -977,7 +973,7 @@ colformat_double(j = c("Average Stop Time (Mins)",'Median Stop Time (Mins)',
 
 ## Stop reasons
 
-Most common stop reasons that resulted in a field interview card being completed 
+This table looks at the most common stop reasons that result in a field interview card being completed alone or in combination with a warning result. More than 20% of stops for __Known to be on Parole / Probation / PRCS / Mandatory Supervision__ or __Reasonable Suspicion__ result in a field interview card being completed. 
 
 ```{r}
 
@@ -1011,7 +1007,7 @@ colformat_double(j = c("Total", "Count", "Percent"), digits = 1)%>%
 
 ## Police assignment
 
-Police assignment of officers that most commonly conduct stops that resulted in a field interview card being completed 
+__Gang enforcement__ and __Other__ police assignments conduct a high count of stops that result in a field interview card being completed alone or in combination with a warning result. 
 
 ```{r}
 
@@ -1042,7 +1038,7 @@ colformat_double(j = c("Total", "Count", "Percent"), digits = 1)%>%
 
 ## Age
 
-Age of people stopped that resulted in a field interview card
+The age distribution of people who are stopped with a resulting field interview card alone or in combination with a warning result is somewhat consistent. Over 14% of people age 18 and under are being stopped and having a field interview card completed. 
 
 ```{r}
 
@@ -1080,7 +1076,7 @@ colformat_double(j = c("Total", "Count", "Percent"), digits = 1)%>%
 
 ## Race
 
-Race of people stopped that resulted in a field interview card
+Black and Latinx people are disproportionately stopped with a field interview card being completed as a result, alone or in combination with a warning. There is also a high percentage of AIAN people being stopped and having a field interview card completed. 
 
 ```{r}
 
@@ -1095,56 +1091,60 @@ df<-field%>%
   group_by(nh_race, result_list)%>%
   mutate(Count=n(),
          Percent=Count/Total*100)%>%
-  mutate(Year='2022')%>%
-  select(Year, nh_race, result_list, Total, Count, Percent)%>%
+  mutate(Year='2022',
+         Assignment='All units',)%>%
+  select(Year, Assignment, nh_race, result_list, Total, Count, Percent)%>%
   slice(1)%>%
-  rename('Race'='nh_race')%>% 
+  rename('Race'='nh_race',
+         'Result'='result_list')%>% 
   arrange(-Percent)
 
 # focus on sswana/aian/nhpi
 
 df1<-field%>%
   left_join(race)%>%
-  select(Year, sswana_flag, aian_flag, nhpi_flag)%>%
-  summarise(Year,
-            sswana=sum(sswana_flag, na.rm=TRUE),
-            nhpi=sum(nhpi_flag, na.rm=TRUE),
-            aian=sum(aian_flag, na.rm=TRUE))%>%
-   pivot_longer(2:4, names_to = "Race", values_to="Total" )%>%
-   group_by(Race)%>%
-  slice(1)
-
-
-df2<-field%>%
-  left_join(race)%>%
-  select(Year, result_list, sswana_flag, aian_flag, nhpi_flag)%>%
+  select(Year, stop_id, person_id, result_list, sswana_flag, aian_flag, nhpi_flag)%>%
+  pivot_longer(5:7, names_to = "Race", values_to="value" )%>%
+ group_by(result_list, Race)%>%
    filter(result_list %in% c("Field interview card completed","Field interview card completed, Warning (verbal or written)"))%>%
-  group_by()
-  mutate(Count=n())%>%
-   mutate(Percent=Count/Total*100)%>%
-   mutate(Assignment='All units')
- 
- 
- # fix order of columns
- race_allunit_other<-race_allunit_other[,c(1,6,3,2,4,5)]
- 
+ mutate(Count=sum(value))%>%
+  slice(1)%>%
+  mutate(Total=ifelse(Race %in% "aian_flag", 228,
+                      ifelse(Race %in% "sswana_flag", 3052, 871)),
+         Race=ifelse(Race %in% "aian_flag", "AIAN",
+                      ifelse(Race %in% "sswana_flag", "SSWANA", "NHPI")),
+         Percent=Count/Total*100,
+         Assignment='All units')%>%
+  rename('Result'='result_list')%>% 
+  select(Year, Assignment, Race, Result, Total, Count, Percent )
+  
+  # Combine both race tables and create race labels
+
+ df<-rbind(df, df1)%>%
+   mutate(Race=ifelse(Race %in% "nh_white", "White NH",
+                 ifelse(Race %in% "nh_black", "Black NH",   
+                        ifelse(Race %in% "latinx", "Latinx",
+                               ifelse(Race %in% "nh_asian", "Asian NH",
+                                      ifelse(Race %in% "nh_twoormor", "Multiracial",
+                                    Race))))))%>%
+   arrange(Result, -Percent)
 
 
 # create table
 
   flextable(df) %>% 
 colformat_double(j = c("Total", "Count", "Percent"), digits = 1)%>% 
-  set_caption('Age of People Stopped and Receiving a Field Interview Card Alone or in Combination with Warning') %>% 
+  set_caption('Race of People Stopped and Receiving a Field Interview Card Alone or in Combination with Warning') %>% 
   theme_vanilla()%>%
-          width(j=3,3,unit="in")
+          width(j=4,3,unit="in")
   
 
 
 ```
 
-## Map by police beat
+## Map by police beat 
 
-Map looking at officer-initiated stops that result in a field interview alone or in combination with a warning across SDPD police beats.
+This map visualizes the percentage of officer-initiated stops that result in a field interview card alone or in combination with a warning across SDPD police beats and divisions. Beats in the Southern region of San Diego have a higher rate of stops resulting in a field interview card being completed.
 
 ```{r}
 
@@ -1212,8 +1212,6 @@ div<- st_transform(div,4326)
 cc_brand <- c("#E2D9FF", "#BDAFE9","#8E7ACA", "#362178","#211447")
 
 #palette purples
-
-pal <- colorQuantile(cc_brand,beats_allunit$count, n = 5)
 
 pal_alone<-colorBin(
   palette =cc_brand,
