@@ -62,7 +62,9 @@ stops$Year = substr(stops$date_stop, 1, 4)
 
 
 reason<-dbGetQuery(con, "SELECT * FROM rel_stopreason")
+person_reason<-dbGetQuery(con, "SELECT * FROM rel_persons_reason")
 person<-dbGetQuery(con, "SELECT * FROM rel_persons")
+person_result<-dbGetQuery(con, "SELECT * FROM  rel_persons_result")
 result<-dbGetQuery(con, "SELECT * FROM rel_stopresult")
 search<-dbGetQuery(con, "SELECT * FROM rel_basis_search")
 contra<-dbGetQuery(con, "SELECT * FROM rel_contrabands_evidences")
@@ -758,6 +760,7 @@ panel.background = element_blank())
 
 This analysis looks at what percentage of stops that resulted in a search produced contraband, also known as the hit rate.
 
+
 ## By Police Assignment
 
 In approximately 70% of people searched, SDPD police found no contraband. This rate is similar across all units and gang enforcement stops.
@@ -897,6 +900,7 @@ ggplot(contra_div, aes( x = contraband_found , y =  Percent) ) +
         panel.grid.minor = element_blank(),
 panel.background = element_blank())
 ```
+
 
 # Age Demographics {#Age-Demographics}
 
@@ -1044,7 +1048,7 @@ The gang enforcement assignment disproportionately targets Black and Latinx indi
   filter(!grepl('nh_sswana|nh_aian|nh_nhpi', Race))%>%
   drop_na(Race) # drop the row where nh_race = NA because that is for the people with 5+ perceived number of races who were recoded tonh_race = NULL
 
-# calculate rates for all units: mesa/aian/nhpi
+# calculate rates for all units: sswana/aian/nhpi
 
  race_allunit_other<-race%>%
   left_join(stops%>%select(stop_id, Year, assignment, stop_in_response_to_cfs ))%>%
@@ -1385,6 +1389,370 @@ leaflet(width = "100%", height = "600px") %>%
   
   #hide supervisorial districts by default
   hideGroup(c( "SDPD Divisions","Gang Enforcement"))%>%
+  
+  #base and view
+  
+  addProviderTiles("CartoDB.Positron")
+
+```
+
+# Field interview card completed
+
+This section focuses on stops that resulted in a field interview card being completed either alone or in combination with a warning result.
+
+## Total Number of Officer-Initiated Stops
+
+In 2022, __10,663__ officer-initiated stops resulted in a field interview card.  This accounts for 12.1% of all officer-initiated stops across all police units. There were __1,407__ officer-initiated stops that resulted in a field interview card and a warning. There were 0 calls for service that resulted in a field interview card being completed. 
+
+```{r}
+
+field<-stops%>%
+ filter(Year=='2022' & stop_in_response_to_cfs == 0)%>%
+  left_join(person_result)
+
+df<-field%>%
+    mutate(Total=n())%>%
+  group_by(result_simple)%>%
+  mutate(Count=n(),
+         Percent=Count/Total*100)%>%
+  slice(1)%>%
+  arrange(-Percent)%>%
+  select(result_simple, Total, Count, Percent)
+  
+df<-field%>%
+  filter(grepl('Field interview',result_list))
+
+tbl<-as.data.frame(table(df$result_list))
+
+
+
+```
+
+## Time Spent
+
+In 2022, SDPD officers across all units spent __215,920 minutes__ (approximately 3,599 hours) on stops where the only result was a field interview card. Note that this analysis is currently using the raw stop duration times found in the SD RIPA dataset. This analysis can be repeated using stop duration times with an outlier cap implemented.  
+
+```{r}
+
+# prep data 
+
+df<-field%>%
+  filter(result_simple=='Field interview card completed')%>%
+  select(stop_id, Year, result_simple, stopduration)%>%
+  filter(Year=='2022')%>%
+  group_by(result_simple)%>%
+  mutate( 'Total Time (Mins)'= sum(stopduration),
+         'Average Stop Time (Mins)' = mean(stopduration, na.rm = FALSE),
+            'Median Stop Time (Mins)'=   median(stopduration,na.rm = FALSE),
+             'Min Stop Time (Mins)'=min(stopduration,na.rm = FALSE),
+            'Max Stop Time (Mins)'=max(stopduration,na.rm = FALSE)
+                     )%>%
+  slice(1)%>%
+  select(-c(stop_id, stopduration))%>%
+  rename('Stop Result'='result_simple')%>%
+  mutate(Assignment = 'All units')%>%
+  relocate(Assignment, .after = Year)
+         
+#create and style flextable
+
+  flextable(df) %>% 
+colformat_double(j = c("Average Stop Time (Mins)",'Median Stop Time (Mins)',
+                       'Min Stop Time (Mins)','Max Stop Time (Mins)', 'Total Time (Mins)'), digits = 1)%>% 
+  set_caption('Time Spent on Stops that Resulted in Field Card Interview for All Units') %>% 
+  theme_vanilla() 
+
+
+```
+
+
+## Stop reasons
+
+This table looks at the most common stop reasons that result in a field interview card being completed. The majority of stops resulting in a field card interview are for __Reasonable Suspicion__ stops, at 73%, followed by __Traffic Violation__ stops.
+
+```{r}
+
+df<-field%>%
+  left_join(person_reason)%>%
+  filter(result_simple == "Field interview card completed")%>%
+  group_by(result_simple)%>%
+  mutate(Total=n())%>%
+  group_by(reason_simple, result_simple)%>%
+  mutate(Count=n(),
+         Percent=Count/Total*100)%>%
+  mutate(Year='2022',
+         Assignment='All units')%>%
+  select(Year, Assignment, reason_simple, result_simple, Total, Count, Percent)%>%
+  slice(1)%>%
+  rename('Stop Result'='result_simple',
+         'Stop Reason'='reason_simple')%>% 
+  arrange(-Percent)
+
+# create table
+
+  flextable(df) %>% 
+colformat_double(j = c("Total", "Count", "Percent"), digits = 1)%>% 
+  set_caption('Stop Reasons that Result in Field Interview Card') %>% 
+  theme_vanilla()%>%
+      width(j=3,2,unit="in")%>%
+          width(j=4,2,unit="in")
+
+
+```
+
+## Police assignment
+
+__Gang enforcement__ and __Other__ police assignments conduct a high count of stops that result in a field interview card being completed. 
+
+```{r}
+
+
+df<-field%>%
+  group_by(assignment)%>%
+  mutate(Total=n())%>%
+  filter(result_simple == "Field interview card completed")%>%
+  group_by(assignment, result_list)%>%
+  mutate(Count=n(),
+         Percent=Count/Total*100)%>%
+  mutate(Year='2022')%>%
+  select(Year, assignment, result_simple, Total, Count, Percent)%>%
+  slice(1)%>%
+  rename('Assignment'='assignment',
+         'Stop Result'='result_simple')%>% 
+  arrange('Stop Result', -Percent)
+
+# create table
+
+  flextable(df) %>% 
+colformat_double(j = c("Total", "Count", "Percent"), digits = 1)%>% 
+  set_caption('Officer Assignments that make Stops Resulting in a Field Interview Card') %>% 
+  theme_vanilla()%>%
+          width(j=3,3,unit="in")
+
+
+```
+
+## Age
+
+Nearly 1/4th of people who are stopped with a resulting field interview card being completed are age 25-34 or 35-44. 
+
+```{r}
+
+df<-field%>%
+  left_join(person%>%select(stop_id, person_id, perceived_age))%>%
+  mutate(age_bracket=ifelse(perceived_age <=18, '18 and under',
+                      ifelse(perceived_age <=24 & perceived_age>18, '19-24',
+                       ifelse(perceived_age <=34 & perceived_age>24, '25-34',
+                        ifelse(perceived_age <=44 & perceived_age>34, '35-44',
+                       ifelse(perceived_age <=54 & perceived_age>44, '45-54',
+                        ifelse(perceived_age <=64 & perceived_age>54, '55-64',
+                                ifelse(perceived_age >=65, '65 and older', 'Blank'))))))))%>%
+    filter(result_simple == "Field interview card completed")%>%
+  group_by(result_simple)%>%
+  mutate(Total=n())%>%
+  group_by(age_bracket, result_simple)%>%
+  mutate(Count=n(),
+         Percent=Count/Total*100)%>%
+  mutate(Year='2022')%>%
+  select(Year, age_bracket, result_simple, Total, Count, Percent)%>%
+  slice(1)%>%
+  rename('Age'='age_bracket',
+         'Stop Result'='result_simple')%>% 
+  arrange('Stop Result')
+
+# create table
+
+  flextable(df) %>% 
+colformat_double(j = c("Total", "Count", "Percent"), digits = 1)%>% 
+  set_caption('Age of People Stopped and Receiving a Field Interview Card') %>% 
+  theme_vanilla()%>%
+          width(j=3,3,unit="in")
+  
+
+```
+
+## Race
+
+Out of all people that are stopped with a resulting field interview card being completed, over 1/3 are Latinx people, and over 1/4 are Black people.
+
+```{r}
+
+# focus on just nh_race 
+
+df<-field%>%
+  left_join(race)%>%
+    filter(result_simple == "Field interview card completed")%>%
+  mutate(Total=n())%>%
+   filter(!grepl("nh_sswana|nh_nhpi|nh_aian", nh_race))%>%
+  group_by(result_simple, nh_race)%>%
+  mutate(Count=n(),
+         Percent=Count/Total*100)%>%
+  mutate(Year='2022',
+         Assignment='All units',)%>%
+  select(Year, Assignment, nh_race, result_simple, Total, Count, Percent)%>%
+  slice(1)%>%
+  rename('Race'='nh_race',
+         'Stop Result'='result_simple')%>% 
+  arrange(-Percent)
+
+# focus on sswana/aian/nhpi
+
+df1<-field%>%
+  left_join(race)%>%
+  select(Year, stop_id, person_id, result_simple, sswana_flag, aian_flag, nhpi_flag)%>%
+  pivot_longer(5:7, names_to = "Race", values_to="value" )%>%
+ group_by(result_simple, Race)%>%
+    filter(result_simple == "Field interview card completed")%>%
+ mutate(Count=sum(value))%>%
+  slice(1)%>%
+  mutate(Total=10663,
+         Percent=Count/Total*100,
+         Assignment='All units')%>%
+  rename('Stop Result'='result_simple')%>% 
+  select(Year, Assignment, Race, 'Stop Result', Total, Count, Percent )
+  
+  # Combine both race tables and create race labels
+
+ df<-rbind(df, df1)%>%
+   mutate(Race=ifelse(Race %in% "nh_white", "White NH",
+                 ifelse(Race %in% "nh_black", "Black NH",   
+                        ifelse(Race %in% "latinx", "Latinx",
+                               ifelse(Race %in% "nh_asian", "Asian NH",
+                                      ifelse(Race %in% "nh_twoormor", "Multiracial",
+                                             ifelse(Race %in% "aian_flag", "AIAN",
+                                                    ifelse(Race %in% "nhpi_flag", "NHPI",
+                                                           ifelse(Race %in% "sswana_flag", "SSWANA",
+                                    Race)))))))))%>%
+   arrange('Stop Result', -Percent)
+
+
+# create table
+
+  flextable(df) %>% 
+colformat_double(j = c("Total", "Count", "Percent"), digits = 1)%>% 
+  set_caption('Race of People Stopped and Receiving a Field Interview Card') %>% 
+  theme_vanilla()%>%
+          width(j=4,3,unit="in")
+  
+
+
+```
+
+
+
+## Map by police beat 
+
+This map visualizes the percentage of officer-initiated stops that result in a field interview card across SDPD police beats and divisions. Beats in the Southern region of San Diego have a higher rate of stops resulting in a field interview card being completed.
+
+```{r}
+
+# prep beats sf so one feature per beat as to not duplicate/double counts per beat later
+
+beats_dissolve<-beats%>%
+  mutate(name=ifelse(beat=='511','BARRIO LOGAN',name))%>%
+  group_by(beat,name)%>%
+  summarise()
+  
+#### Field interview ONLY Layer ####
+
+# first summarise count of stops that result in a field interview per beat 
+
+field_alone<-field%>%
+  group_by(beat_name)%>%
+  mutate(Total=n())%>%
+  group_by(beat_name, result_list)%>%
+filter(result_list =="Field interview card completed")%>%
+   mutate(Count=n(),
+          Percent=Count/Total*100)%>%
+  inner_join(beats_dissolve, by=c("beat"="beat"))%>%
+  slice(1)%>%
+  select(beat_name, result_list, Count, Total, Percent, geom)%>%
+  ungroup()
+
+
+# convert for leaflet
+
+field_alone<-st_as_sf(field_alone)%>%
+  st_transform(4326)
+
+
+### Divisional overlay ####
+
+# pull in divisional layer to create an overlay
+
+div<-st_read(con, query = "SELECT * FROM sangis_sdpd_divisions_2023")
+
+# transform for leaflet
+
+div<- st_transform(div,4326)
+
+#### Map ####
+
+# set palette
+cc_brand <- c("#E2D9FF", "#BDAFE9","#8E7ACA", "#362178","#211447")
+
+#palette purples
+
+pal_alone<-colorBin(
+  palette =cc_brand,
+  domain = field_alone$Percent,
+  bins=c(0,5,10,15,20, Inf),
+   na.color = NA
+)
+
+# popups
+
+popup_alone<-paste0("Assignment: All Units","<br>","Beat Name: ",field_alone$beat_name,"<br>","Stop count: ", field_alone$Count,"<br>","Stop percent: ", percent(field_alone$Percent/100,.1))
+
+div_popup<-paste0(div$div_name)
+
+# legend label
+
+labels_alone<- c( "0%-5%", "5%-10%", "10%-15%", "15%-20%", "Greater than 20%")
+
+
+# map
+
+  
+leaflet(width = "100%", height = "600px") %>%
+  
+  addMapPane("alone_pane", zIndex=485)%>%
+    addMapPane("div_pane", zIndex=485)%>%
+
+  #  field alone layer
+  
+  addPolygons(data = field_alone,  label=~htmlEscape(paste0("Beat name: ", field_alone$beat_name)), color = "#444444", weight = 1, smoothFactor = 0.5,  opacity = 1, fillOpacity =1,  fillColor = ~pal_alone(field_alone$Percent),
+               popup = ~paste0(popup_alone), 
+              highlight = highlightOptions(color = "white", weight = 3, bringToFront = FALSE), group = "Field Interview Card (Alone)",
+               options = pathOptions(pane = "alone_pane")) %>%
+  
+ 
+  # divisional overlay
+  
+   addPolygons(data=div, color="#CEEA01", weight = 1.5, smoothFactor = 0.5,
+                label=~htmlEscape(paste0("Division name: ",div_popup)),
+  
+                           opacity = 1.0, fillOpacity = 0, group="SDPD Divisions",
+               options = pathOptions(pane = "div_pane"))%>%
+
+
+ ## add legends for stop count for each layer
+  
+  addLegend(position = "bottomleft", pal = pal_alone, values = field_alone$Percent, opacity = 1,
+            title = "Field Interview Card (Alone)", na.label = NA,
+            group="Field Interview Card (Alone)",
+             labFormat= function(type, cuts, p) {  
+                                                  paste0(labels_alone)
+                             }) %>%
+
+  # layer control
+  
+   addLayersControl(overlayGroups = c("Field Interview Card (Alone)", "SDPD Divisions"),
+                   options = layersControlOptions(collapsed = FALSE),
+                   position = 'topright')%>%
+  
+  
+  #hide divisions by default
+  hideGroup("SDPD Divisions")%>%
   
   #base and view
   
