@@ -1766,7 +1766,7 @@ leaflet(width = "100%", height = "600px") %>%
 
 ## Race and SDPD Division
 
-This graph shows the percentage of officer initiated stops that result in a field interview card by race/ethnicity for two SDPD divisions: Southeastern and Northern SDPD divisions. It is clear that in Southeast San Diego Black and Latinx people are disproportionately being stopped with field interview cards being completed. 
+This graph shows the percentage of people, by race/ethnicity, stopped for officer initiated stops that resulted in a field interview card for two SDPD divisions: Southeastern and Northern. In the Southeast division, Black and Latinx people are disproportionately being stopped with field interview cards being completed. In contrast, a much higher percentage of White people are being stopped with a field card interview being completed in the Northern district.
 
 ```{r fig.height = 7, fig.width = 13}
 
@@ -1831,10 +1831,11 @@ final<-rbind(df, df1)%>%
                  y= Percent),vjust = -0.4, size = 4, color ="black", fontface="bold")+
       facet_wrap( ~ div_name, nrow=1) + 
       xlab("")+
-  ylab("Percent of Officer-Initiated Stops (%)")+
+  ylab("Percent of Officer-Initiated Stops Resulting in Field Interview Card (%)\n")+
     scale_x_discrete(labels = wrap_format(10))+
   theme_bw()+
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size=15),
+        axis.text.y = element_text(size=15),
         strip.background = element_rect(fill = "#362178"),
         strip.text = element_text(color = "white", size=15, face="bold"),
         panel.grid.major = element_blank(), 
