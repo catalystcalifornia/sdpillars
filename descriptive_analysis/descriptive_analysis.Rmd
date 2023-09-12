@@ -1766,7 +1766,10 @@ leaflet(width = "100%", height = "600px") %>%
 
 ## Race and SDPD Division
 
-This graph shows the percentage of people, by race/ethnicity, stopped for officer initiated stops that resulted in a field interview card for two SDPD divisions: Southeastern and Northern. In the Southeast division, Black and Latinx people are disproportionately being stopped with field interview cards being completed. In contrast, a much higher percentage of White people are being stopped with a field card interview being completed in the Northern district.
+In both Northern and Southeastern SDPD divisions, __Black people are disproportionately stopped for an officer-initiated stop that results in a field interview card.__ Out of the total population in the Northern division, only 2% of people are Black, yet they make up 16.3% of stops resulting in a field interview card. Similarly, 49.9% of people stopped for an officer-initiated stop resulting in a field interview card are Black in the Southeastern division, yet Black people only make up 14.9% of the population in that division. 
+
+__White people stopped with a resulting field interview card are underrepresented in both Northern and Southeastern divisions.__ While White people make up 62.4% of the total Northern division population, only 53.5% of people stopped with a resulting field interview card are White in that division. In the Southeastern division, 10% of the total population is White but only 7.5% of people stopped with a resulting field interview card are White in that division.
+
 
 ```{r fig.height = 7, fig.width = 13}
 
