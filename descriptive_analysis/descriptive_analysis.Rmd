@@ -1178,7 +1178,7 @@ div_race_nh<-div_race_nh%>%
            Percent=Count/Total*100)%>%
   slice(1)%>%
   rename( 'Race'='nh_race')%>%
-  filter(!grepl('nh_mesa|nh_aian|nh_nhpi', Race))%>%
+  filter(!grepl('nh_sswana|nh_aian|nh_nhpi', Race))%>%
   drop_na(Race) # drop the row where nh_race = NA because that is for the people with 5+ perceived number of races who were recoded to nh_race = NULL
 
 
@@ -1192,7 +1192,7 @@ div_race_nh<-div_race_nh%>%
    group_by(div_name)%>%
     mutate(Total=n())%>%
   summarise( Total,
-            mesa=sum(sswana_flag, na.rm=TRUE),
+            sswana=sum(sswana_flag, na.rm=TRUE),
             nhpi=sum(nhpi_flag, na.rm=TRUE),
             aian=sum(aian_flag, na.rm=TRUE))%>%
    pivot_longer(3:5, names_to = "Race", values_to="Count" )%>%
@@ -1214,7 +1214,7 @@ div_race_nh<-div_race_nh%>%
                  ifelse(Race %in% "nh_black", "Black NH",   
                         ifelse(Race %in% "latinx", "Latinx",
                                ifelse(Race %in% "nh_asian", "Asian NH",
-                                      ifelse(Race %in% "mesa", "SSWANA",
+                                      ifelse(Race %in% "sswana", "SSWANA",
                                              ifelse(Race %in% "aian", "AIAN",
                                                     ifelse(Race %in% "nhpi", "NHPI", "Multiracial"))))))))
 
