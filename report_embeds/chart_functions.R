@@ -19,12 +19,14 @@ orange <- "#F25922"
 peridot <- "#CEEA01"
 lavender <- "#CEC4E2"
 meteorite <- "#3A207D"
+ccblue <- "#0860BC"
 
 black <- "#000000"
 alabaster<-"#FBFBFB"
 gainsboro <- "#DEDEDE"
 
 divergent_color_ramp <- c("#372278", "#5F3B63","#A8683C", "#D58424", "#FF9900")
+grouped_color_ramp <-c(meteorite, orange, peridot, "#BDAFE9", "#E2D9FF")
 
 ## FONTS ##
 main_font <- "Inter"
@@ -107,7 +109,7 @@ cc_theme <- hc_theme(
       fontFamily = main_font, # font_axis_label
       fontWeight = regular_font_weight,
       color = black,
-      fontSize = '1vw'
+      fontSize = '1.5vw'
     ),
     
     itemHoverStyle = list(
@@ -255,28 +257,25 @@ fx_stack <- function(
     x, # independent variable
     y, # dependent variable
     group_var, # variable to group by
+    group_colors, # vector for colors to use
     top_finding, # chart title
     subtitle,
     tooltip_text,
     caption) {
   
   hchart(df, 
-         "bar", hcaes(x = !!rlang::ensym(chart_x), y = !!rlang::ensym(chart_y), group = !!rlang::ensym(chart_group)),
+         "bar", hcaes(x = !!rlang::ensym(x), y = !!rlang::ensym(y), group = !!rlang::ensym(group_var)),
          stacking = "percent",
-         tooltip =  list(headerFormat='',pointFormat=chart_tooltip)) %>%
+         tooltip =  list(headerFormat='',pointFormat=tooltip_text)) %>%
     
     hc_title(
-      text = chart_title,
-      align = "left",
-      widthAdjust = -50) %>%
+      text = top_finding) %>%
     
     hc_subtitle(
-      text = chart_subtitle,
-      align = "left") %>%
+      text = subtitle) %>%
     
     hc_caption(
-      text = chart_caption,
-      align = "left") %>%
+      text = caption) %>%
     
     hc_yAxis(title = list(text = paste0(""))) %>%
     
@@ -284,21 +283,46 @@ fx_stack <- function(
                           labels=list(position="bottom"))) %>%
     
     hc_legend(enabled = TRUE, 
-              reversed =  TRUE)%>% 
+              reversed =  TRUE,
+              x=50)%>% 
     
     hc_add_theme(cc_theme)%>%
     
-    # hc_size(height=480, 
-    #         width=830) %>%
+    hc_colors(group_colors) %>%
     
     hc_exporting(
       enabled = TRUE, sourceWidth=900, sourceHeight=600, 
       chartOptions=list(plotOptions=list(series=list(dataLabels=list(enabled=TRUE,format='{point.rate:.1f}%')))),
-      filename = paste0(chart_subtitle,"_Catalyst California, catalystcalifornia.org, 2023."),
+      filename = paste0(subtitle,"_Catalyst California, catalystcalifornia.org, 2023."),
       buttons=list(contextButton=list(menuItems=list('downloadPNG', 'downloadSVG',
                                                      'downloadXLS', 'downloadCSV'))))
 }
 
+#### test stacked bar chart ####
+library(RPostgreSQL)
+source("W:\\RDA Team\\R\\credentials_source.R")
+pillars_conn <- connect_to_db("rjs_pillars")
+
+stoprates_age_race_ficard_person <- dbGetQuery(pillars_conn, "SELECT * FROM data.report_stoprates_age_race_ficard_person")
+
+race_levels<-c("latinx","nh_asian","nh_black","nh_nhpi","nh_white", "aian", "nhpi", "sswana", "nh_twoormor")
+race_labels<-c("latinx","nh_asian","nh_black","nh_nhpi","nh_white", "aian", "nhpi", "sswana", "nh_twoormor")
+stoprates_age_race_ficard_person$race<-factor(stoprates_age_race_ficard_person$race, ordered=TRUE, 
+                                               levels=race_levels, labels=race_labels)
+
+tooltip_text <- "<b>{point.rate:.1f}%</b> of SDPD field interviews were conducted on <b>{point.race:.1f} people  ages {point.age_bracket:.1f} </b>"
+
+fx_stack(  
+  df = stoprates_age_race_ficard_person,
+  x = 'age_bracket',
+  y = 'rate',
+  group_var = 'race',
+  group_colors = c(meteorite, lavender, orange, peridot, ccblue, gainsboro, "#211447",
+                         "#FF9E0D", "#A8683C"),
+  top_finding = 'A top level finding about systemic impact',
+  subtitle = 'stop rates for field interviews for every race across age brackets',
+  tooltip = tooltip_text,
+  caption = paste0(racenote,"<br><br>", sourcenote, "<br>","Analysis for all officer-initiated stops.","<br>"))
 
 #### Item Chart ####
 
@@ -434,15 +458,7 @@ col <-c(meteorite, lavender, orange, peridot, ccblue, gainsboro, "#211447",
 
 
 ## Test Stacked Bar Chart ##
-fx_stack(  
-  df = df_merge,
-  chart_x = 'question_label',
-  chart_y = 'rate',
-  chart_group = 'value',
-  chart_title = title_text,
-  chart_subtitle = subtitle_text,
-  chart_tooltip = tooltip_text,
-  chart_caption = caption_text)
+
 
 ## Test Item Chart ##
 hchart(
