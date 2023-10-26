@@ -133,7 +133,7 @@ cc_theme <- hc_theme(
 sourcenote<-paste0("Catalyst California's calculations based on City of San Diego's Police Stop Data (2022), catalystcalifornia.org, 2023.")
 racenote<-paste0("Race/ethnicity: AIAN=American Indian or Alaska Native, NHPI=Native Hawaiian or Pacific Islander, SSWANA=South Asian, Southwest <br>Asian, or North African.")
 
-#### Combined Bar and Bubble Chart - Bubblepop chart ####
+#### Bubblepop Chart - Combined Bar and Bubble Charts ####
 
 fx_bubblepopchart <- function(
     db,
@@ -277,60 +277,60 @@ fx_stack <- function(
 #### Item Chart ####
 #read in table
 
-df<-dbGetQuery(con, "SELECT * FROM report_timespent_result_stop ")
-
-
-# for now filter just traffic and reasonable suspicion as separate dfs
-
-df_traffic<-df%>%
-  filter(grepl('Traffic Violation',stop_reason_short))%>%
-  arrange(-hours_rate)
+# df<-dbGetQuery(con, "SELECT * FROM report_timespent_result_stop ")
+# 
+# 
+# # for now filter just traffic and reasonable suspicion as separate dfs
+# 
+# df_traffic<-df%>%
+#   filter(grepl('Traffic Violation',stop_reason_short))%>%
+#   arrange(-hours_rate)
 
 
 # mutate(hours_rate= round(hours_rate, 0))
 
-col <-c(meteorite, lavender, orange, peridot, "#177FEB", "#733256", "#9B9A9A", "#211447",
-        "#FF9E0D")
-
-# mobile_screen_opts <- list(layout="vertical")
-
-hc<-hchart(
-  df_traffic,
-  "item",
-  rows=7,
-  hcaes(
-    name = stop_result_short,
-    y = hours_rate,
-    label = stop_result_short,
-    color = col),
-  name = "Total Hours",
-  showInLegend = TRUE) %>%
-  hc_title(text = "The majority of hours LBPD spends on traffic stops only result in citations, warnings, or no action.", 
-           widthAdjust = -50,
-           align="left" )%>%
-  hc_subtitle(text = "Hours Spent on Traffic Stops by Result", 
-              align="left" ) %>%
-  hc_size(height=450) %>%
-  hc_caption(text = paste0(sourcenote," Analysis for all officer-initiated stops for traffic violations.")) %>%
-  hc_add_theme(cc_theme)%>%
-  hc_exporting(enabled = TRUE, sourceWidth=900, sourceHeight=600,
-               chartOptions=list(plotOptions=list(series=list(dataLabels=list(enabled=TRUE,                                                           format=paste0(list(pointFormat='{point.hours_rate:.1f}')))))),
-               filename = paste0("Hours Spent on Traffic Stops by Result",
-                                 "_Catalyst California, catalystcalifornia.org, 2023."))%>%
-  
-  hc_legend(title=list(text='<span style="color: #000000; font-weight: bold">Single dot represents 1 hour out of 100 hours</span><br/><span style="color: #666; font-style: italic">Click to hide</span>'),
-            enable = TRUE,
-            labelFormat = '{name} <span style="opacity: 0.4">{hours_rate:.1f}</span>')  %>%
-  hc_tooltip(headerFormat="", 
-             pointFormat = "Out of 100 hours, LBPD spent <b>{point.hours_rate:.1f}</b> hours on traffic stops that resulted in <b>{point.stop_result_short}</b>") %>%
-  
-  # add in margins so the graph isn't cut off
-  hc_chart(
-    marginRight = 20,
-    marginLeft=20
-  )
-
-hc
+# col <-c(meteorite, lavender, orange, peridot, "#177FEB", "#733256", "#9B9A9A", "#211447",
+#         "#FF9E0D")
+# 
+# # mobile_screen_opts <- list(layout="vertical")
+# 
+# hc<-hchart(
+#   df_traffic,
+#   "item",
+#   rows=7,
+#   hcaes(
+#     name = stop_result_short,
+#     y = hours_rate,
+#     label = stop_result_short,
+#     color = col),
+#   name = "Total Hours",
+#   showInLegend = TRUE) %>%
+#   hc_title(text = "The majority of hours LBPD spends on traffic stops only result in citations, warnings, or no action.", 
+#            widthAdjust = -50,
+#            align="left" )%>%
+#   hc_subtitle(text = "Hours Spent on Traffic Stops by Result", 
+#               align="left" ) %>%
+#   hc_size(height=450) %>%
+#   hc_caption(text = paste0(sourcenote," Analysis for all officer-initiated stops for traffic violations.")) %>%
+#   hc_add_theme(cc_theme)%>%
+#   hc_exporting(enabled = TRUE, sourceWidth=900, sourceHeight=600,
+#                chartOptions=list(plotOptions=list(series=list(dataLabels=list(enabled=TRUE,                                                           format=paste0(list(pointFormat='{point.hours_rate:.1f}')))))),
+#                filename = paste0("Hours Spent on Traffic Stops by Result",
+#                                  "_Catalyst California, catalystcalifornia.org, 2023."))%>%
+#   
+#   hc_legend(title=list(text='<span style="color: #000000; font-weight: bold">Single dot represents 1 hour out of 100 hours</span><br/><span style="color: #666; font-style: italic">Click to hide</span>'),
+#             enable = TRUE,
+#             labelFormat = '{name} <span style="opacity: 0.4">{hours_rate:.1f}</span>')  %>%
+#   hc_tooltip(headerFormat="", 
+#              pointFormat = "Out of 100 hours, LBPD spent <b>{point.hours_rate:.1f}</b> hours on traffic stops that resulted in <b>{point.stop_result_short}</b>") %>%
+#   
+#   # add in margins so the graph isn't cut off
+#   hc_chart(
+#     marginRight = 20,
+#     marginLeft=20
+#   )
+# 
+# hc
 
 
 #### Testing Functions ####
@@ -339,8 +339,9 @@ source("W:\\RDA Team\\R\\credentials_source.R")
 conn <- connect_to_db("rjs_pillars")
 
 ## Load in RJS Pillars data ##
-report_stoprates_race_person <- dbGetQuery(conn, "SELECT * FROM data.report_gang_stoprates_race_person")  %>% filter(race!="total")
+report_stoprates_race_person <- dbGetQuery(conn, "SELECT * FROM data.report_gang_stoprates_race_person")  %>% filter(race!="total" & !is.na(stop_count))
 
+## Test bubblepop ##
 fx_bubblepopchart(
   
   db=report_stoprates_race_person, #name of dataframe
