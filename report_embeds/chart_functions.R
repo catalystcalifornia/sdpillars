@@ -78,7 +78,8 @@ cc_theme <- hc_theme(
         color=black,
         fontFamily = main_font, # font_x_label
         fontWeight = semi_bold_font_weight,
-        width=120,  #argument to modify the width of the labels,
+        width=120,  #argument to modify the width of the labels
+        min=0,
         # spacingLeft = "150px",
         fontSize="1.5vw")),
     lineColor=gainsboro
@@ -108,6 +109,7 @@ cc_theme <- hc_theme(
       color = black,
       fontSize = '1vw'
     ),
+    
     itemHoverStyle = list(
       fontFamily = main_font, # font_table_text
       fontWeight = regular_font_weight,
@@ -125,15 +127,14 @@ racenote<-paste0("Race/ethnicity: AIAN=American Indian or Alaska Native, NHPI=Na
 #### Bubblepop Chart - Combined Bar and Bubble Charts ####
 
 fx_bubblepopchart <- function(
-    db,
-    order_var,
-    x,
-    y,
-    z,
+    df, # name of dataframe
+    x, # x or independent variables - will appear on y-axis
+    y, # y or dependent variable - will appear on x-axis
+    z, # variable storing count - will determine bubble size
     top_finding="",
-    chart_title= "",
+    subtitle= "",
     tooltip_text="",
-    chart_caption = "",
+    caption = "",
     yaxis_label = "''",
     export_data_label="") {
   
@@ -143,7 +144,7 @@ fx_bubblepopchart <- function(
   # add line breaks to tooltip_text
   tooltip_text <- sapply(strwrap(tooltip_text, 110, simplify=FALSE), paste, collapse="<br>" )
   
-  db <-  db %>%
+  df <-  df %>%
     arrange(desc(y))
   
   highchart() %>%
@@ -151,20 +152,19 @@ fx_bubblepopchart <- function(
     hc_tooltip(headerFormat='', # removes series label from top of tooltip
                useHTML=TRUE) %>%  # allows tooltip to read <br> html in reformatted tooltip_text 
     
-    hc_add_series(db, "bar", invert=TRUE,
+    hc_add_series(df, "bar", invert=TRUE,
                   hcaes(x=!!rlang::ensym(x), y=!!rlang::ensym(y)), 
                   showInLegend=FALSE, 
                   enableMouseTracking=FALSE)%>% # disables tooltip from popping up when mouse moves over bars
     
-    hc_add_series(db, "bubble", invert=TRUE,
+    hc_add_series(df, "bubble", invert=TRUE,
                   hcaes(x=!!rlang::ensym(x), y=!!rlang::ensym(y), size=!!rlang::ensym(z)), 
                   maxSize="15%", tooltip =  list(pointFormat = tooltip_text), showInLegend=FALSE,
                   clip=FALSE) %>%
     
     hc_xAxis(title = list(text = ""),
              type="category",
-             categories=db$x,
-             min=0) %>%
+             categories=df$x) %>%
     
     hc_yAxis(title = list(text = ""),
              labels = list(formatter = JS(yaxis_label_JS))
@@ -189,7 +189,10 @@ fx_bubblepopchart <- function(
                                    connectorColor=meteorite,
                                    labels = list(
                                      format="{value:,.0f} persons",
-                                     style=list(fontSize='1.25vw'))
+                                     style=list(fontSize='1.25vw')),
+                                   marker = list(
+                                     fillColor = lavender
+                                   )
               )) %>%
     # Sets bar width 
     hc_plotOptions(series=list(pointWidth=2,
@@ -206,11 +209,11 @@ fx_bubblepopchart <- function(
       widthAdjust = -50,
       style = list(useHTML = TRUE)) %>%
     
-    hc_subtitle(text = paste0(chart_title), 
+    hc_subtitle(text = paste0(subtitle), 
                 align="left") %>%
     
     hc_caption(
-      text = paste0(chart_caption),
+      text = paste0(caption),
       margin=30,
       floating=FALSE
     ) %>%
@@ -225,45 +228,72 @@ fx_bubblepopchart <- function(
         series=list(
           dataLabels=list(
             enabled=TRUE, format=paste0(export_data_label))))),
-      filename = paste0(chart_title,"_Catalyst California, catalystcalifornia.org, 2023.")
+      filename = paste0(subtitle,"_Catalyst California, catalystcalifornia.org, 2023.")
     )}
+
+#### Testing bubblepop ####
+library(RPostgreSQL)
+source("W:\\RDA Team\\R\\credentials_source.R")
+pillars_conn <- connect_to_db("rjs_pillars")
+
+## Load in RJS Pillars data: Bubble Pop test ##
+report_stoprates_race_person <- dbGetQuery(pillars_conn, "SELECT * FROM data.report_gang_stoprates_race_person")  %>% filter(race!="total" & !is.na(stop_count))
+
+fx_bubblepopchart(
+  df=report_stoprates_race_person, 
+  x='race', 
+  y='stop_per1k_rate', 
+  z='stop_count',
+  top_finding=paste0("TOP LEVEL FINDING ABOUT SYSTEMIC IMPACT."), # this is the top finding from the chart that gets used like a title
+  subtitle= paste0("Number of Officer-initiated, Gang-related Stops per 1K of Same Population by Race and Ethnicity"), # this is the more standard chart title that gets used as a subtitle
+  tooltip_text="For every 1K <b>{point.race_label_long:.1f}</b> people in San Diego, SDPD stopped <b>{point.stop_rate_per1k:.1f}</b> people perceived as <b>{point.race_label_long:.1f}</b>, a total of <b>{point.stop_count:,0f}</b> people.", # customize your tooltip as a statement, calling out rate and count
+  caption = paste0(racenote,"<br><br>", sourcenote, "<br>","Analysis for all officer-initiated stops.","<br>"), # if necessary add a method note between the racenote and sourcenote with a line break, use racenote if graph includes data by race, and always use sourcenote. Each of these are standard objects across all charts
+  yaxis_label = "''", #format for your y axis labels
+  export_data_label=list(pointFormat='{point.stop_rate_per1k:.1f} per 1K')
+)
 
 #### Stacked Bar Chart ####
 fx_stack <- function(
     df,
-    chart_x,
-    chart_y,
-    chart_group,
-    chart_title,
-    chart_subtitle,
-    chart_tooltip,
-    chart_caption) {
+    x, # independent variable
+    y, # dependent variable
+    group_var, # variable to group by
+    top_finding, # chart title
+    subtitle,
+    tooltip_text,
+    caption) {
+  
   hchart(df, 
          "bar", hcaes(x = !!rlang::ensym(chart_x), y = !!rlang::ensym(chart_y), group = !!rlang::ensym(chart_group)),
          stacking = "percent",
          tooltip =  list(headerFormat='',pointFormat=chart_tooltip)) %>%
+    
     hc_title(
       text = chart_title,
       align = "left",
-      widthAdjust = -50
-    ) %>%
+      widthAdjust = -50) %>%
+    
     hc_subtitle(
       text = chart_subtitle,
-      align = "left"
-    ) %>%
+      align = "left") %>%
+    
     hc_caption(
       text = chart_caption,
-      align = "left"
-    ) %>%
-    hc_yAxis(title = list(text = paste0(""))
-    ) %>%
+      align = "left") %>%
+    
+    hc_yAxis(title = list(text = paste0(""))) %>%
+    
     hc_xAxis(title = list(text = paste0(""),
-                          labels=list(position="bottom"))
-    ) %>%
-    hc_legend(enabled = TRUE, reversed =  TRUE)%>% 
-    hc_add_theme(cc_theme
-    )%>%
-    hc_size(height=480, width=830) %>%
+                          labels=list(position="bottom"))) %>%
+    
+    hc_legend(enabled = TRUE, 
+              reversed =  TRUE)%>% 
+    
+    hc_add_theme(cc_theme)%>%
+    
+    # hc_size(height=480, 
+    #         width=830) %>%
+    
     hc_exporting(
       enabled = TRUE, sourceWidth=900, sourceHeight=600, 
       chartOptions=list(plotOptions=list(series=list(dataLabels=list(enabled=TRUE,format='{point.rate:.1f}%')))),
@@ -403,31 +433,7 @@ timespent_ficard_race_person <- dbGetQuery(pillars_conn, "SELECT * FROM data.rep
 col <-c(meteorite, lavender, orange, peridot, ccblue, gainsboro, "#211447",
         "#FF9E0D", "#A8683C")
 
-## Test bubblepop ##
-fx_bubblepopchart(
-  
-  db=report_stoprates_race_person, #name of dataframe
-  
-  order_var=report_stoprates_race_person$stop_per1k_rate, #variable you're sorting by
-  
-  x='race', # x or independent variables
-  
-  y='stop_per1k_rate', # y or dependent variable
-  
-  z='stop_count',
-  
-  top_finding=paste0("TOP LEVEL FINDING ABOUT SYSTEMIC IMPACT."), # this is the top finding from the chart that gets used like a title
-  
-  chart_title= paste0("Number of Officer-initiated, Gang-related Stops per 1K of Same Population by Race and Ethnicity"), # this is the more standard chart title that gets used as a subtitle
-  
-  tooltip_text="For every 1K <b>{point.race_label_long:.1f}</b> people in San Diego, SDPD stopped <b>{point.stop_rate_per1k:.1f}</b> people perceived as <b>{point.race_label_long:.1f}</b>, a total of <b>{point.stop_count:,0f}</b> people.", # customize your tooltip as a statement, calling out rate and count
-  
-  
-  chart_caption = paste0(racenote,"<br>", sourcenote, "<br>","Analysis for all officer-initiated stops.","<br><br>"), # if necessary add a method note between the racenote and sourcenote with a line break, use racenote if graph includes data by race, and always use sourcenote. Each of these are standard objects across all charts
-  
-  yaxis_label = "''", #format for your y axis labels
-  export_data_label=list(pointFormat='{point.stop_rate_per1k:.1f} per 1K')
-)
+
 
 
 ## Test Stacked Bar Chart ##
