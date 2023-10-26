@@ -138,7 +138,7 @@ racenote<-paste0("Race/ethnicity: AIAN=American Indian or Alaska Native, NHPI=Na
 
 #### Combined Bar and Bubble Chart - Bubblepop chart ####
 
-fx_barbubblechart <- function(
+fx_bubblepopchart <- function(
     db,
     order_var,
     x,
