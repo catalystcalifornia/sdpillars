@@ -310,7 +310,7 @@ race_labels<-c("latinx","nh_asian","nh_black","nh_nhpi","nh_white", "aian", "nhp
 stoprates_age_race_ficard_person$race<-factor(stoprates_age_race_ficard_person$race, ordered=TRUE, 
                                                levels=race_levels, labels=race_labels)
 
-tooltip_text <- "<b>{point.rate:.1f}%</b> of SDPD field interviews were conducted on <b>{point.race:.1f} people  ages {point.age_bracket:.1f} </b>"
+tooltip_text <- "Across all field interviews of folks <b> ages {point.age_bracket:.1f} </b>, SDPD stopped <b>{point.race:.1f} people {point.rate:.1f}% of the time.</b>"
 
 fx_stack(  
   df = stoprates_age_race_ficard_person,
@@ -325,7 +325,29 @@ fx_stack(
   caption = paste0(racenote,"<br><br>", sourcenote, "<br>","Analysis for all officer-initiated stops.","<br>"))
 
 #### Item Chart ####
-
+fx_itemchart <- function(
+    df, # name of dataframe
+    x, # x or independent variables - will appear on y-axis
+    y, # y or dependent variable - will appear on x-axis
+    z, # variable storing count - will determine bubble size
+    top_finding="",
+    subtitle= "",
+    tooltip_text="",
+    caption = "",
+    yaxis_label = "''",
+    export_data_label="") {
+  
+  yaxis_label_JS <- paste0("function() {
+        	return this.value +", yaxis_label, "}")
+  
+  # add line breaks to tooltip_text
+  tooltip_text <- sapply(strwrap(tooltip_text, 110, simplify=FALSE), paste, collapse="<br>" )
+  
+  df <-  df %>%
+    arrange(desc(y))
+  
+  highchart() %>%
+    
 # 
 # 
 # # for now filter just traffic and reasonable suspicion as separate dfs
