@@ -43,27 +43,21 @@ cc_theme <- hc_theme(
       color=alabaster
     ) 
   ),
-  plotOptions = 
-    list(
-      line = 
-        list(marker = 
-            list())
-    ),
   title = list(widthAdjust = -50,
-    style = list(
-      color = meteorite,
-      fontFamily = main_font, # font_title
-      fontWeight = black_font_weight,
-      textAlign="left",
-      fontSize='21px'
-    )
+               style = list(
+                 color = meteorite,
+                 fontFamily = main_font, # font_title
+                 fontWeight = black_font_weight,
+                 textAlign="left",
+                 fontSize='3vw'
+               )
   ),
   subtitle = list(
     style = list(
       color = meteorite, 
       fontFamily = main_font, # font_subtitle
       fontWeight = regular_font_weight,
-      fontSize='14px'
+      fontSize='2vw'
     )
   ),
   caption = list(
@@ -71,18 +65,11 @@ cc_theme <- hc_theme(
       color = meteorite,
       fontFamily = main_font, # font_caption
       fontWeight = regular_font_weight,
+      fontSize = "1.25vw",
       textAlign = "left",
-      fontSize="10px"
+      width = 50
     ),
     useHTML = TRUE
-  ),
-  axis = list(
-    style = list(
-      color = gainsboro,
-      fontFamily = main_font, # font_axis_label
-      fontWeight = semi_bold_font_weight,
-      fontSize='12px'
-    )
   ),
   
   xAxis=list(
@@ -92,8 +79,8 @@ cc_theme <- hc_theme(
         fontFamily = main_font, # font_x_label
         fontWeight = semi_bold_font_weight,
         width=120,  #argument to modify the width of the labels,
-        spacingLeft = "150px",
-        fontSize="12px")),
+        # spacingLeft = "150px",
+        fontSize="1.5vw")),
     lineColor=gainsboro
   ),
   
@@ -103,27 +90,29 @@ cc_theme <- hc_theme(
         color=black,
         fontFamily = main_font, # font_axis_label
         fontWeight = regular_font_weight,
-        fontSize="12px",
+        fontSize="1.5vw",
         margin = 50)),
     gridLineWidth=0, # removes vertical grid lines
     visible=TRUE, # makes axis line visible
     lineWidth=1,
-    lineColor=gainsboro
+    lineColor=gainsboro,
+    min=0,
+    tickAmount=6,
+    tickWidth=1
   ),
-  
   
   legend = list(
     itemStyle = list(
       fontFamily = main_font, # font_axis_label
       fontWeight = regular_font_weight,
-      color = black
+      color = black,
+      fontSize = '1vw'
     ),
     itemHoverStyle = list(
       fontFamily = main_font, # font_table_text
       fontWeight = regular_font_weight,
       color = black
     ),
-    # tooltip=list(headerFormat=""),
     plotLines=list(color=gainsboro)
   )
 )
