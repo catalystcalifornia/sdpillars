@@ -26,6 +26,8 @@ black <- "#000000"
 alabaster<-"#FBFBFB"
 gainsboro <- "#DEDEDE"
 
+divergent_color_ramp <- c("#372278", "#5F3B63","#A8683C", "#D58424", "#FF9900")
+
 ## FONTS ##
 main_font <- "Inter"
 regular_font_weight <- 400
