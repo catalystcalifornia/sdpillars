@@ -1,8 +1,7 @@
 #### Interactive chart functions ####
 
 #### Load libraries ####
-library(tidyverse)
-library(sf)
+library(dplyr)
 library(RPostgreSQL)
 library(highcharter)
 library(extrafont)
@@ -48,11 +47,8 @@ cc_theme <- hc_theme(
   plotOptions = 
     list(
       line = 
-        list(
-          marker = 
-            list(
-            )
-        )
+        list(marker = 
+            list())
     ),
   title = list(widthAdjust = -50,
     style = list(
@@ -278,6 +274,7 @@ fx_stack <- function(
                                                      'downloadXLS', 'downloadCSV'))))
 }
 
+
 #### Item Chart ####
 #read in table
 
@@ -297,11 +294,6 @@ col <-c(meteorite, lavender, orange, peridot, "#177FEB", "#733256", "#9B9A9A", "
         "#FF9E0D")
 
 mobile_screen_opts <- list(layout="vertical")
-
-
-
-
-#### Item Chart - Traffic Stops by Results -rate of hours (/100) ####
 
 hc<-hchart(
   df_traffic,
@@ -341,3 +333,6 @@ hc<-hchart(
 
 hc
 
+#### Testing Functions ####
+# source("W:\\RDA Team\\R\\credentials_source.R")
+# conn <- connect_to_db("rjs_pillars")
