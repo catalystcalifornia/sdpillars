@@ -235,5 +235,47 @@ fx_bubblepopchart <- function(
     )}
 
 #### Stacked Bar Chart ####
+fx_stack <- function(
+    df,
+    chart_x,
+    chart_y,
+    chart_group,
+    chart_title,
+    chart_subtitle,
+    chart_tooltip,
+    chart_caption) {
+  hchart(df, 
+         "bar", hcaes(x = !!rlang::ensym(chart_x), y = !!rlang::ensym(chart_y), group = !!rlang::ensym(chart_group)),
+         stacking = "percent",
+         tooltip =  list(headerFormat='',pointFormat=chart_tooltip)) %>%
+    hc_title(
+      text = chart_title,
+      align = "left",
+      widthAdjust = -50
+    ) %>%
+    hc_subtitle(
+      text = chart_subtitle,
+      align = "left"
+    ) %>%
+    hc_caption(
+      text = chart_caption,
+      align = "left"
+    ) %>%
+    hc_yAxis(title = list(text = paste0(""))
+    ) %>%
+    hc_xAxis(title = list(text = paste0(""),
+                          labels=list(position="bottom"))
+    ) %>%
+    hc_legend(enabled = TRUE, reversed =  TRUE)%>% 
+    hc_add_theme(cc_theme
+    )%>%
+    hc_size(height=480, width=830) %>%
+    hc_exporting(
+      enabled = TRUE, sourceWidth=900, sourceHeight=600, 
+      chartOptions=list(plotOptions=list(series=list(dataLabels=list(enabled=TRUE,format='{point.rate:.1f}%')))),
+      filename = paste0(chart_subtitle,"_Catalyst California, catalystcalifornia.org, 2023."),
+      buttons=list(contextButton=list(menuItems=list('downloadPNG', 'downloadSVG',
+                                                     'downloadXLS', 'downloadCSV'))))
+}
 
 #### Item Chart ####
