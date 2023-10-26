@@ -147,6 +147,7 @@ fx_bubblepopchart <- function(
     arrange(desc(y))
   
   highchart() %>%
+    
     hc_tooltip(headerFormat='', # removes series label from top of tooltip
                useHTML=TRUE) %>%  # allows tooltip to read <br> html in reformatted tooltip_text 
     
@@ -154,21 +155,23 @@ fx_bubblepopchart <- function(
                   hcaes(x=!!rlang::ensym(x), y=!!rlang::ensym(y)), 
                   showInLegend=FALSE, 
                   enableMouseTracking=FALSE)%>% # disables tooltip from popping up when mouse moves over bars
+    
     hc_add_series(db, "bubble", invert=TRUE,
                   hcaes(x=!!rlang::ensym(x), y=!!rlang::ensym(y), size=!!rlang::ensym(z)), 
-                  maxSize="10%", tooltip =  list(pointFormat = tooltip_text), showInLegend=FALSE,
+                  maxSize="15%", tooltip =  list(pointFormat = tooltip_text), showInLegend=FALSE,
                   clip=FALSE) %>%
     
     hc_xAxis(title = list(text = ""),
              type="category",
              categories=db$x,
              min=0) %>%
+    
     hc_yAxis(title = list(text = ""),
-             labels = list(formatter = JS(yaxis_label_JS)),
-             min=0,
-             tickAmount=6,
-             tickWidth=1)  %>%
+             labels = list(formatter = JS(yaxis_label_JS))
+    )  %>%
+    
     hc_legend(enabled = TRUE, 
+              width = '15%',
               align = "right", 
               verticalAlign="bottom",
               y=10,
@@ -184,7 +187,10 @@ fx_bubblepopchart <- function(
                                    connectorDistance=20,
                                    borderColor=meteorite,
                                    connectorColor=meteorite,
-                                   labels = list(format="{value:,.0f} persons"))) %>%
+                                   labels = list(
+                                     format="{value:,.0f} persons",
+                                     style=list(fontSize='1.25vw'))
+              )) %>%
     # Sets bar width 
     hc_plotOptions(series=list(pointWidth=2,
                                marker=list(fillColor=lavender, 
@@ -199,16 +205,20 @@ fx_bubblepopchart <- function(
       align = "left",
       widthAdjust = -50,
       style = list(useHTML = TRUE)) %>%
+    
     hc_subtitle(text = paste0(chart_title), 
                 align="left") %>%
+    
     hc_caption(
       text = paste0(chart_caption),
       margin=30,
-      floating=FALSE,
-      style=list(fontSize='8px')
+      floating=FALSE
     ) %>%
+    
     hc_add_theme(cc_theme)%>%
+    
     hc_chart(inverted = T) %>%
+    
     hc_exporting(
       enabled = TRUE, sourceWidth=900, sourceHeight=600,
       chartOptions=list(plotOptions=list(
