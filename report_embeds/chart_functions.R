@@ -336,10 +336,73 @@ fx_stack <- function(
 #### Testing Functions ####
 library(RPostgreSQL)
 source("W:\\RDA Team\\R\\credentials_source.R")
-conn <- connect_to_db("rjs_pillars")
+pillars_conn <- connect_to_db("rjs_pillars")
+ourla_conn <- connect_to_db("pv_lareform")
 
 ## Load in RJS Pillars data ##
-report_stoprates_race_person <- dbGetQuery(conn, "SELECT * FROM data.report_gang_stoprates_race_person")  %>% filter(race!="total" & !is.na(stop_count))
+report_stoprates_race_person <- dbGetQuery(pillars_conn, "SELECT * FROM data.report_gang_stoprates_race_person")  %>% filter(race!="total" & !is.na(stop_count))
+
+## Load in Our LA stacked data ##
+library(stringr)
+source("W:/Project/Political Voice/LA Reform/Phase 1/R/lareform_chart_prep/lareform_chart_prep/chart_styling.R")
+
+# Step 2a: pull df from postgres
+df <-dbGetQuery(ourla_conn, "SELECT * FROM report_effect_total") %>% 
+  filter(question %in% c("irc_10a", "irc_10b", "irc_10c")) %>% #filter for the question needed 
+  filter(value != "Unsure/Don't Know")  #filter out response options not of interest
+
+# Step 2b: pull data dictionary                     
+dict <-dbGetQuery(ourla_conn, "SELECT * FROM data_dictionary") %>% 
+  filter(variable %in% c("irc_10a", "irc_10b", "irc_10c")) #filter for the question needed 
+
+# Step 2c: merge databases for labels
+df_merge <- merge(df, dict, by.x = c("question"), by.y = c("variable"), all.x = TRUE)
+df_merge<-df_merge%>%rename(question_label=sub_question) #pull out question label for pop-up
+
+# Step 2d: The following levels set the order for the response options so they display correctly. Use the one that corresponds to the question you're visualizing for. 
+effect_levels<-c("Very positive effect","Slight positive effect","No effect","Slight negative effect","Very negative effect")
+effect_labels<-c("Very positive effect","Slight positive effect","No effect","Slight negative effect","Very negative effect")
+df_merge$value<-factor(df_merge$value, ordered=TRUE, levels=effect_levels, labels=effect_labels)
+
+# STEP 3: INSERT the text needed in the visual and follow the standards in this template. 
+
+# TITLE 
+title_text <- paste0("The majority of people believe an IRC will have a positive effect on their representation.")
+
+# SUBTITLE
+subtitle_text <- paste0("Percent of people by how they feel an IRC would impact their representation")
+
+# N CALCULATION REVISION
+n<-df%>%
+  group_by(question)%>%
+  mutate(n=min(total))%>%
+  slice(1)%>%
+  select(question, n)%>%
+  left_join(dict, by=c("question"="variable"))%>%
+  select("question", "n", "sub_question")
+
+
+
+# CAPTION 
+# take the question text from the data dictionary 
+question <- dict[1, "question"] #may need to use sub_question depending on what you're visualizing for
+# take the sample size from the data frame
+
+subquestion<-paste0(n[1,3]," (n=",n[1,2],")/",n[2,3]," (n=",n[2,2],")/",n[3,3]," (n=",n[3,2],")")
+
+caption_text <- paste0("<br>Survey Question: ", question," ",subquestion,"<br>",cc_footnote)
+
+# EXTRA TOOLTIP PREP 
+
+df_merge<-df_merge%>%
+  mutate(value_tooltip=ifelse(value!="No effect", paste0("a ","<b>",str_to_title(value),"</b>"),
+                              paste0("<b>",str_to_title(value),"</b>")))
+
+#TOOLTIP
+tooltip_text <- "<b>{point.rate:.1f}%</b> of people believe an IRC would have {point.value_tooltip} on <br><b>'{point.question_label}'</b>"
+
+
+
 
 ## Test bubblepop ##
 fx_bubblepopchart(
@@ -366,3 +429,23 @@ fx_bubblepopchart(
   yaxis_label = "''", #format for your y axis labels
   export_data_label=list(pointFormat='{point.stop_rate_per1k:.1f} per 1K')
 )
+
+# EXTRA TOOLTIP PREP 
+
+df_merge<-df_merge%>%
+  mutate(value_tooltip=ifelse(value!="No effect", paste0("a ","<b>",str_to_title(value),"</b>"),
+                              paste0("<b>",str_to_title(value),"</b>")))
+
+#TOOLTIP
+tooltip_text <- "<b>{point.rate:.1f}%</b> of people believe an IRC would have {point.value_tooltip} on <br><b>'{point.question_label}'</b>"
+
+## Test Stacked Bar Chart ##
+fx_stack(  
+  df = df_merge,
+  chart_x = 'question_label',
+  chart_y = 'rate',
+  chart_group = 'value',
+  chart_title = title_text,
+  chart_subtitle = subtitle_text,
+  chart_tooltip = tooltip_text,
+  chart_caption = caption_text)
