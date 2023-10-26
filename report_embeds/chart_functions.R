@@ -2,7 +2,6 @@
 
 #### Load libraries ####
 library(dplyr)
-library(RPostgreSQL)
 library(highcharter)
 library(extrafont)
 library(showtext)
@@ -293,7 +292,7 @@ df_traffic<-df%>%
 col <-c(meteorite, lavender, orange, peridot, "#177FEB", "#733256", "#9B9A9A", "#211447",
         "#FF9E0D")
 
-mobile_screen_opts <- list(layout="vertical")
+# mobile_screen_opts <- list(layout="vertical")
 
 hc<-hchart(
   df_traffic,
@@ -333,6 +332,36 @@ hc<-hchart(
 
 hc
 
+
 #### Testing Functions ####
-# source("W:\\RDA Team\\R\\credentials_source.R")
-# conn <- connect_to_db("rjs_pillars")
+library(RPostgreSQL)
+source("W:\\RDA Team\\R\\credentials_source.R")
+conn <- connect_to_db("rjs_pillars")
+
+## Load in RJS Pillars data ##
+report_stoprates_race_person <- dbGetQuery(conn, "SELECT * FROM data.report_gang_stoprates_race_person")  %>% filter(race!="total")
+
+fx_bubblepopchart(
+  
+  db=report_stoprates_race_person, #name of dataframe
+  
+  order_var=report_stoprates_race_person$stop_per1k_rate, #variable you're sorting by
+  
+  x='race', # x or independent variables
+  
+  y='stop_per1k_rate', # y or dependent variable
+  
+  z='stop_count',
+  
+  top_finding=paste0("TOP LEVEL FINDING ABOUT SYSTEMIC IMPACT."), # this is the top finding from the chart that gets used like a title
+  
+  chart_title= paste0("Number of Officer-initiated, Gang-related Stops per 1K of Same Population by Race and Ethnicity"), # this is the more standard chart title that gets used as a subtitle
+  
+  tooltip_text="For every 1K <b>{point.race_label_long:.1f}</b> people in San Diego, SDPD stopped <b>{point.stop_rate_per1k:.1f}</b> people perceived as <b>{point.race_label_long:.1f}</b>, a total of <b>{point.stop_count:,0f}</b> people.", # customize your tooltip as a statement, calling out rate and count
+  
+  
+  chart_caption = paste0(racenote,"<br>", sourcenote, "<br>","Analysis for all officer-initiated stops.","<br><br>"), # if necessary add a method note between the racenote and sourcenote with a line break, use racenote if graph includes data by race, and always use sourcenote. Each of these are standard objects across all charts
+  
+  yaxis_label = "''", #format for your y axis labels
+  export_data_label=list(pointFormat='{point.stop_rate_per1k:.1f} per 1K')
+)
