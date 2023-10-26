@@ -49,16 +49,16 @@ cc_theme <- hc_theme(
                  fontFamily = main_font, # font_title
                  fontWeight = black_font_weight,
                  textAlign="left",
-                 fontSize='3vw'
-               )
+                 fontSize='3vw'),
+               align = "left"
   ),
   subtitle = list(
     style = list(
       color = meteorite, 
       fontFamily = main_font, # font_subtitle
       fontWeight = regular_font_weight,
-      fontSize='2vw'
-    )
+      fontSize='2vw'),
+    align='left'
   ),
   caption = list(
     style = list(
@@ -67,9 +67,9 @@ cc_theme <- hc_theme(
       fontWeight = regular_font_weight,
       fontSize = "1.25vw",
       textAlign = "left",
-      width = 50
-    ),
-    useHTML = TRUE
+      width = 50),
+    useHTML = TRUE,
+    floating = FALSE
   ),
   
   xAxis=list(
@@ -191,9 +191,8 @@ fx_bubblepopchart <- function(
                                      format="{value:,.0f} persons",
                                      style=list(fontSize='1.25vw')),
                                    marker = list(
-                                     fillColor = lavender
-                                   )
-              )) %>%
+                                     fillColor = lavender))) %>%
+    
     # Sets bar width 
     hc_plotOptions(series=list(pointWidth=2,
                                marker=list(fillColor=lavender, 
@@ -205,17 +204,13 @@ fx_bubblepopchart <- function(
     # title elements
     hc_title(
       text = paste0(top_finding),
-      align = "left",
-      widthAdjust = -50,
       style = list(useHTML = TRUE)) %>%
     
-    hc_subtitle(text = paste0(subtitle), 
-                align="left") %>%
+    hc_subtitle(text = paste0(subtitle)) %>%
     
     hc_caption(
       text = paste0(caption),
-      margin=30,
-      floating=FALSE
+      margin=30
     ) %>%
     
     hc_add_theme(cc_theme)%>%
@@ -251,6 +246,8 @@ fx_bubblepopchart(
   yaxis_label = "''", #format for your y axis labels
   export_data_label=list(pointFormat='{point.stop_rate_per1k:.1f} per 1K')
 )
+
+dbDisconnect(pillars_conn)
 
 #### Stacked Bar Chart ####
 fx_stack <- function(
