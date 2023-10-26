@@ -275,9 +275,7 @@ fx_stack <- function(
 
 
 #### Item Chart ####
-#read in table
 
-# df<-dbGetQuery(con, "SELECT * FROM report_timespent_result_stop ")
 # 
 # 
 # # for now filter just traffic and reasonable suspicion as separate dfs
@@ -339,10 +337,10 @@ source("W:\\RDA Team\\R\\credentials_source.R")
 pillars_conn <- connect_to_db("rjs_pillars")
 ourla_conn <- connect_to_db("pv_lareform")
 
-## Load in RJS Pillars data ##
+## Load in RJS Pillars data: Bubble Pop test ##
 report_stoprates_race_person <- dbGetQuery(pillars_conn, "SELECT * FROM data.report_gang_stoprates_race_person")  %>% filter(race!="total" & !is.na(stop_count))
 
-## Load in Our LA stacked data ##
+## Load in Our LA stacked data: Stacked Bar Chart test ##
 library(stringr)
 source("W:/Project/Political Voice/LA Reform/Phase 1/R/lareform_chart_prep/lareform_chart_prep/chart_styling.R")
 
@@ -381,11 +379,10 @@ n<-df%>%
   left_join(dict, by=c("question"="variable"))%>%
   select("question", "n", "sub_question")
 
-
-
 # CAPTION 
 # take the question text from the data dictionary 
 question <- dict[1, "question"] #may need to use sub_question depending on what you're visualizing for
+
 # take the sample size from the data frame
 
 subquestion<-paste0(n[1,3]," (n=",n[1,2],")/",n[2,3]," (n=",n[2,2],")/",n[3,3]," (n=",n[3,2],")")
@@ -397,12 +394,15 @@ caption_text <- paste0("<br>Survey Question: ", question," ",subquestion,"<br>",
 df_merge<-df_merge%>%
   mutate(value_tooltip=ifelse(value!="No effect", paste0("a ","<b>",str_to_title(value),"</b>"),
                               paste0("<b>",str_to_title(value),"</b>")))
-
-#TOOLTIP
+# TOOLTIP
 tooltip_text <- "<b>{point.rate:.1f}%</b> of people believe an IRC would have {point.value_tooltip} on <br><b>'{point.question_label}'</b>"
 
 
-
+## Load in RJS Pillars Data: Item Chart test ##
+timespent_ficard_race_person <- dbGetQuery(pillars_conn, "SELECT * FROM data.report_timespent_ficard_race_person") %>%
+  filter(race != "overall")
+col <-c(meteorite, lavender, orange, peridot, ccblue, gainsboro, "#211447",
+        "#FF9E0D", "#A8683C")
 
 ## Test bubblepop ##
 fx_bubblepopchart(
@@ -430,14 +430,6 @@ fx_bubblepopchart(
   export_data_label=list(pointFormat='{point.stop_rate_per1k:.1f} per 1K')
 )
 
-# EXTRA TOOLTIP PREP 
-
-df_merge<-df_merge%>%
-  mutate(value_tooltip=ifelse(value!="No effect", paste0("a ","<b>",str_to_title(value),"</b>"),
-                              paste0("<b>",str_to_title(value),"</b>")))
-
-#TOOLTIP
-tooltip_text <- "<b>{point.rate:.1f}%</b> of people believe an IRC would have {point.value_tooltip} on <br><b>'{point.question_label}'</b>"
 
 ## Test Stacked Bar Chart ##
 fx_stack(  
@@ -449,3 +441,40 @@ fx_stack(
   chart_subtitle = subtitle_text,
   chart_tooltip = tooltip_text,
   chart_caption = caption_text)
+
+## Test Item Chart ##
+hchart(
+  timespent_ficard_race_person,
+  "item",
+  rows=7,
+  hcaes(
+    name = race,
+    y = duration_rate,
+    label = race,
+    color = col),
+  name = "Total Hours",
+  showInLegend = TRUE) %>%
+  hc_title(text = "TOP SYSTEMIC FINDING STATEMENT", 
+           widthAdjust = -50,
+           align="left" )%>%
+  hc_subtitle(text = "Hours Spent on Field Interview Cards by Race", 
+              align="left" ) %>%
+  hc_size(height=450) %>%
+  hc_caption(text = paste0(sourcenote," Analysis for all officer-initiated stops RESULTING IN FIELD INTERVIEWS ONLY.")) %>%
+  hc_add_theme(cc_theme)%>%
+  hc_exporting(enabled = TRUE, sourceWidth=900, sourceHeight=600,
+               chartOptions=list(plotOptions=list(series=list(dataLabels=list(enabled=TRUE, format=paste0(list(pointFormat='{point.duration_rate:.1f}')))))),
+               filename = paste0("Hours Spent CONDUCTING FIELD INTERVIEWS BY RACE",
+                                 "_Catalyst California, catalystcalifornia.org, 2023."))%>%
+  
+  hc_legend(title=list(text='<span style="color: #000000; font-weight: bold">Single dot represents 1 hour out of 100 hours</span><br/><span style="color: #666; font-style: italic">Click to hide</span>'),
+            enable = TRUE,
+            labelFormat = '{name} <span style="opacity: 0.4">{duration_rate:.1f}</span>')  %>%
+  hc_tooltip(headerFormat="", 
+             pointFormat = "Out of 100 hours, SDPD spent <b>{point.duration_rate:.1f}</b> hours ON STOPS CONDUCTING FIELD INTERVIWS OF <b>{point.race} PEOPLE</b>") %>%
+  
+  # add in margins so the graph isn't cut off
+  hc_chart(
+    marginRight = 20,
+    marginLeft=20
+  )
