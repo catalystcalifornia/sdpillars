@@ -263,11 +263,13 @@ fx_stackedbarchart <- function(
     
     hc_legend(enabled = TRUE, 
               reversed =  TRUE,
-              x=50)%>% 
+              x=20)%>% 
     
     hc_add_theme(cc_theme)%>%
     
     hc_colors(group_colors) %>%
+    hc_chart(
+      marginRight=120) %>%
     
     hc_exporting(
       enabled = TRUE, sourceWidth=900, sourceHeight=600, 
@@ -277,31 +279,6 @@ fx_stackedbarchart <- function(
                                                      'downloadXLS', 'downloadCSV'))))
 }
 
-#### test stacked bar chart ####
-library(RPostgreSQL)
-source("W:\\RDA Team\\R\\credentials_source.R")
-pillars_conn <- connect_to_db("rjs_pillars")
-
-stoprates_age_race_ficard_person <- dbGetQuery(pillars_conn, "SELECT * FROM data.report_stoprates_age_race_ficard_person")
-
-race_levels<-c("latinx","nh_asian","nh_black","nh_nhpi","nh_white", "aian", "nhpi", "sswana", "nh_twoormor")
-race_labels<-c("latinx","nh_asian","nh_black","nh_nhpi","nh_white", "aian", "nhpi", "sswana", "nh_twoormor")
-stoprates_age_race_ficard_person$race<-factor(stoprates_age_race_ficard_person$race, ordered=TRUE, 
-                                               levels=race_levels, labels=race_labels)
-
-tooltip_text <- "Across all field interviews of folks <b> ages {point.age_bracket:.1f} </b>, SDPD stopped <b>{point.race:.1f} people {point.rate:.1f}% of the time.</b>"
-
-fx_stackedbarchart(  
-  df = stoprates_age_race_ficard_person,
-  x = 'age_bracket',
-  y = 'rate',
-  group_var = 'race',
-  group_colors = c(meteorite, lavender, orange, peridot, ccblue, gainsboro, "#211447",
-                         "#FF9E0D", "#A8683C"),
-  top_finding = 'A top level finding about systemic impact',
-  subtitle = 'stop rates for field interviews for every race across age brackets',
-  tooltip = tooltip_text,
-  caption = paste0(racenote,"<br><br>", sourcenote, "<br>","Analysis for all officer-initiated stops.","<br>"))
 
 #### Item Chart ####
 fx_itemchart <- function(
