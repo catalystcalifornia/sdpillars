@@ -121,6 +121,86 @@ cc_theme <- hc_theme(
   )
 )
 
+cc_theme_test <- hc_theme(
+  colors = c(meteorite, lavender, orange, peridot
+  ),
+  chart = list(
+    backgroundColor = alabaster,
+    style = list(
+      fontFamily = main_font, # font_subtitle
+      color=alabaster
+    ) 
+  ),
+  title = list(widthAdjust = -50,
+               style = list(
+                 color = meteorite,
+                 fontFamily = main_font, # font_title
+                 fontWeight = black_font_weight,
+                 textAlign="left",
+                 fontSize='3vmin'),
+               align = "left"
+  ),
+  subtitle = list(
+    style = list(
+      color = meteorite, 
+      fontFamily = main_font, # font_subtitle
+      fontWeight = regular_font_weight,
+      fontSize='2vmin'),
+    align='left'
+  ),
+  caption = list(
+    style = list(
+      color = meteorite,
+      fontFamily = main_font, # font_caption
+      fontWeight = regular_font_weight,
+      fontSize = "1.25vmin",
+      textAlign = "left"),
+    useHTML = TRUE,
+    floating = FALSE
+  ),
+  
+  xAxis=list(
+    labels=list(
+      style=list(
+        color=black,
+        fontFamily = main_font, # font_x_label
+        fontWeight = semi_bold_font_weight,
+        fontSize="1.5vmin")),
+    lineColor=gainsboro
+  ),
+  
+  yAxis=list(
+    labels=list(
+      style=list(
+        color=black,
+        fontFamily = main_font, # font_axis_label
+        fontWeight = regular_font_weight,
+        fontSize="1.5vmin")),
+    gridLineWidth=0, # removes vertical grid lines
+    visible=TRUE, # makes axis line visible
+    lineWidth=1,
+    lineColor=gainsboro,
+    tickAmount=6,
+    tickWidth=1
+  ),
+  
+  legend = list(
+    itemStyle = list(
+      fontFamily = main_font, # font_axis_label
+      fontWeight = regular_font_weight,
+      color = black,
+      fontSize = '1.5vmin'
+    ),
+    
+    itemHoverStyle = list(
+      fontFamily = main_font, # font_table_text
+      fontWeight = regular_font_weight,
+      color = black
+    ),
+    plotLines=list(color=gainsboro)
+  )
+)
+
 
 #### Standard notes ####
 sourcenote<-paste0("Catalyst California's calculations based on City of San Diego's Police Stop Data (2022), catalystcalifornia.org, 2023.")
@@ -286,7 +366,7 @@ fx_itemchart <- function(
     x, # category - will appear on y-axis
     y, # rate - will appear on x-axis
     group_colors, # vector of color values
-    row_nums, # integer
+    row_nums=0, # integer
     top_finding="",
     subtitle= "",
     tooltip_text="",
@@ -304,13 +384,19 @@ fx_itemchart <- function(
                   hcaes(name=!!rlang::ensym(x), 
                         y=!!rlang::ensym(y),
                         label=!!rlang::ensym(x)),
-                  name="I DON'T KNOW WHAT THIS IS",
+                  innerSize='96%',
                   showInLegend=TRUE)%>% # disables tooltip from popping up when mouse moves over bars
     hc_colors(group_colors) %>%
+    hc_xAxis(labels=list(
+      style=list(color=black,
+                 fontFamily = main_font, # font_x_label
+                 fontWeight = semi_bold_font_weight,
+                 fontSize="1.5vmin")),
+      lineColor=gainsboro) %>%
     hc_title(text=top_finding) %>%
     hc_subtitle(text=subtitle) %>%
     hc_caption(text=caption) %>%
-    hc_add_theme(cc_theme)%>%
+    hc_add_theme(cc_theme_test)%>%
     hc_legend(title=list(text=paste0('<span style="color: #000000; font-weight: bold">', legend_text, '</span><br/><span style="color: #666; font-style: italic">Click to hide</span>')),
               enable = TRUE,
               labelFormat = paste0('{name} <span style="opacity: 0.4">{', y, ':.1f}</span>'))  %>%
@@ -321,33 +407,8 @@ fx_itemchart <- function(
                                                                               format=paste0(list(pointFormat=paste0('{point.', y,':.1f}')))))),
                filename = paste0(subtitle,"_Catalyst California, catalystcalifornia.org, 2023."))) %>%
     hc_chart(
-      marginRight=100,
-      marginLeft=50)
+      marginRight=50)
 }
   
 
-#### testing item chart ####  
-pillars_conn <- connect_to_db("rjs_pillars")
-timespent_ficard_race_person <- dbGetQuery(pillars_conn, "SELECT * FROM data.report_timespent_ficard_race_person") %>%
-  filter(race != "overall")
 
-fx_itemchart(
-    df=timespent_ficard_race_person, 
-    x="race",
-    y="duration_rate", 
-    group_colors=c(meteorite, lavender, orange, peridot, ccblue, gainsboro, "#211447",
-    "#FF9E0D", "#A8683C"),
-    row_nums=7, # integer
-    top_finding="The top finding related to systemic factors",
-    subtitle= "The number of hours SDPD spent conducting field interviews by race",
-    tooltip_text="Out of 100 hours, LBPD spent <b>{point.duration_rate:.1f}</b> hours conducting field interviews on <b>{point.race} people</b>",
-    legend_text="Single dot represents 1 hour out of 100 hours",
-    caption = paste0(sourcenote," Analysis for all officer-initiated stops RESULTING IN FIELD INTERVIEWS ONLY."))    
-
-  dbDisconnect(pillars_conn)
-  
-
-
-
-
-  
