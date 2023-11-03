@@ -58,6 +58,7 @@ tooltip_text <- "<b>{point.rate:.0f}%</b> of people {point.value_tooltip} an IRC
 # fx_stackedbarchart
 
 # See chart_functions.R for more documentation on each chart's arguments
+# See testing_bubblepop, testing_item, testing_stackedbar for more information on how to apply these functions
 
 # Example:
 
