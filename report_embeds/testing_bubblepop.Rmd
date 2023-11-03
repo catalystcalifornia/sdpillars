@@ -16,7 +16,7 @@ source("W:\\Project\\RJS\\Pillars\\GitHub\\HK\\sdpillars\\report_embeds\\chart_f
 pillars_conn <- connect_to_db("rjs_pillars")
 
 ## Load in RJS Pillars data: Bubble Pop test ##
-report_stoprates_race_person <- dbGetQuery(pillars_conn, "SELECT * FROM data.report_gang_stoprates_race_person")  %>% filter(race!="total" & !is.na(stop_count))
+report_stoprates_race_person <- dbGetQuery(pillars_conn, "SELECT * FROM data.report_stoprates_race_gang_person")  %>% filter(race!="total" & !is.na(stop_count))
 
 chart <- fx_bubblepopchart(
   df=report_stoprates_race_person, 
