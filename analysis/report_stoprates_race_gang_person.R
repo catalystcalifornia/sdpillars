@@ -100,4 +100,7 @@ COMMENT ON COLUMN report_stoprates_race_gang_person.stop_prc_rate IS '% of gang 
 
 # send table comment + column metadata
 #dbSendQuery(conn = conn, table_comment)
+<<<<<<< HEAD
 
+=======
+>>>>>>> 46241b6962ad2474c1412b76e7354a691fc4b8d7

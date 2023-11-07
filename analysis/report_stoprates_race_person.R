@@ -97,6 +97,7 @@ COMMENT ON COLUMN report_stoprates_race_person.level IS 'all of SDPD';
 # send table comment + column metadata
 #dbSendQuery(conn = conn, table_comment)
 
+<<<<<<< HEAD
 
 
 
@@ -105,3 +106,5 @@ COMMENT ON COLUMN report_stoprates_race_person.level IS 'all of SDPD';
 
 
 
+=======
+>>>>>>> 46241b6962ad2474c1412b76e7354a691fc4b8d7
