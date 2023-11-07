@@ -21,8 +21,7 @@ chart <- fx_itemchart(
     df=timespent_ficard_race_person, 
     x="race",
     y="duration_rate", 
-    group_colors=c(meteorite, lavender, orange, peridot, ccblue, gainsboro, "#211447",
-    "#FF9E0D", "#A8683C"),
+    group_colors=group_colors_item,
     # row_nums=5, # integer
     top_finding="The top finding related to systemic factors",
     subtitle= "The number of hours SDPD spent conducting field interviews by race",
