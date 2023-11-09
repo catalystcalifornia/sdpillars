@@ -8,6 +8,7 @@ output:
 
 ```{r, include=FALSE}
 
+#### Testing bubblepop ####
 library(RPostgreSQL)
 source("W:\\RDA Team\\R\\credentials_source.R")
 source("W:\\Project\\RJS\\Pillars\\GitHub\\HK\\sdpillars\\report_embeds\\chart_functions.R")
