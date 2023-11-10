@@ -28,7 +28,7 @@ df$race<-factor(df$race, ordered=TRUE,
 
 
 
-tooltip_text <- "Across all field interviews of folks <b> ages {point.age_bracket:.1f} </b>, SDPD stopped <b>{point.race:.1f} people {point.rate:.1f}% of the time.</b>"
+tooltip_text <- "Across all field interviews of folks <b> ages {point.age_bracket:.1f} </b>, SDPD stopped <b>{point.race_label_short:.1f} people {point.rate:.1f}% of the time.</b>"
 
 chart <- fx_stackedbarchart(  
   df = df,
