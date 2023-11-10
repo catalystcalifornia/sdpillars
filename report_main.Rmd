@@ -1,0 +1,190 @@
+---
+title: "Joint Report on SDPD's Gang Enforcement"
+subtitle: "DRAFT"
+author: "Catalyst California"
+output:
+  html_document:
+    css: "W:\\RDA Team\\R\\cc_brandguide.css"
+    toc: yes
+    toc_depth: 2
+    toc_float: yes
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+---
+  
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+```{r setup, include=FALSE}
+
+knitr::opts_chunk$set(echo = FALSE, message=FALSE, warning=FALSE)
+
+
+list.of.packages <- c("usethis", "highcharter", "tidyverse", "sf", "leaflet", "sp", "htmltools", "magrittr", "flextable", "htmlwidgets")
+
+new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
+if(length(new.packages)) install.packages(new.packages)
+
+#### Load libraries ####
+library(usethis)
+library(highcharter)
+library(tidyverse)
+library(sf)
+library(leaflet)
+library(sp)
+library(htmltools) # for html escape
+library(magrittr)
+library(flextable)
+
+library(htmlwidgets)
+
+
+#### Add database connection ####
+source("W:\\RDA Team\\R\\credentials_source.R")
+
+con <- connect_to_db("rjs_pillars")
+
+## Source the Chart Template
+
+source("report_embeds/chart_functions.R")
+
+## Reknit all embeds so git will recognize file changes
+# source("report_embeds/run_embeds.R")
+
+peridot <- "#CEEA01"
+orange <- "#F25922"
+
+```
+
+**Topline: The SDPD criminalizes communities of color, especially Black people, in Southeast San Diego by falsely labeling them as gang members.  This routine practice inflicts devastating racially biased harms, undermines community safety, and wastes tremendous public dollars.**  
+
+<div style="background-color:peridot">Community quote or video</div>"
+
+# The Context 
+
+* Falsely documenting people of color as gang members is a longstanding racially biased practice of law enforcement agencies, especially SDPD  (Chauncee)
+
+  + Critique/debunk normative assumptions about what it means to be a gang member (Mitchelle)
+
+  + Gang Documentation and Databases are a Longstanding Problem  (Chauncee)
+
+  + SDPD has a history and practice of Incorrectly Documenting People as Gang Members (Mitchelle)
+
+<div style="background-color:peridot">Community quote or video</div>"
+
+  + This is “Criminalization” (define via callout box) and it Inflicts Devastating Racially Biased Harms (direct and indirect) (Mitchelle)
+
+<div style="background-color:peridot">Community quote or video</div>"
+
+<div style="background-color:orange">Criminalization callout box</div>"
+
+# FINDINGS
+
+## SDPD targets communities of color, particularly Black and young people in Southeast San Diego, with this harmful practice
+
+<div style="background-color:peridot">Community quote or video</div>"
+
+### Data show that stops made by the SDPD are racially biased.
+
+```{r bubble-chart, child= 'report_embeds/report_stoprates_race_person_bubble.Rmd', echo=FALSE}
+```
+
+```{r bubble-chart, child= 'report_embeds/report_stopsrates_result_race_person.Rmd', echo=FALSE}
+```
+
+### Officer-initiated stops are largely dedicated to traffic violations for offenses that rarely require an arrest  
+
+Looking at officer-initiated stops, we analyze the time officers spent on stops by stop reason and then by result to determine if officers are making stops that help prevent serious threats to community safety. We find that stops are made mainly for traffic violations that are resolved with a citation, warning, or no action. LBPD makes almost 2 in 3 (or 61.7% of stops) for traffic violations. If we distribute these traffic stops across 100 hours and look at how officers spend their time based on the result of the stop, we see over half of those hours (54.5) goes towards stops resolved with a citation, 16.9 towards those resolved with a warning, and 11.3 resolved with no action at all. Only 4.6 out of 100 hours, are spent on stops that result in an arrest. 
+The top five offenses that people are cited for are infractions related to moving violations.    Transportation and criminal justice research suggests that, rather than having law enforcement stop people and issue fines and fees through tickets, street design improvements (like narrowing travel lanes) are more effective means at reducing speed and preventing serious injuries than direct police contact.^[NACTO Global Designing Cities Initiative, “Global Street Design Guide.”] ^[https://catalyst-ca.cdn.prismic.io/catalyst-ca/126c30a8-852c-416a-b8a7-55a90c77a04e_APCA+ACLU+REIMAGINING+COMMUNITY+SAFETY+2022_5.pdf, pg. 22]     
+
+
+```{r tabbed-charts, child= 'report_embeds/time_spent_stop_reason.Rmd'}
+```
+
+
+### Stops are racially biased and disproportionately impact people of color 
+
+Officer-initiated stops are more likely to impact people of color in Long Beach. As a part of RIPA data collection, officers are required to report the race of the person they stopped, based on the officer’s perception. The data show LBPD officers stop people they perceive as Black, Native Hawaiian or Pacific Islander (NHPI), and South Asian, Southwest Asian, or North African (SSWANA) at the highest rates.^[RIPA data includes a category for officers to identify someone they perceived as Middle Eastern or South Asian. However, that term is not commonly used among people who identify with the communities the data aim to include. We use the term South Asian, Southwest Asian, or North African (SSWANA) to better represent this diverse community and their geographical origins, and move away from the use of the term Middle Eastern.] For example, LBPD officers stopped 169 Black people for every 1000 Black people in Long Beach. By comparison, only 61 out of every 1000 White people were stopped.  
+
+```{r, child= 'report_embeds/stop_rates_race_per1k.Rmd'}
+```
+
+We narrow in on traffic stops that resulted in no action to evaluate whether racial disparities in stops are connected to pretextual stops. A pretextual stop occurs when an officer has a “hunch” that a person may be connected to an illegal activity, but that “hunch” is insufficient to stop the person. To justify the stop, the officer then identifies a minor traffic violation or other infraction (i.e., “pretext”), and then subjects the person to an investigation for more serious criminal activity. Pretextual stops are a central pathway for racial profiling because those “hunches” are often based on racial biases.  
+
+A stop that results in no action (i.e., no citation, warning, or arrest) is an indicator of pretext because if there was a serious safety risk, presumably, a citation, arrest, or other enforcement action would occur. We find that people LBPD perceived as two or more races, or as Black, were stopped at the highest rates for stops resulting in no action.^[While people perceived as SSWANA and AIAN have the lowest rate of traffic stops with no action, like other groups, they are no more likely to have a stop result in an arrest. Stops of people perceived as SSWANA are more likely to result in a citation for an infraction, but data show these citations are for traffic infractions like speeding and failing to stop at a stop sign that do not require an armed officer response.]  In   2019, over 1 in 5 traffic stops of officers perceived as Black resulted in no action. These figures are important because every additional police encounter has implications for community health and wellbeing. 
+
+Studies show that police encounters and harassment increase anxiety and trauma among people of color, particularly Black people.^[Alang et al., Police Brutality and Black Health: Setting the Agenda for Public Health Scholars (2017) 107 Am. J. Pub. Health 662 <https://www.researchgate.net/publication/315510199_Police_Brutality_and_Black_ Health_Setting_the_Agenda_for_Public_Health_Scholars> [as of Nov. 29, 2022]] In one study in New York City, young men who reported more police contact and intrusive encounters showed higher levels of trauma and anxiety symptoms because of their experiences.^[https://scholarship.law.columbia.edu/cgi/viewcontent.cgi?article=2851&context=faculty_scholarship]  In Baltimore City following the high-profile murder of Freddie Gray, researchers found that Black residents associated the stress and fear of police harassment with community fragmentation and poor community health.^[https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4824692/pdf/11524_2015_Article_22.pdf]   Another study in New York found a significant association between more invasive pedestrian stops and the prevalence of chronic health conditions, including diabetes, high blood pressure, asthma, obesity, where neighborhoods with more invasive encounters also had poorer health outcomes.^[https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4824697/] 
+
+```{r, child= 'report_embeds/stop_results_race_rate.Rmd'}
+```
+
+
+## LBPD unjustly targets low-income communities of color with unnecessary stops.  
+
+We also analyze variations in where LBPD officer-initiated stops occur to understand how stops differ across communities. We map the approximate location of officer-initiated stops by council district, race, and result based on location information. 
+
+First, we show how stops are distributed across council districts in relationship to race.  Then we look at how the results of officer-initiated stops vary by district. The data show that council districts with higher concentrations of people of color experienced the highest stop rates across council districts. Specifically, council districts in the West side of Long Beach, which includes districts 1, 6, and 7, had the highest number of stops and stop rates. These council districts also have higher concentrations of people of color and lower median incomes compared to the east side of Long Beach.^[https://la.myneighborhooddata.org/2019/02/employment-inequality-across-long-beach-city/]  
+
+Higher stop rates in a district does not translate to a greater likelihood of stops resulting in an enforcement action (e.g., citation, arrest, etc.). In districts with a higher concentration of people of color and more stops, LBPD is more likely to spend time on stops with no action. For instance, the East side of Long Beach, which consists of districts 3,4, and 5, had lower overall stops, but police spent a lower percentage of hours on stops with no action compared to other districts. Districts 3, 4, and 5 coincide to areas in the city with a higher concentration of White people and higher median income. 
+
+
+### People of color are stopped at higher rates across council districts.  
+
+Across council districts, LBPD stops people of color at the highest rates.  Plotting stops by race and council districts, we find a greater density of stops of Black and Latinx people across the city. 
+
+People LBPD perceived as Black have the highest stop rates in six out of nine council districts despite making up only a small portion of the population. For example, in Council District 3, which is in the East side of Long Beach, Black people only make up 5.6% of the population while White people make up 59% of the population; but LBPD stops people they perceive as Black at a rate 3.6 times higher than White people. In   Council District 9, Black people make up 14.5% of the population; but LBPD stops 103.8 people perceived as Black for every 1,000 Black people in the district. 
+
+People LBPD perceived as SSWANA and NHPI also experience the highest rate of stops in three council districts total. LBPD stops people they perceive as NHPI at higher rates than other people in districts 6 and 8. In Council District 9, they stop people perceived as SSWANA at the highest rates. In each of these districts, SSWANA and NHPI people make up a small percentage of the population but are more likely to be stopped than other community members. In Council District 9, SSWANA people make up only 0.7% of the population but have the highest stop rate, with a stop rate of 106.1 per 1,000 people who identify as SSWANA. In Council District 8, LBPD stops people perceived as NHPI at a rate of 159.7  per 1,000 people who identify as NHPI despite making up only 1% of the population in the district.
+
+The east side region of Long Beach, consisting of council districts 3,4, and 5, have a larger White population compared to other parts of the city and have higher rates of stops for people of color. In particular, people LBPD perceived as Latinx have the second highest stop rate in Council Districts 3 & 4 and the third highest stop rate in District 5. Additionally, people LBPD perceived as Black have the highest stop rate in all of these regions. Lastly, people LBPD perceived as NHPI have the third highest stop rate in Council Districts 3  & 4 and the second highest stop rate in Council District 5. In summary, people of color, specifically people LBPD perceived as Black, NHPI, SSWANA, and Latinx still end up with the highest stop rates in majority white-districts in Long Beach. 
+
+```{r, child= 'report_embeds/officer_stops_race_cd.Rmd'}
+```
+
+### More hours are spent on unnecessary stops in communities of color
+
+Higher stop rates in communities do not necessarily translate to a higher likelihood of detecting serious crimes. We calculate the percent of hours LBPD spends on officer-initiated stops that resulted in no action (e.g. no citation, warning, or arrest) in each council district. These officer-initiated stops waste public resources that could be invested in more effective and equitable approaches to community safety.       
+
+Council districts 1, 9, 6, and 8 have  higher rates of stops that result in no action (i.e., no citation, arrest, etc.). Council districts 8 and 9 have a large concentration of residents who identify as Latinx and Black. These districts are located in the North side of Long Beach and have a lower median income compared to the East side of the city based on data from the Neighborhood Data for Social Change (NDSC).^[“Although the 2016 median family income for the City of Long Beach was $55,151 – relatively similar to the county average – income levels varied greatly across the city’s census tracts. In the west side of the city, median household income levels were as low as $11,736. Meanwhile, median household income levels were as high as $122,526 in the east side of the city, a difference more than 10 times the other.” Neighborhood Data for Social Change (NSDC). (n.d.). Addressing Employment Inequality in the City of Long Beach. Retrieved from https://la.myneighborhooddata.org/2019/02/employment-inequality-across-long-beach-city/] The east side region of Long Beach, consisting of council districts 3, 4, and 5, have a larger White population compared to other parts of the city and have lower rates of stops that result in no action. In these council districts, officers are spending less than 10 percent of their hours (or less than 1 in 10 hours) on officer-initiated stops on stops that result in no action compared to more than 18 percent of their hours (or almost 1 in 5 hours) on stops that result in no action in District 9. 
+
+```{r, child= 'report_embeds/officer_stops_no_action_cd.Rmd'}
+```
+
+## Traffic stops are an inefficient means of advancing safety and pose a greater burden on people of color
+
+A common narrative is that traffic stops and police presence are necessary for safety in our communities and roadways. In reality, built environment and street design improvements can be a more effective means for traffic safety and do not expose communities of color to unnecessary contact with law enforcement. 
+
+Traffic stops and police presence increase trauma for communities of color already disproportionately impacted by traffic injuries. Police presence alone can heighten feelings of anxiety among people of color, specifically Black people, and increased interactions with police are associated with heightened symptoms of anxiety and trauma.^[https://oag.ca.gov/system/files/media/ripa-board-report-2023.pdf https://scholarship.law.columbia.edu/cgi/viewcontent.cgi?article=2851&context=faculty_scholarship https://repository.law.umich.edu/cgi/viewcontent.cgi?article=1293&context=mjrl]  Analysis of police stop data routinely shows that traffic stops of people of color are less likely to lead to evidence of a crime and people of color are overrepresented in stops that lead to no enforcement.^[https://www.ppic.org/publication/racial-disparities-in-law-enforcement-stops/]  And while communities of color are disproportionately burdened by unnecessary police stops and traffic injuries, they often have worse street design and conditions that undermine safety for pedestrians.^[ https://bridgingthegap.ihrp.uic.edu/_asset/02fpi3/btg_street_walkability_FINAL_03-09-12.pdf]
+
+Data show that such trends prove true in Long Beach. Specifically, we map stop rates for traffic violations by council district and high-injury networks for motor vehicles, pedestrians, and bikes. We also analyze the hit rate, or percentage of searches among traffic stops that yield evidence or contraband, by race. The data show that traffic stops are concentrated in low-income communities of color most impacted by high-injury networks. Data also show that people of color are also most impacted by unnecessary searches made by LBPD.
+
+
+### Low-income communities of color are dually impacted by traffic stops and traffic injuries.
+
+Low-income communities and people of color are overrepresented in victims of traffic collisions based on research in Los Angeles and nationally.  In Long Beach, we compare 2019 traffic stops to high-injury corridors and intersections identified by the Safe Streets Long Beach initiative in 2013-17 to examine how communities of color are being impacted both by the burden of law enforcement stops and traffic injuries.^[The initiative identified these high-injury corridors and intersections based on 2013-17 data, but they remain the initiative’s action plan to guarantee equity in increasing road safety.]
+
+Council districts 1 and 6 have the highest number of high-injury corridors and highest rate of officer-initiated traffic stops. These districts also have high shares of people of color and coincide with areas in Long Beach that have lower median incomes.^[https://la.myneighborhooddata.org/2019/02/employment-inequality-across-long-beach-city/]  Notably, council districts 3, 4, and 5, the districts with the lowest percentages of people of color have fewer high-injury pedestrian or bike corridors. In other words, low-income communities of color in Long Beach are disproportionately impacted by traffic injuries and police stops. Public investments in traffic safety should be made based on the needs and priorities of these communities. Research has shown that more police stops do not reduce traffic injuries or fatalities. Based on data across 33 states, the National Institute of Health found no significant association between police stops and vehicle collision death rates.^[https://catalyst-ca.cdn.prismic.io/catalyst-ca/126c30a8-852c-416a-b8a7-55a90c77a04e_APCA+ACLU+REIMAGINING+COMMUNITY+SAFETY+2022_5.pdf] 
+
+Prior research and recommendations from transportation practitioners underscore how traffic safety can be increased without the additional trauma of police interactions. In Seattle, reducing speeds and increasing sign density lowered speeds and led to fewer crashes in the city.^[https://www.seattle.gov/Documents/Departments/SDOT/VisionZero/SpeedLimit_CaseStudies_Report.pdf]  And while street design can help with pedestrian safety, communities of color and low-income communities are less likely to have features of street design known to help with pedestrian safety.^[https://bridgingthegap.ihrp.uic.edu/_asset/02fpi3/btg_street_walkability_FINAL_03-09-12.pdf]  Highway siting decisions, traffic engineering practices, and other street design decisions can also result in substandard, dangerous streets for communities of color.^[https://nacto.org/wp-content/uploads/2020/07/NACTO_CityLimits_Spreads.pdf#page=7]  Rather than using traffic stops to enforce traffic safety, enhancing urban design (such as through street/sidewalk lighting, marked crosswalks, pedestrian-friendly medians, traffic islands, curb extensions and traffic circles) should be considered as a solution-driven alternative.^[https://bridgingthegap.ihrp.uic.edu/_asset/02fpi3/btg_street_walkability_FINAL_03-09-12.pdf] 
+
+```{r, child= 'report_embeds/traffic_stop_rates_high_injury.Rmd'}
+```
+
+### Traffic stops lead to unnecessary, intrusive encounters with LBPD
+
+Instead of creating safer communities, officers use routine traffic stops to profile and harass people of color. Data on traffic and pretextual stops consistently show that stops are ineffective in finding evidence of a crime and disproportionately impact people of color.^[https://www.ppic.org/publication/racial-disparities-in-law-enforcement-stops/] Traffic stops also have little efficacy in preventing or reducing crime. In one case study, when police conducted fewer stops in response to law enforcement scrutiny, there was no observable increase in total, violent, or property crimes.^[https://www.sciencedirect.com/science/article/abs/pii/S0047235217301289]
+
+In Long Beach, LBPD officers use routine traffic stops to search people, but this practice overwhelmingly yields ineffective results. We find most searches, nearly 4 in 5 across all community members, lead to no contraband or evidence found for a crime. In addition to these searches being ineffective generally, they are even more ineffective when applied to people of color. In over 85% of searches done during traffic stops of people perceived as SSWANA, Black, Multi-racial, Asian, or AIAN, LBPD officers found no contraband or evidence.
+
+```{r, child= 'report_embeds/traffic_stops_no_evidence_race.Rmd'}
+```
+
+
+# The Solution
+
+[Forthcoming based on partner conversations] 
+
+
+# The Takeaway
+
+[Forthcoming based on partner conversations] 
+
+
+
