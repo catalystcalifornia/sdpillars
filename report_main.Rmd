@@ -1,7 +1,7 @@
 ---
 title: "Joint Report on SDPD's Gang Enforcement"
 subtitle: "DRAFT"
-author: "Catalyst California"
+author: "Catalyst California & Pillars of the Community"
 output:
   html_document:
     css: "W:\\RDA Team\\R\\cc_brandguide.css"
@@ -55,92 +55,180 @@ orange <- "#F25922"
 
 **Topline: The SDPD criminalizes communities of color, especially Black people, in Southeast San Diego by falsely labeling them as gang members.  This routine practice inflicts devastating racially biased harms, undermines community safety, and wastes tremendous public dollars.**  
 
-<div style="background-color:peridot">Community quote or video</div>"
+<div style="background-color:#CEEA01;font-size:12pt">Community quote or video
+</div>
 
-# The Context 
+# ACKNOWLEDGEMENTS
 
-* Falsely documenting people of color as gang members is a longstanding racially biased practice of law enforcement agencies, especially SDPD  (Chauncee)
+[insert text]
 
-  + Critique/debunk normative assumptions about what it means to be a gang member (Mitchelle)
+<br>
 
-  + Gang Documentation and Databases are a Longstanding Problem  (Chauncee)
+# CONTEXT
 
-  + SDPD has a history and practice of Incorrectly Documenting People as Gang Members (Mitchelle)
+* Falsely documenting people of color as gang members is a longstanding racially biased practice of law enforcement agencies, especially SDPD  
 
-<div style="background-color:peridot">Community quote or video</div>"
+  + Critique/debunk normative assumptions about what it means to be a gang member 
 
-  + This is “Criminalization” (define via callout box) and it Inflicts Devastating Racially Biased Harms (direct and indirect) (Mitchelle)
+  + Gang Documentation and Databases are a Longstanding Problem  
 
-<div style="background-color:peridot">Community quote or video</div>"
+  + SDPD has a history and practice of Incorrectly Documenting People as Gang Members 
 
-<div style="background-color:orange">Criminalization callout box</div>"
+<div style="background-color:#CEEA01;font-size:12pt">Community quote or video</div>
+<br>
+
+* This is “Criminalization” (define via callout box) and it Inflicts Devastating Racially Biased Harms (direct and indirect) (Mitchelle)
+
+<div style="background-color:#CEEA01;font-size:12pt">Community quote or video</div>
+
+<br>
+
+<div style="background-color:#F25922;font-size:12pt">Criminalization callout box</div>
+
+<br>
 
 # FINDINGS
 
-## SDPD targets communities of color, particularly Black and young people in Southeast San Diego, with this harmful practice
+## 1. SDPD targets communities of color, particularly Black and young people in Southeast San Diego, with this harmful practice
 
-<div style="background-color:peridot">Community quote or video</div>"
+<div style="background-color:#CEEA01;font-size:12pt">Community quote or video</div>
+
+[insert text]
+<br>
 
 ### Data show that stops made by the SDPD are racially biased.
 
+[insert text/findings]
+
 ```{r bubble-chart, child= 'report_embeds/report_stoprates_race_person_bubble.Rmd', echo=FALSE}
 ```
+<br>
+
+[insert text/findings]
 
 ```{r bubble-chart, child= 'report_embeds/report_stopsrates_result_race_person.Rmd', echo=FALSE}
 ```
+<br>
 
 ### Available data show that SDPD’s gang enforcement assignment profiles young and Black people for gang activity.   
 
-<div style="background-color:peridot">Community quote or video</div>"
+<div style="background-color:#CEEA01;font-size:12pt">Community quote or video</div>
 
+[insert text/findings]
 
 ```{r bubble-chart, child= 'report_embeds/report_stoprates_race_gang_person_bubble.Rmd'}
 ```
+<br>
+
+[insert text/findings]
 
 ```{r stacked-chart, child= 'report_embeds/report_stopsrates_age_race_gang_person_stacked.Rmd'}
 ```
+<br>
+
+
+<div style="background-color:#F25922">
+### SDPD data are underinclusive and mask the extent of racially biased, gang profiling in San Diego.
+
+* Compare what data show (relatively low numbers) to lived experiences (revealing a more expansive practice)
+
+* Compare to figures in CalGang 
+
+* Explain inconsistency between Gang Unit (under SDPD) and “Gang Enforcement” Assignment (under RIPA)  
+
+* Denial of PRA Request on Gang Unit is a form of secrecy (rather than transparency) used to hidecover  SDPD’s racially biased gang documentation practices.  This lack of transparency erodes both public trust in SDPD’s ability to advance and community safety.
+</div>
+<br>
+
 
 ### Beyond the gang enforcement assignment, an analysis of stops that result in field interview cards also show that SDPD targets young, Black people, unfairly labeling them as gang members. 
 
-<div style="background-color:peridot">Community quote or video</div>"
+<div style="background-color:#F25922;font-size:12pt">FI Card explanation/definition</div>
 
+<br>
+
+<div style="background-color:#CEEA01;font-size:12pt">Community quote or video</div>
+
+[insert text/findings]
+[chart coming]
 ```{r}
 ```
+<br>
+
+[insert text/findings]
 
 ```{r stacked-chart, child= 'report_embeds/report_stoprates_age_race_ficard_person_stacked.Rmd'}
 ```
+<br>
 
-## Such racially biased stops harm the Southeast community and undermine community safety.  
 
-<div style="background-color:peridot">Community quote or video</div>"
+## 2. Such racially biased stops harm the Southeast community and undermine community safety.  
+
+<div style="background-color:#CEEA01;font-size:12pt">Community quote or video</div>
+
+[insert text]
+<br>
 
 ### When searches are conducted as a part of gang profiling, they are largely ineffective and biased.  
 
+[insert text/findings]
+[chart coming]
 ```{r}
 ```
+<br>
+
+[insert text/findings]
 
 ```{r}
 ```
+<br>
 
 ### Southeast community members have had their wellbeing and safety harmed by gang enforcement stops.
 
-<div style="background-color:peridot">Community quote or video</div>"
+<div style="background-color:#CEEA01;font-size:12pt">Community quote or video</div>
 
+[insert text/findings]
+[chart coming]
 ```{r}
 ```
+<br>
 
-## These racially biased activities waste public resources.
 
-<div style="background-color:peridot">Community quote or video</div>"
+## 3. These racially biased activities waste public resources.
+
+<div style="background-color:#CEEA01;font-size:12pt">Community quote or video</div>
+
+[insert text]
+<br>
+
+### Based on available data, SDPD spends a disproportionate amount of time on profiling people of color for gang activity.
+
+[insert text/findings]
 
 ```{r item-chart, child= 'report_embeds/report_timespent_ficard_race_stop_item.Rmd'}
 ```
+<br>
+
+[insert text/findings]
 
 ```{r item-chart, child= 'report_embeds/report_timespent_ficard_gang_stop_item.Rmd'}
 ```
+<br>
 
-# Recommendations
+### This time translates to wasted public dollars.
+
+[insert text/findings]
+<br>
+
+
+# RECOMMENDATIONS
 
 1. Alternative investments that actually increase safety
 2. Enact the Protect Act
 3. Others...
+<br>
+
+
+# METHODOLOGY
+
+[link to methodology on GitHub]
