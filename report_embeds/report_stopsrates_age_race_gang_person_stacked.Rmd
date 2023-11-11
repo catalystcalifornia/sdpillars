@@ -27,6 +27,12 @@ race_labels<-c("latinx","nh_asian","nh_black","nh_nhpi","nh_white", "nh_aian", "
 df$race<-factor(df$race, ordered=TRUE, 
                                                levels=race_levels, labels=race_labels)
 
+age_levels<-c("18 and under","19-24","25-34","35-44","45-54", "55-64", "65 and older")
+age_labels<-c("18 and under","19-24","25-34","35-44","45-54", "55-64", "65 and older")
+df$age<-factor(df$age_bracket, ordered=TRUE, 
+                                               levels=age_levels, labels=age_labels)
+
+
 tooltip_text <- "Across all officer-initiated stops made by SDPD Gang Enforcement assignment of folks <b> ages {point.age_bracket:.1f}</b>, officers assigned to gang enforcement stopped <b>{point.race_label_short:.1f} people {point.rate:.1f}% of the time.</b>"
 
 chart <- fx_stackedbarchart(  
