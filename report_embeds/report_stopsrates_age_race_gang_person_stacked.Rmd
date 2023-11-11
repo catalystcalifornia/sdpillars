@@ -19,14 +19,15 @@ meta<-dbGetQuery(pillars_conn, "SELECT * FROM metadata_race_labels")
 
 
 df<-df%>%
-  left_join(meta, by=c("race"="race_base"))
+  left_join(meta, by=c("race"="race_base"))%>%
+  filter(race!='sswana' & race !="nhpi" & race != 'aian') ### Responding to QA: Filtering out for now
 
-race_levels<-c("latinx","nh_asian","nh_black","nh_nhpi","nh_white", "aian", "nhpi", "sswana", "nh_twoormor")
-race_labels<-c("latinx","nh_asian","nh_black","nh_nhpi","nh_white", "aian", "nhpi", "sswana", "nh_twoormor")
+race_levels<-c("latinx","nh_asian","nh_black","nh_nhpi","nh_white", "nh_aian", "nh_nhpi", "nh_sswana", "nh_twoormor")
+race_labels<-c("latinx","nh_asian","nh_black","nh_nhpi","nh_white", "nh_aian", "nh_nhpi", "nh_sswana", "nh_twoormor")
 df$race<-factor(df$race, ordered=TRUE, 
                                                levels=race_levels, labels=race_labels)
 
-tooltip_text <- "Across all officer-initiated stops of folks <b> ages {point.age_bracket:.1f} </b>,officers assigned to gang enforcement stopped <b>{point.race_label_short:.1f} people {point.rate:.1f}% of the time.</b>"
+tooltip_text <- "Across all officer-initiated stops made by SDPD Gang Enforcement assignment of folks <b> ages {point.age_bracket:.1f}</b>, officers assigned to gang enforcement stopped <b>{point.race_label_short:.1f} people {point.rate:.1f}% of the time.</b>"
 
 chart <- fx_stackedbarchart(  
   df = df,
@@ -35,10 +36,10 @@ chart <- fx_stackedbarchart(
   group_var = 'race_label_short',
   group_colors = c(meteorite, lavender, orange, peridot, ccblue, gainsboro, "#211447",
                          "#FF9E0D", "#A8683C"),
-  top_finding = 'Officers assigned to Gang Enforcement stop Latinx youth at disproportionately high rates',
-  subtitle = 'Stop rates for officer-initiated stops made by officers assigned to gang enforcement for every race across age groups',
+  top_finding = 'Officers assigned to Gang Enforcement stop Black and Latinx youth at disproportionately high rates',
+  subtitle = 'Stop rates for officer-initiated stops made by officers assigned to Gang Enforcement for every race across age groups',
   tooltip = tooltip_text,
-  caption = paste0(racenote,"<br><br>", sourcenote, "<br>","Analysis for all officer-initiated stops.","<br>"))
+  caption = paste0(racenote,"<br><br>", sourcenote, "<br>","Analysis for all officer-initiated stops made by officers assigned to Gang Enforcement.","<br>"))
 
 dbDisconnect(pillars_conn)
 ```
