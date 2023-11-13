@@ -1,0 +1,51 @@
+---
+title: ""
+output:
+  html_document
+---
+<!-- link to Google Font -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+```{r, include=FALSE}
+
+#### Testing bubblepop ####
+library(RPostgreSQL)
+source("W:\\RDA Team\\R\\credentials_source.R")
+source("W:\\Project\\RJS\\Pillars\\GitHub\\HK\\sdpillars\\report_embeds\\chart_functions.R")
+
+pillars_conn <- connect_to_db("rjs_pillars")
+## load in race metadata
+metadata_race_labels <-  dbGetQuery(pillars_conn, "SELECT * FROM metadata_race_labels") %>% select(race_base, race_label_short, race_label_long)
+
+## Load in RJS Pillars data: Bubble Pop test ##
+df <- dbGetQuery(pillars_conn, "SELECT * FROM data.report_hitrates_race_ficard_person")  %>% filter(race!="total" & race != "nhpi" & race!= "aian" & !is.na(stop_count))  %>% left_join(metadata_race_labels, by = c("race" = "race_base")) %>% arrange(desc(no_contraband_prc_rate))
+
+chart <- fx_bubblepopchart(
+  df=df, 
+  x='race_label_short', 
+  y='no_contraband_prc_rate', 
+  z='stop_count',
+  top_finding=paste0("In gang profiling searches by SDPD, most yield no contraband and disproportionately target people of color."), # this is the top finding from the chart that gets used like a title
+  subtitle= paste0("Searches with No Contraband or Evidence Found Among Gang Profiling Traffic Stops by Race"), # this is the more standard chart title that gets used as a subtitle
+  tooltip_text="For every 100 searches conducted during traffic stops for individuals perceived as <b>{point.race_label_long:.1f}</b> in gang profiling, SDPD found no contraband/evidence in <b>{point.no_contraband_prc_rate:.1f}</b> stops, a total of <b>{point.stop_count:,0f}</b> biased searches.", # customize your tooltip as a statement, calling out rate and count
+  caption = paste0(racenote,"<br><br>", sourcenote, "<br>","Analysis for all officer-initiated stops.","<br>"), # if necessary add a method note between the racenote and sourcenote with a line break, use racenote if graph includes data by race, and always use sourcenote. Each of these are standard objects across all charts
+  yaxis_label = "''", #format for your y axis labels
+  export_data_label=list(pointFormat='{point.stop_rate_per1k:.1f} per 1K')
+)
+
+
+
+dbDisconnect(pillars_conn)
+```
+
+```{r, echo=FALSE}
+chart
+```
+
+<script>
+  widg = document.getElementsByClassName('html-widget'); //find widgets
+  for (let i = 0; i < widg.length; i++) { //loop through
+    document.getElementsByClassName('highchart')[i].style.width = '100%'; //adjust width
+    document.getElementsByClassName('highchart')[i].style.height = '100%'; //adjust height
+  }
+</script>
