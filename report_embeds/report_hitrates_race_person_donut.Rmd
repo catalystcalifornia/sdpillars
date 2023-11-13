@@ -1,0 +1,72 @@
+
+---
+title: ""
+output:
+  html_document
+---
+<!-- link to Google Font -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+```{r, include=FALSE}
+
+#### Testing bubblepop ####
+library(RPostgreSQL)
+source("W:\\RDA Team\\R\\credentials_source.R")
+source("W:\\Project\\RJS\\Pillars\\GitHub\\HK\\sdpillars\\report_embeds\\chart_functions.R")
+
+pillars_conn <- connect_to_db("rjs_pillars")
+## load in race metadata
+metadata_race_labels <-  dbGetQuery(pillars_conn, "SELECT * FROM metadata_race_labels") %>% select(race_base, race_label_short, race_label_long)
+
+## Load in RJS Pillars data: Bubble Pop test ##
+df_no <- dbGetQuery(pillars_conn, "SELECT * FROM data.report_hitrates_race_person") %>% filter(race=="total")  %>% mutate(label = "No Contraband or Evidence Found") %>% rename(count = no_contraband_count, rate = no_contraband_prc_rate)
+
+df_yes <- dbGetQuery(pillars_conn, "SELECT * FROM data.report_hitrates_race_person") %>% filter(race=="total")  %>% mutate(label = "Contraband or Evidence Found", count = stop_count - no_contraband_count, rate = 100-no_contraband_prc_rate) %>% select(-no_contraband_count, -no_contraband_prc_rate)
+
+df <- bind_rows(df_no, df_yes)
+
+
+chart <- 
+df %>%
+  hchart(
+    "pie", hcaes(x = label, y = rate),
+    name = "",
+    tooltip = list(headerFormat="", pointFormat = "<b>{point.rate:.1f}%</b> of stops result in <b>{point.label}</b>, or a total of {point.count:,.1f} stops"),
+     innerSize="65%",
+     center = c(50, 50), 
+    )%>% 
+  hc_title(text = "The majority of searches conducted by SDPD during traffic stops yield no evidence or contraband.",
+ align="left")%>%
+   hc_subtitle(text = "Percentage of searches resulting in the discovery of contraband/evidence compared to those where no contraband/evidence was found.",
+                     align="left") %>%
+  hc_caption(
+    text = paste0(sourcenote," Analysis for all stops."))%>%
+  hc_plotOptions(
+    innersize="50%", 
+    startAngle=90, 
+    endAngle=90,
+    center=list('50%', '75%'),
+    size='120%')%>%
+hc_add_theme(cc_theme)%>%
+  hc_exporting(
+    enabled = TRUE, sourceWidth=900, sourceHeight=600, 
+    chartOptions=list(plotOptions=list(series=list(dataLabels=list(enabled=TRUE, format='{point.hours_rate_cap:.1f}%')))),
+    filename = paste0("Percent of hours spent on calls for service versus officer-initiated stops","_Catalyst California, catalystcalifornia.org, 2023.")
+  )
+
+
+
+dbDisconnect(pillars_conn)
+```
+
+```{r, echo=FALSE}
+chart
+```
+
+<script>
+  widg = document.getElementsByClassName('html-widget'); //find widgets
+  for (let i = 0; i < widg.length; i++) { //loop through
+    document.getElementsByClassName('highchart')[i].style.width = '100%'; //adjust width
+    document.getElementsByClassName('highchart')[i].style.height = '100%'; //adjust height
+  }
+</script>
