@@ -17,48 +17,36 @@ pillars_conn <- connect_to_db("rjs_pillars")
 
 ## Load in RJS Pillars data
 df <- dbGetQuery(pillars_conn, "SELECT * FROM report_stoprates_result_race_person") 
-meta<-dbGetQuery(pillars_conn, "SELECT * FROM ")
+meta<-dbGetQuery(pillars_conn, "SELECT * FROM metadata_race_labels")
 
-# Aggregate to combine No Action/Warning into one result, then add race metadata
+# Aggregate to combine No Action/Warning into one result: I don't find that these results are as compelling we don't see as many racial disparities across rates, I think I would vote to do the stacked bar graph route
 
-df<-df%>%
+df_combine<-df%>%
     filter(result_simple=="Warning (verbal or written)" | result_simple =="No Action")%>%
   group_by(race)%>%
-  mutate(count_warningnoaction=sum(count))%>%
+  mutate(count_warningnoaction=sum(count),
+         rate_warningnoaction=count_warningnoaction/total*100)%>%
   slice(1)
 
+# Stacked bar graph for Warning/No Action:
 
 df<-df%>%
-  filter(result_simple=="Citation for infraction")%>%
-mutate(race=ifelse(race %in% "nh_aian", "NH AIAN",
-        ifelse(race %in% "nh_nhpi", "NH NHPI",
-          ifelse(race %in% "sswana", "SSWANA",
-                 ifelse(race %in% "nh_white", "White",
-                        ifelse(race %in% "nh_black", "Black",
-                               ifelse(race %in% "nh_asian", "Asian",
-                                      ifelse(race %in% "latinx", "Latinx",
-                                             ifelse(race %in% "aian", "AIAN",
-                                                    ifelse(race %in% "nh_sswana", "NH SSWANA",
-                                                           ifelse(race %in% "nh_twoormor", "Multiple Races",
-                                                                  "NHPI")))))))))))%>%
-  arrange(-rate)
-                  
+ filter(result_simple=="Warning (verbal or written)" | result_simple =="No Action")%>%
+left_join(meta, by=c("race"="race_base"))
 
-chart <- fx_bubblepopchart(
-  df=df, 
-  x='race', 
-  y='rate', 
-  z='count',
-  top_finding=paste0("SDPD disproportionately makes stops that result in no action against Black and Latinx people"),
-  
-  subtitle= paste0("Number of Officer-initiated Stops Resulting in No Action by Race and Ethnicity"), 
-  
-  tooltip_text="For every 100 <b>{point.race:.1f}</b> people in San Diego stopped for an officer-initiated stop, SDPD stopped <b>{point.rate:.1f}</b> people perceived as <b>{point.race:.1f}</b> for stops that resulted in No Action, a total of <b>{point.count:,0f}</b> people.", # customize your tooltip as a statement, calling out rate and count
-  
-  caption = paste0(racenote,"<br><br>", sourcenote, "<br>","Analysis for all officer-initiated stops.","<br>"), # if necessary add a method note between the racenote and sourcenote with a line break, use racenote if graph includes data by race, and always use sourcenote. Each of these are standard objects across all charts
-  yaxis_label = "''", #format for your y axis labels
-  export_data_label=list(pointFormat='{point.rate:.1f}')
-)
+
+tooltip_text <- "For every 100 people <b>{point.race_label_short:.1f}</b> people in San Diego stopped for an officer-initiated stop, SDPD stopped <b>{point.rate:.1f}</b> people perceived as <b>{point.race_label_short:.1f}</b> for stops that resulted in  <b>{point.result_simple:.1f}</b>, a total of <b>{point.count:,0f}</b> people."
+
+chart <- fx_stackedbarchart(  
+  df = df,
+  x = 'race_label_short',
+  y = 'rate',
+  group_var = 'result_simple',
+  group_colors = group_colors_item,
+  top_finding = 'A top level finding about systemic impact',
+  subtitle = 'stop rates for field interviews for every race across age brackets',
+  tooltip = tooltip_text,
+  caption = paste0(racenote,"<br><br>", sourcenote, "<br>","Analysis for all officer-initiated stops.","<br>"))
 
 ```
 
