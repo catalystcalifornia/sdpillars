@@ -106,7 +106,10 @@ orange <- "#F25922"
 
 [insert text/findings]
 
-```{r bubble-chart, child= 'report_embeds/report_stopsrates_result_race_person.Rmd', echo=FALSE}
+```{r bubble-chart, child= 'report_embeds/report_stoprates_result_race_person_bubble.Rmd', echo=FALSE}
+```
+
+```{r bubble-chart, child= 'report_embeds/report_stoprates_result_race_person_stacked.Rmd', echo=FALSE}
 ```
 <br>
 
@@ -150,7 +153,7 @@ orange <- "#F25922"
 <div style="background-color:#CEEA01;font-size:12pt">Community quote or video</div>
 
 [insert text/findings]
-[chart coming]
+**NEED CHART HERE**
 ```{r}
 ```
 <br>
@@ -172,14 +175,14 @@ orange <- "#F25922"
 ### When searches are conducted as a part of gang profiling, they are largely ineffective and biased.  
 
 [insert text/findings]
-[chart coming]
-```{r}
+
+```{r stacked-chart, child= 'report_embeds/report_hitrates_race_person_donut.Rmd'}
 ```
 <br>
 
 [insert text/findings]
 
-```{r}
+```{r stacked-chart, child= 'report_embeds/report_hitrates_race_ficard_person_bubblepop.Rmd'}
 ```
 <br>
 
@@ -188,7 +191,7 @@ orange <- "#F25922"
 <div style="background-color:#CEEA01;font-size:12pt">Community quote or video</div>
 
 [insert text/findings]
-[chart coming]
+**NEED CHART**
 ```{r}
 ```
 <br>
