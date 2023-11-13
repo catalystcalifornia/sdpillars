@@ -15,10 +15,18 @@ source("W:\\Project\\RJS\\Pillars\\GitHub\\HK\\sdpillars\\report_embeds\\chart_f
 
 pillars_conn <- connect_to_db("rjs_pillars")
 
-## Load in RJS Pillars data: Bubble Pop test ##
-df <- dbGetQuery(pillars_conn, "SELECT * FROM report_stopsrates_result_race_person")  %>% filter(race!="total" )
+## Load in RJS Pillars data
+df <- dbGetQuery(pillars_conn, "SELECT * FROM report_stoprates_result_race_person") 
+meta<-dbGetQuery(pillars_conn, "SELECT * FROM ")
 
-# For now, lets just filter and visualize result == Warning
+# Aggregate to combine No Action/Warning into one result, then add race metadata
+
+df<-df%>%
+    filter(result_simple=="Warning (verbal or written)" | result_simple =="No Action")%>%
+  group_by(race)%>%
+  mutate(count_warningnoaction=sum(count))%>%
+  slice(1)
+
 
 df<-df%>%
   filter(result_simple=="Citation for infraction")%>%
