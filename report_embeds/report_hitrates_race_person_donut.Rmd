@@ -19,11 +19,7 @@ pillars_conn <- connect_to_db("rjs_pillars")
 metadata_race_labels <-  dbGetQuery(pillars_conn, "SELECT * FROM metadata_race_labels") %>% select(race_base, race_label_short, race_label_long)
 
 ## Load in RJS Pillars data: Bubble Pop test ##
-df_no <- dbGetQuery(pillars_conn, "SELECT * FROM data.report_hitrates_race_person") %>% filter(race=="total")  %>% mutate(label = "No Contraband or Evidence Found") %>% rename(count = no_contraband_count, rate = no_contraband_prc_rate)
-
-df_yes <- dbGetQuery(pillars_conn, "SELECT * FROM data.report_hitrates_race_person") %>% filter(race=="total")  %>% mutate(label = "Contraband or Evidence Found", count = stop_count - no_contraband_count, rate = 100-no_contraband_prc_rate) %>% select(-no_contraband_count, -no_contraband_prc_rate)
-
-df <- bind_rows(df_no, df_yes)
+df<- dbGetQuery(pillars_conn, "SELECT * FROM data.report_hitrates_race_person")
 
 
 chart <- 
