@@ -19,7 +19,8 @@ df <- dbGetQuery(pillars_conn, "SELECT * FROM report_stoprates_age_race_ficard_p
 meta<-dbGetQuery(pillars_conn, "SELECT * FROM metadata_race_labels")
 
 df<-df%>%
-  left_join(meta, by=c("race"="race_base"))
+  left_join(meta, by=c("race"="race_base"))%>%
+  filter(race!='sswana' & race !="nhpi" & race != 'aian') ### Responding to QA: Filtering out for now
 
 race_levels<-c("latinx","nh_asian","nh_black","nh_nhpi","nh_white", "aian", "nh_aian", "nhpi", "nh_nhpi", "sswana", "nh_sswana", "nh_twoormor")
 race_labels<-c("latinx","nh_asian","nh_black","nh_nhpi","nh_white", "aian", "nh_aian", "nhpi", "nh_nhpi", "sswana", "nh_sswana", "nh_twoormor")
@@ -28,7 +29,7 @@ df$race<-factor(df$race, ordered=TRUE,
 
 
 
-tooltip_text <- "Across all field interviews of folks <b> ages {point.age_bracket:.1f} </b>, SDPD stopped <b>{point.race_label_short:.1f} people {point.rate:.1f}% of the time.</b>"
+tooltip_text <- "Across all field interviews of people <b> ages {point.age_bracket:.1f} </b>, SDPD stopped people perceived as <b>{point.race_label_short:.1f} {point.rate:.1f}% of the time.</b>"
 
 chart <- fx_stackedbarchart(  
   df = df,
@@ -38,9 +39,9 @@ chart <- fx_stackedbarchart(
   group_colors = c(meteorite, lavender, orange, peridot, ccblue, gainsboro, "#211447",
                          "#FF9E0D", "#A8683C"),
   top_finding = 'SDPD is disproportionately stopping and conducting field interview cards for Black and Latinx youth',
-  subtitle = 'Stop rates resulting in only a field interview for every race across age groups',
+  subtitle = 'Stops Resulting in a Field Interview Card by Age and Race',
   tooltip = tooltip_text,
-  caption = paste0(racenote,"<br><br>", sourcenote, "<br>","Analysis for all officer-initiated stops.","<br>"))
+  caption = paste0(racenote,"<br><br>", sourcenote, "<br>","Analysis for all officer-initiated stops that only resulted in a field interview card completed.","<br>"))
 
 dbDisconnect(pillars_conn)
 ```
