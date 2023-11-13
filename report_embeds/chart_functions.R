@@ -324,7 +324,7 @@ fx_stackedbarchart <- function(
   
   hchart(df, 
          "bar", hcaes(x = !!rlang::ensym(x), y = !!rlang::ensym(y), group = !!rlang::ensym(group_var)),
-         stacking = "percent",
+         stacking = "normal",
          tooltip =  list(headerFormat='',pointFormat=tooltip_text)) %>%
     
     hc_title(
