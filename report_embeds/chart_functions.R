@@ -208,6 +208,20 @@ sourcenote<-paste0("Catalyst California's calculations based on City of San Dieg
 racenote<-paste0("Race/ethnicity: AIAN=American Indian or Alaska Native, NHPI=Native Hawaiian or Pacific Islander, SSWANA=South Asian, Southwest <br>Asian, or North African.")
 
 #### Bubblepop Chart - Combined Bar and Bubble Charts ####
+# loadFunction <- JS("function(event) {$('.highcharts-legend-item rect').attr('height', '2').attr('y', '10');}")
+
+# to dos:
+# revert colors - High priority
+# stacked chart - take category and only plot values - high priority
+# fix labels (final vertical axis) - collapse on smaller windows - high priority
+# update testing Rmds to pull from relative chart function script
+# "-1" thing
+# Double legend mockups for bubblepop
+# Race metadata labels
+# turn off legend interactivity
+# add statements to explain legends
+# some label cutoffs (final vertical axis) - low priority
+# Chart functions down't 
 
 fx_bubblepopchart <- function(
     df, # name of dataframe
@@ -237,7 +251,7 @@ fx_bubblepopchart <- function(
     
     hc_add_series(df, "bar", invert=TRUE,
                   hcaes(x=!!rlang::ensym(x), y=!!rlang::ensym(y)), 
-                  showInLegend=FALSE, 
+                  showInLegend=TRUE, 
                   enableMouseTracking=FALSE)%>% # disables tooltip from popping up when mouse moves over bars
     
     hc_add_series(df, "bubble", invert=TRUE,
@@ -256,14 +270,19 @@ fx_bubblepopchart <- function(
     hc_legend(enabled = TRUE, 
               width = '15%',
               align = "right", 
-              verticalAlign="bottom",
-              y=10,
+              verticalAlign="top",
+              y=100,
               layout="vertical",
-              floating=TRUE,
+              floating=FALSE,
               borderColor=gainsboro,
               borderWidth=1,
               borderRadius=5,
               itemWidth=120,
+              symbolHeight=2,
+              symbolWidth=15,
+              symbolRadius=0,
+              squareSymbol=FALSE,
+              symbolPadding=20,
               padding=4,
               itemMarginBottom=20,
               bubbleLegend =  list(enabled = TRUE,
