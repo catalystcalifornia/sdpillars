@@ -21,19 +21,19 @@ meta<-dbGetQuery(pillars_conn, "SELECT * FROM metadata_race_labels")
 
 # Aggregate to combine No Action/Warning into one result: I don't find that these results are as compelling we don't see as many racial disparities across rates, I think I would vote to do the stacked bar graph route
 
-df_combine<-df%>%
-    filter(result_simple=="Warning (verbal or written)" | result_simple =="No Action")%>%
-  group_by(race)%>%
-  mutate(count_warningnoaction=sum(count),
-         rate_warningnoaction=count_warningnoaction/total*100)%>%
-  slice(1)
+# df_combine<-df%>%
+#     filter(result_simple=="Warning (verbal or written)" | result_simple =="No Action")%>%
+#   group_by(race)%>%
+#   mutate(count_warningnoaction=sum(count),
+#          rate_warningnoaction=count_warningnoaction/total*100)%>%
+#   slice(1)
 
 # Stacked bar graph for Warning/No Action:
 
 df<-df%>%
  filter(result_simple=="Warning (verbal or written)" | result_simple =="No Action")%>%
-left_join(meta, by=c("race"="race_base"))
-
+left_join(meta, by=c("race"="race_base"))%>%
+  filter(race!="aian" & race != "nhpi" & race != "sswana") # filter out aian/nhpi/sswana for now
 
 tooltip_text <- "For every 100 people <b>{point.race_label_short:.1f}</b> people in San Diego stopped for an officer-initiated stop, SDPD stopped <b>{point.rate:.1f}</b> people perceived as <b>{point.race_label_short:.1f}</b> for stops that resulted in  <b>{point.result_simple:.1f}</b>, a total of <b>{point.count:,0f}</b> people."
 
@@ -43,23 +43,18 @@ chart <- fx_stackedbarchart(
   y = 'rate',
   group_var = 'result_simple',
   group_colors = group_colors_item,
-  top_finding = 'A top level finding about systemic impact',
-  subtitle = 'stop rates for field interviews for every race across age brackets',
+  top_finding = 'SDPD is most likely to stop Black and Latinx people for stops that then result in no action',
+  subtitle = 'Stop rates for officer-initiated stops that result in a warning or no action by race',
   tooltip = tooltip_text,
   caption = paste0(racenote,"<br><br>", sourcenote, "<br>","Analysis for all officer-initiated stops.","<br>"))
+
+dbDisconnect(pillars_conn)
+
 
 ```
 
 ```{r, echo=FALSE}
 chart
-
-```
-
-```{r, echo=FALSE, message=FALSE, warning=FALSE, result='hide', include=FALSE}
-
-
-dbDisconnect(pillars_conn)
-
 
 ```
 
