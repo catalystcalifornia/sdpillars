@@ -15,20 +15,19 @@ lang$thousandsSep <- ","
 options(highcharter.lang = lang)
 
 ## COLORS ##
-orange <- "#3A207D" #"#F25922"
-peridot <- "#3A207D" #"#CEEA01"
-lavender <- "#3A207D" #"#CEC4E2"
+orange <- "#F25922"
+peridot <- "#CEEA01"
+lavender <- "#CEC4E2"
 meteorite <- "#3A207D"
-ccblue <- "#3A207D" #"#0860BC"
+ccblue <- "#0860BC"
 
 black <- "#000000"
 alabaster<-"#FBFBFB"
 gainsboro <- "#DEDEDE"
 
-divergent_color_ramp <- c("#372278", "#372278", "#372278", "#372278", "#372278") #, "#5F3B63","#A8683C", "#D58424", "#FF9900")
-grouped_color_ramp <-c(meteorite, meteorite, meteorite, meteorite, meteorite) # orange, peridot, "#BDAFE9", "#E2D9FF")
-group_colors_item <- c(meteorite, meteorite, meteorite, meteorite, meteorite, meteorite, meteorite,
-                       meteorite, meteorite)
+divergent_color_ramp <- c("#372278", "#5F3B63","#A8683C", "#D58424", "#FF9900") 
+grouped_color_ramp <-c(meteorite, orange, peridot, "#BDAFE9", "#E2D9FF")
+group_colors_item <- c(meteorite, orange, peridot, lavender, ccblue, "#5F3B63","#A8683C", "#D58424", "#FF9900")
 ## FONTS ##
 main_font <- "Inter"
 regular_font_weight <- 400
@@ -325,7 +324,7 @@ fx_stackedbarchart <- function(
   
   hchart(df, 
          "bar", hcaes(x = !!rlang::ensym(x), y = !!rlang::ensym(y), group = !!rlang::ensym(group_var)),
-         stacking = "percent",
+         stacking = "normal",
          tooltip =  list(headerFormat='',pointFormat=tooltip_text)) %>%
     
     hc_title(
