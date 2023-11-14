@@ -10,7 +10,7 @@ output:
 
 library(RPostgreSQL)
 source("W:\\RDA Team\\R\\credentials_source.R")
-source("W:\\Project\\RJS\\Pillars\\GitHub\\HK\\sdpillars\\report_embeds\\chart_functions.R")
+source("chart_functions.R")
 
 pillars_conn <- connect_to_db("rjs_pillars")
 
@@ -28,23 +28,72 @@ df$race<-factor(df$race, ordered=TRUE,
 
 age_levels<-c("18 and under","19-24","25-34","35-44","45-54", "55-64", "65 and older")
 age_labels<-c("18 and under","19-24","25-34","35-44","45-54", "55-64", "65 and older")
-df$age<-factor(df$age_bracket, ordered=TRUE, 
+df$age_bracket<-factor(df$age_bracket, ordered=TRUE, 
                                                levels=age_levels, labels=age_labels)
 
 
 tooltip_text <- "Across all officer-initiated stops made by SDPD Gang Enforcement assignment of folks <b> ages {point.age_bracket:.1f}</b>, officers assigned to gang enforcement stopped <b>{point.race_label_short:.1f} people {point.rate:.1f}% of the time.</b>"
 
-chart <- fx_stackedbarchart(  
-  df = df,
-  x = 'age_bracket',
-  y = 'rate',
-  group_var = 'race_label_short',
-  group_colors = c(meteorite, lavender, orange, peridot, ccblue, gainsboro, "#211447",
-                         "#FF9E0D", "#A8683C"),
-  top_finding = 'Officers assigned to Gang Enforcement stop Black and Latinx youth at disproportionately high rates',
-  subtitle = 'Stop rates for officer-initiated stops made by officers assigned to Gang Enforcement for every race across age groups',
-  tooltip = tooltip_text,
-  caption = paste0(racenote,"<br><br>", sourcenote, "<br>","Analysis for all officer-initiated stops made by officers assigned to Gang Enforcement.","<br>"))
+# Using function: CANNOT get the age order to work
+
+# chart <- fx_stackedbarchart(  
+#   df = df,
+#   x = 'age_bracket',
+#   y = 'rate',
+#   group_var = 'race_label_short',
+#   group_colors = c(meteorite, lavender, orange, peridot, ccblue, gainsboro, "#211447",
+#                          "#FF9E0D", "#A8683C"),
+#   top_finding = 'Officers assigned to Gang Enforcement stop Black and Latinx youth at disproportionately high rates',
+#   subtitle = 'Stop rates for officer-initiated stops made by officers assigned to Gang Enforcement for every race across age groups',
+#   tooltip = tooltip_text,
+#   caption = paste0(racenote,"<br><br>", sourcenote, "<br>","Analysis for all officer-initiated stops made by officers assigned to Gang Enforcement.","<br>"))
+
+
+## manual code to get age brackets in correct order ##
+
+group_colors <- c(meteorite, orange, peridot, lavender, ccblue, "#5F3B63","#A8683C", "#D58424", "#FF9900")
+
+
+chart<-hchart(df, 
+         "bar", hcaes(x = age_bracket, y = rate, group =race_label_short),
+         stacking = "normal",
+         tooltip =  list(headerFormat='',pointFormat=tooltip_text)) %>%
+    
+    hc_title(
+      text = "Officers assigned to Gang Enforcement stop Black and Latinx youth at disproportionately high rates") %>%
+    
+    hc_subtitle(
+      text = "Stop rates for officer-initiated stops made by officers assigned to Gang Enforcement for every race across age groups") %>%
+    
+    hc_caption(
+      text = paste0(racenote,"<br><br>", sourcenote, "<br>","Analysis for all officer-initiated stops made by officers assigned to Gang Enforcement.","<br>")) %>%
+    
+    hc_yAxis(title = list(text = paste0(""))) %>%
+    
+    hc_xAxis( categories=list("18 and under","19-24","25-34","35-44","45-54", "55-64", "65 and older"),
+              title = list(text = paste0(""),
+                          labels=list(position="bottom"))) %>%
+    
+    hc_legend(enabled = TRUE, 
+              reversed =  TRUE,
+              x=20)%>% 
+    
+    hc_add_theme(cc_theme)%>%
+    
+    hc_colors(group_colors) %>%
+    hc_chart(
+      marginRight=120) %>%
+    
+    hc_exporting(
+      enabled = TRUE, sourceWidth=900, sourceHeight=600, 
+      chartOptions=list(plotOptions=list(series=list(dataLabels=list(enabled=TRUE,format='{point.rate:.1f}%')))),
+      filename = paste0("Stop rates for officer-initiated stops made by officers assigned to Gang Enforcement for every race across age groups","_Catalyst California, catalystcalifornia.org, 2023."),
+      buttons=list(contextButton=list(menuItems=list('downloadPNG', 'downloadSVG',
+                                                     'downloadXLS', 'downloadCSV'))))
+
+
+
+
 
 dbDisconnect(pillars_conn)
 ```
