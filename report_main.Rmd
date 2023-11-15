@@ -43,7 +43,7 @@ con <- connect_to_db("rjs_pillars")
 
 ## Source the Chart Template
 
-source("report_embeds/chart_functions.R")
+# source("report_embeds/chart_functions.R")
 
 ## Reknit all embeds so git will recognize file changes
 # source("report_embeds/run_embeds.R")
@@ -207,13 +207,13 @@ orange <- "#F25922"
 
 ```{r item-chart, child= 'report_embeds/report_timespent_ficard_race_stop_item.Rmd'}
 ```
-<br>
+
 
 [insert text/findings]
 
 ```{r item-chart, child= 'report_embeds/report_timespent_ficard_gang_stop_item.Rmd'}
 ```
-<br>
+
 
 ### This time translates to wasted public dollars.
 
