@@ -62,8 +62,14 @@ tooltip_text <- "Across all people <b>ages {point.age_bracket:.1f}</b> stopped b
 
 ## manual code to get age brackets in correct order ##
 
-group_colors <- c(meteorite, orange, peridot, lavender, ccblue, "#5F3B63","#A8683C", "#D58424", "#FF9900")
+group_colors <- c(meteorite, lavender, orange, peridot, ccblue, gainsboro, "#211447",
+                         "#FF9E0D", "#A8683C")
 
+# set order of stacking within bars
+
+df <- within(df, race_label_short <- factor(race_label_short, levels=c("White","Multiracial", "SWANA/SA", "NHPI","AIAN", "Asian",  "Latinx","Black")))
+
+# graph
 
 chart<-hchart(df, 
          "bar", hcaes(x = age_bracket, y = rate, group =race_label_short),
