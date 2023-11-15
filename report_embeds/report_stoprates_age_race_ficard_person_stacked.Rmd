@@ -16,32 +16,86 @@ source("chart_functions.R")
 pillars_conn <- connect_to_db("rjs_pillars")
 
 df <- dbGetQuery(pillars_conn, "SELECT * FROM report_stoprates_age_race_ficard_person")
+age<-dbGetQuery(pillars_conn, "SELECT * FROM population_age_race_sd_city")%>%
+  mutate(race=ifelse(race %in% "latino", "latinx", race))%>%
+  rename("pop_count"="count",
+         "pop_rate"="rate")
 meta<-dbGetQuery(pillars_conn, "SELECT * FROM metadata_race_labels")
 
 df<-df%>%
+    left_join(age)%>%
   left_join(meta, by=c("race"="race_base"))%>%
   filter(race!='sswana' & race !="nhpi" & race != 'aian') ### Responding to QA: Filtering out for now
 
-race_levels<-c("latinx","nh_asian","nh_black","nh_nhpi","nh_white", "aian", "nh_aian", "nhpi", "nh_nhpi", "sswana", "nh_sswana", "nh_twoormor")
-race_labels<-c("latinx","nh_asian","nh_black","nh_nhpi","nh_white", "aian", "nh_aian", "nhpi", "nh_nhpi", "sswana", "nh_sswana", "nh_twoormor")
-df$race<-factor(df$race, ordered=TRUE, 
-                                               levels=race_levels, labels=race_labels)
+
+tooltip_text <- "Across all field interviews of people age <b>{point.age_bracket:.1f}</b>, SDPD stopped people perceived as <b>{point.race_label_short:.1f} {point.rate:.1f}%</b> of the time. <b>{point.race_label_short:.1f}</b> people ages <b>{point.age_bracket:.1f}</b> make up <b>{point.pop_rate:.1f}%</b> of the population in San Diego."
+
+# chart <- fx_stackedbarchart(  
+#   df = df,
+#   x = 'age_bracket',
+#   y = 'rate',
+#   group_var = 'race_label_long',
+#   group_colors = c(meteorite, lavender, orange, peridot, ccblue, gainsboro, "#211447",
+#                          "#FF9E0D", "#A8683C"),
+#   top_finding = 'SDPD disproportionately stops and conducts field interview cards of Black people of all ages and Latinx young adults',
+#   subtitle = 'Stops resulting in a field interview card by age and race',
+#   tooltip = tooltip_text,
+#   caption = paste0(racenote,"<br><br>", sourcenote, "<br>","Analysis for all officer-initiated stops that only resulted in a field interview card completed.","<br>"))
+
+
+## manual code to get age brackets in correct order ##
+
+group_colors <- c(meteorite, lavender, orange, peridot, ccblue, gainsboro, "#211447",
+                         "#FF9E0D", "#A8683C")
+
+# set order of stacking within bars
+
+df <- within(df, race_label_short <- factor(race_label_short, levels=c("White","Multiracial", "SWANA/SA", "NHPI","AIAN", "Asian",  "Latinx","Black")))
+
+# graph
+
+chart<-hchart(df, 
+         "bar", hcaes(x = age_bracket, y = rate, group =race_label_short),
+         stacking = "normal",
+         tooltip =  list(headerFormat='',pointFormat=tooltip_text)) %>%
+    
+    hc_title(
+      text = "SDPD disproportionately stops and conducts field interview cards of Black people of all ages and Latinx young adults") %>%
+    
+    hc_subtitle(
+      text = "Stops resulting in a field interview card by age and race") %>%
+    
+    hc_caption(
+      text = paste0(racenote,"<br><br>", sourcenote, "<br>","Analysis for all officer-initiated stops that only resulted in a field interview card completed.","<br>")) %>%
+    
+    hc_yAxis(title = list(text = paste0(""))) %>%
+    
+    hc_xAxis( categories=list("17 and under","18-24","25-34","35-44","45-54", "55-64", "65 and older"),
+              title = list(text = paste0(""),
+                          labels=list(position="bottom"))) %>%
+    
+    hc_legend(enabled = TRUE, 
+              reversed =  TRUE,
+              x=20)%>% 
+    
+    hc_add_theme(cc_theme)%>%
+    
+    hc_colors(group_colors) %>%
+    hc_chart(
+      marginRight=120) %>%
+    
+    hc_exporting(
+      enabled = TRUE, sourceWidth=900, sourceHeight=600, 
+      chartOptions=list(plotOptions=list(series=list(dataLabels=list(enabled=TRUE,format='{point.rate:.1f}%')))),
+      filename = paste0("Stop rates for officer-initiated stops made by officers assigned to Gang Enforcement for every race across age groups","_Catalyst California, catalystcalifornia.org, 2023."),
+      buttons=list(contextButton=list(menuItems=list('downloadPNG', 'downloadSVG',
+                                                     'downloadXLS', 'downloadCSV'))))
 
 
 
-tooltip_text <- "Across all field interviews of people <b> ages {point.age_bracket:.1f} </b>, SDPD stopped people perceived as <b>{point.race_label_short:.1f} {point.rate:.1f}% of the time.</b>"
 
-chart <- fx_stackedbarchart(  
-  df = df,
-  x = 'age_bracket',
-  y = 'rate',
-  group_var = 'race_label_long',
-  group_colors = c(meteorite, lavender, orange, peridot, ccblue, gainsboro, "#211447",
-                         "#FF9E0D", "#A8683C"),
-  top_finding = 'SDPD is disproportionately stopping and conducting field interview cards for Black and Latinx youth',
-  subtitle = 'Stops Resulting in a Field Interview Card by Age and Race',
-  tooltip = tooltip_text,
-  caption = paste0(racenote,"<br><br>", sourcenote, "<br>","Analysis for all officer-initiated stops that only resulted in a field interview card completed.","<br>"))
+
+
 
 dbDisconnect(pillars_conn)
 ```

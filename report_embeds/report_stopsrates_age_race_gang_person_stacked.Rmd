@@ -15,24 +15,35 @@ source("chart_functions.R")
 pillars_conn <- connect_to_db("rjs_pillars")
 
 df <- dbGetQuery(pillars_conn, "SELECT * FROM report_stoprates_age_race_gang_person")
+
+age<-dbGetQuery(pillars_conn, "SELECT * FROM population_age_race_sd_city")%>%
+  mutate(race=ifelse(race %in% "latino", "latinx", race))%>%
+  rename("pop_count"="count",
+         "pop_rate"="rate")
+
+
 meta<-dbGetQuery(pillars_conn, "SELECT * FROM metadata_race_labels")
 
 df<-df%>%
+  left_join(age)%>%
   left_join(meta, by=c("race"="race_base"))%>%
-  filter(race!='sswana' & race !="nhpi" & race != 'aian') ### Responding to QA: Filtering out for now
+  filter(race!='sswana' & race !="nhpi" & race != 'aian')### Responding to QA: Filtering out for now
 
-race_levels<-c("latinx","nh_asian","nh_black","nh_nhpi","nh_white", "nh_aian", "nh_nhpi", "nh_sswana", "nh_twoormor")
-race_labels<-c("latinx","nh_asian","nh_black","nh_nhpi","nh_white", "nh_aian", "nh_nhpi", "nh_sswana", "nh_twoormor")
+
+race_levels<-c("latinx","nh_asian","nh_black","nh_white", "nh_aian", "nh_nhpi", "nh_sswana", "nh_twoormor")
+race_labels<-c("latinx","nh_asian","nh_black","nh_white", "nh_aian", "nh_nhpi", "nh_sswana", "nh_twoormor")
 df$race<-factor(df$race, ordered=TRUE, 
                                                levels=race_levels, labels=race_labels)
 
-age_levels<-c("18 and under","19-24","25-34","35-44","45-54", "55-64", "65 and older")
-age_labels<-c("18 and under","19-24","25-34","35-44","45-54", "55-64", "65 and older")
+
+
+age_levels<-c("17 and under","18-24","25-34","35-44","45-54", "55-64", "65 and older")
+age_labels<-c("17 and under","18-24","25-34","35-44","45-54", "55-64", "65 and older")
 df$age_bracket<-factor(df$age_bracket, ordered=TRUE, 
                                                levels=age_levels, labels=age_labels)
 
 
-tooltip_text <- "Across all officer-initiated stops made by SDPD Gang Enforcement assignment of folks <b> ages {point.age_bracket:.1f}</b>, officers assigned to gang enforcement stopped <b>{point.race_label_short:.1f} people {point.rate:.1f}% of the time.</b>"
+tooltip_text <- "Across all people ages <b>{point.age_bracket:.1f}</b> stopped by officers assigned to gang enforcement, officers stopped people perceived as <b>{point.race_label_short:.1f}</b> are stopped <b>{point.rate:.1f}%</b> of the time. <b>{point.race_label_short:.1f}</b> people ages <b>{point.age_bracket:.1f}</b> make up <b>{point.pop_rate:.1f}%</b> of the population in San Diego."
 
 # Using function: CANNOT get the age order to work
 
@@ -51,8 +62,14 @@ tooltip_text <- "Across all officer-initiated stops made by SDPD Gang Enforcemen
 
 ## manual code to get age brackets in correct order ##
 
-group_colors <- c(meteorite, orange, peridot, lavender, ccblue, "#5F3B63","#A8683C", "#D58424", "#FF9900")
+group_colors <- c(meteorite, lavender, orange, peridot, ccblue, gainsboro, "#211447",
+                         "#FF9E0D", "#A8683C")
 
+# set order of stacking within bars
+
+df <- within(df, race_label_short <- factor(race_label_short, levels=c("White","Multiracial", "SWANA/SA", "NHPI","AIAN", "Asian",  "Latinx","Black")))
+
+# graph
 
 chart<-hchart(df, 
          "bar", hcaes(x = age_bracket, y = rate, group =race_label_short),
@@ -60,17 +77,17 @@ chart<-hchart(df,
          tooltip =  list(headerFormat='',pointFormat=tooltip_text)) %>%
     
     hc_title(
-      text = "Officers assigned to Gang Enforcement stop Black and Latinx youth at disproportionately high rates") %>%
+      text = "Officers assigned to gang enforcement disproportionately stop people they perceive as Black and Latinx across all age groups") %>%
     
     hc_subtitle(
-      text = "Stop rates for officer-initiated stops made by officers assigned to Gang Enforcement for every race across age groups") %>%
+      text = "People stopped by officers assigned to gang enforcement by race and age") %>%
     
     hc_caption(
       text = paste0(racenote,"<br><br>", sourcenote, "<br>","Analysis for all officer-initiated stops made by officers assigned to Gang Enforcement.","<br>")) %>%
     
     hc_yAxis(title = list(text = paste0(""))) %>%
     
-    hc_xAxis( categories=list("18 and under","19-24","25-34","35-44","45-54", "55-64", "65 and older"),
+    hc_xAxis( categories=list("17 and under","18-24","25-34","35-44","45-54", "55-64", "65 and older"),
               title = list(text = paste0(""),
                           labels=list(position="bottom"))) %>%
     
