@@ -43,7 +43,7 @@ df$age_bracket<-factor(df$age_bracket, ordered=TRUE,
                                                levels=age_levels, labels=age_labels)
 
 
-tooltip_text <- "Across all people <b>ages {point.age_bracket:.1f}</b> stopped by officers assigned to gang enforcement, officers stopped people perceived as <b>{point.race_label_short:.1f}</> are stopped <b>{point.rate:.1f}%</b>of the time. <b>{point.race_label_short:.1f}</b> people ages <b>{point.age_bracket:.1f}</b> make up <b>{point.pop_rate:.1f}%</b> of the population in San Diego."
+tooltip_text <- "Across all people ages <b>{point.age_bracket:.1f}</b> stopped by officers assigned to gang enforcement, officers stopped people perceived as <b>{point.race_label_short:.1f}</b> are stopped <b>{point.rate:.1f}%</b> of the time. <b>{point.race_label_short:.1f}</b> people ages <b>{point.age_bracket:.1f}</b> make up <b>{point.pop_rate:.1f}%</b> of the population in San Diego."
 
 # Using function: CANNOT get the age order to work
 

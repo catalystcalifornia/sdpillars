@@ -28,7 +28,7 @@ df<-df%>%
   filter(race!='sswana' & race !="nhpi" & race != 'aian') ### Responding to QA: Filtering out for now
 
 
-tooltip_text <- "Across all field interviews of people age <b>{point.age_bracket:.1f}</b>, SDPD stopped people perceived as <b>{point.race_label_short:.1f} {point.rate:.1f}% of the time</b>. <b>{point.race_label_short:.1f}</b> people ages <b>{point.age_bracket:.1f}</b> make up <b>{point.pop_rate:.1f}%</b> of the population in San Diego."
+tooltip_text <- "Across all field interviews of people age <b>{point.age_bracket:.1f}</b>, SDPD stopped people perceived as <b>{point.race_label_short:.1f} {point.rate:.1f}%</b> of the time. <b>{point.race_label_short:.1f}</b> people ages <b>{point.age_bracket:.1f}</b> make up <b>{point.pop_rate:.1f}%</b> of the population in San Diego."
 
 # chart <- fx_stackedbarchart(  
 #   df = df,
