@@ -106,9 +106,6 @@ orange <- "#F25922"
 
 [insert text/findings]
 
-```{r bubble-chart, child= 'report_embeds/report_stoprates_result_race_person_bubble.Rmd', echo=FALSE}
-```
-
 ```{r bubble-chart, child= 'report_embeds/report_stoprates_result_race_person_stacked.Rmd', echo=FALSE}
 ```
 <br>
@@ -176,8 +173,8 @@ orange <- "#F25922"
 
 [insert text/findings]
 
-```{r stacked-chart, child= 'report_embeds/report_hitrates_race_person_donut.Rmd'}
-```
+# ```{r stacked-chart, child= 'report_embeds/report_hitrates_race_person_donut.Rmd'}
+# ```
 <br>
 
 [insert text/findings]
@@ -210,13 +207,13 @@ orange <- "#F25922"
 
 ```{r item-chart, child= 'report_embeds/report_timespent_ficard_race_stop_item.Rmd'}
 ```
-<br>
+
 
 [insert text/findings]
 
 ```{r item-chart, child= 'report_embeds/report_timespent_ficard_gang_stop_item.Rmd'}
 ```
-<br>
+
 
 ### This time translates to wasted public dollars.
 
