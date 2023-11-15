@@ -43,7 +43,7 @@ con <- connect_to_db("rjs_pillars")
 
 ## Source the Chart Template
 
-# source("report_embeds/chart_functions.R")
+source("report_embeds/chart_functions.R")
 
 ## Reknit all embeds so git will recognize file changes
 # source("report_embeds/run_embeds.R")
