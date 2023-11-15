@@ -150,8 +150,8 @@ orange <- "#F25922"
 <div style="background-color:#CEEA01;font-size:12pt">Community quote or video</div>
 
 [insert text/findings]
-**NEED CHART HERE**
-```{r}
+
+```{r bubble-chart, child= 'report_embeds/report_stoprates_ficard_race_person_bubble.Rmd'}
 ```
 <br>
 
@@ -173,8 +173,8 @@ orange <- "#F25922"
 
 [insert text/findings]
 
-# ```{r stacked-chart, child= 'report_embeds/report_hitrates_race_person_donut.Rmd'}
-# ```
+```{r donut-chart, child= 'report_embeds/report_hitrates_race_person_donut.Rmd'} 
+```
 <br>
 
 [insert text/findings]
@@ -188,8 +188,8 @@ orange <- "#F25922"
 <div style="background-color:#CEEA01;font-size:12pt">Community quote or video</div>
 
 [insert text/findings]
-**NEED CHART**
-```{r}
+
+```{r dot-map, child= 'report_embeds/report_hitrates_div_race_ficard_stop_density_map.Rmd'}
 ```
 <br>
 
