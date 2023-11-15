@@ -8,30 +8,29 @@ output:
 
 ```{r, include=FALSE}
 
-#### Testing bubblepop ####
 library(RPostgreSQL)
 source("W:\\RDA Team\\R\\credentials_source.R")
-source("W:\\Project\\RJS\\Pillars\\GitHub\\HK\\sdpillars\\report_embeds\\chart_functions.R")
+source("chart_functions.R")
 
 pillars_conn <- connect_to_db("rjs_pillars")
 
-meta<-dbGetQuery(pillars_conn, "SELECT * FROM metadata_race_labels")
+meta<-dbGetQuery(pillars_conn, "SELECT * FROM metadata_race_labels")%>%
+  mutate(race_label_short=ifelse(race_base %in% "nh_twoormor", "Two or more", race_label_short))
 
 df <- dbGetQuery(pillars_conn, "SELECT * FROM report_timespent_ficard_race_stop") %>%
-  filter(race != "overall")%>%
-  filter(stop_result_simple=='Field interview card completed')%>% ## for now keeping it to FI card but knowing we probably will change this to visualize something more interesting
-  left_join(meta, by=c("race"="race_base"))
+  left_join(meta, by=c("race"="race_base"))%>%
+  mutate(race_label_short=ifelse(race %in% "nh_multi_race", "Multiracial", race_label_short))
 
   
 chart <- fx_itemchart(
     df=df, 
-    x="race",
+    x="race_label_short",
     y="duration_rate", 
     group_colors=group_colors_item,
     # row_nums=5, # integer
-    top_finding="SDPD spends the most time stopping and conducting field interview cards for multiracial people",
-    subtitle= "The number of hours SDPD spent conducting field interviews by race",
-    tooltip_text="Out of 100 hours, LBPD spent <b>{point.duration_rate:.1f}</b> hours conducting field interviews on <b>{point.race} people</b>",
+    top_finding="SDPD disproportionately conducts field interview cards for SSWANA and Latinx people relative to other racial groups",
+    subtitle= "The percent of hours SDPD spent conducting officer-initiated stops that reulted in a field interview by race",
+    tooltip_text="Out of 100 hours spent on <b>officer-initiated stops resulting in a field interview card</b>, SDPD spent <b>{point.duration_rate:.1f}</b> hours conducting field interviews on people perceived as <b>{point.race_label_short}</b>",
     legend_text="Single dot represents 1 hour out of 100 hours",
     caption = paste0(sourcenote," Analysis for all officer-initiated stops RESULTING IN FIELD INTERVIEWS ONLY."))    
 

@@ -10,7 +10,7 @@ output:
 
 library(RPostgreSQL)
 source("W:\\RDA Team\\R\\credentials_source.R")
-source("W:\\Project\\RJS\\Pillars\\GitHub\\HK\\sdpillars\\report_embeds\\chart_functions.R")
+source("chart_functions.R")
 
 pillars_conn <- connect_to_db("rjs_pillars")
 df <- dbGetQuery(pillars_conn, "SELECT * FROM report_timespent_ficard_gang_stop") 
