@@ -19,6 +19,7 @@ library(htmltools) # for html escape
 library(magrittr)
 library(RPostgreSQL)
 library(htmlwidgets)
+library(stringr)
 
 source("W:\\RDA Team\\R\\credentials_source.R")
 source("W:\\Project\\RJS\\Pillars\\GitHub\\HK\\sdpillars\\report_embeds\\chart_functions.R")
@@ -30,6 +31,10 @@ metadata_race_labels <-  dbGetQuery(pillars_conn, "SELECT * FROM metadata_race_l
 ## Load in RJS Pillars data ##
 df_long <- dbGetQuery(pillars_conn, "SELECT * FROM data.report_hitrates_div_race_ficard_person")
 div <- st_read(pillars_conn, query =  "SELECT * FROM data.sangis_sdpd_divisions_2023") 
+
+## change division name to sentence case
+df_long$div_name <- str_to_title(df_long$div_name)
+div$div_name <- str_to_title(div$div_name)
 # transform for leaflet
 
 div<- st_transform(div,4326)
@@ -45,6 +50,7 @@ df_wide <- df_long %>% pivot_wider(
 
 # merge division sf by df: this is only for the shapefile
 div_wide_sf <- div %>% left_join(df_wide)
+
 
 # the dot density needs the data to be long
 div_long_sf <- div %>% left_join(df_long)
@@ -94,7 +100,7 @@ rate_popup <- paste0(
   label = paste0(
      "<div class='leaflet-popup-scrolled' style='max-width:800px;max-height:200px'>", 
      
-   "In Division <span style='font-size: 14px; font-weight: bold;'>", div_wide_sf$div_num, 
+   "In <span style='font-size: 14px; font-weight: bold;'>", div_wide_sf$div_name, " Division",  "(", div_wide_sf$div_num, ")",
    
    "</span>, <br> <br> Out of <span style='font-size: 14px; font-weight: bold;'>", div_wide_sf$stop_count_nh_black,  "</span> searches conducted during traffic stops for individuals perceives as <span style='font-size: 14px; font-weight: bold;'>", "Black",  "</span> where a field interview card was completed, SDPD found no contraband/evidence in <span style='font-size: 14px; font-weight: bold;'>", div_wide_sf$no_contraband_count_nh_black, "</span> stops, a no hit rate of <span style='font-size: 14px; font-weight: bold;'>", round(div_wide_sf$no_contraband_prc_rate_nh_black, digits = 1), "</span>%.</br>",
    
@@ -182,7 +188,7 @@ addCircleMarkers(data = nh_black_dots, group = "Black", label = NULL, weight = 2
  addCircleMarkers(data = nhpi_dots, group = "NHPI", label = NULL, weight = 2, fillOpacity = 1, radius = 2, color="white",  fillColor= halaya_ube, stroke = TRUE) %>% 
   
    # add Division 
-  addPolygons(data = div_wide_sf, label=~htmlEscape(paste0("Division ", div_num)),
+  addPolygons(data = div_wide_sf, label=~htmlEscape(paste0(div_name, " Division ")),
               color = "black", fillColor = "white", opacity = 1,  popup = ~paste0(rate_popup), 
             weight = 2, smoothFactor = 0.5,  highlight = highlightOptions(color = "white", weight = 3, bringToFront = TRUE, sendToBack = FALSE)) %>%
    
