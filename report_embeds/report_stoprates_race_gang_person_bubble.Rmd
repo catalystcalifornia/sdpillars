@@ -18,17 +18,7 @@ pillars_conn <- connect_to_db("rjs_pillars")
 metadata_race_labels <-  dbGetQuery(pillars_conn, "SELECT * FROM metadata_race_labels") %>% select(race_base, race_label_short, race_label_long)
 
 ## Load in RJS Pillars data
-df <- dbGetQuery(pillars_conn, "SELECT * FROM report_stoprates_race_gang_person") %>% filter(race!="total" & race != "nhpi" & race!= "aian" & !is.na(stop_count) & stop_count != "0") %>% left_join(metadata_race_labels, by = c("race" = "race_base")) %>% mutate(race_label_long = 
-                                                                                                                                                                                                                                            ifelse(race %in% "nh_aian", "American Indian or Alaska Native",
-                                                                                                                                                                                                                                           ifelse(race %in% "nh_nhpi", "Native Hawaiian or Pacific Islander", race_label_long)
-                                                                                                                                                                                                                                            )) %>% 
-                                                                                                                                                                                                                                    
-                                                                                                                                                                                                                                           
-                                                                                                                                                                                                                                           mutate(race_label_short = 
-                                                                                                                                                                                                                                            ifelse(race %in% "nh_aian", "AIAN",
-                                                                                                                                                                                                                                           ifelse(race %in% "nh_nhpi", "NHPI", race_label_short)
-                                                                                                                                                                                                                                            )
-                                                                                                                                                                                                                                           )
+df <- dbGetQuery(pillars_conn, "SELECT * FROM report_stoprates_race_gang_person") %>% filter(race!="total" & race != "nhpi" & race!= "aian" & !is.na(stop_count) & stop_count != "0") %>% left_join(metadata_race_labels, by = c("race" = "race_base"))
                                                           
 
 chart <- fx_bubblepopchart(
@@ -36,10 +26,10 @@ chart <- fx_bubblepopchart(
   x='race_label_short', 
   y='stop_prc_rate', 
   z='stop_count',
-  top_finding=paste0("SDPD profiles Black and Latinx people for gang activity at higher rates than other community members."), # this is the top finding from the chart that gets used like a title
-  subtitle= paste0("Number of officer initiated, gang enforcement assignment stops per total gang enforced stops by Race and Ethnicity"), # this is the more standard chart title that gets used as a subtitle
-  tooltip_text="Out of the <b>{point.stop_total_count:.1f}</b> total gang enforced stops, SDPD stopped <b>{point.stop_count:.1f}</b> people perceived as <b>{point.race_label_long:.1f}</b>, a rate of  <b>{point.stop_prc_rate:.1f}</b>%.", # customize your tooltip as a statement, calling out rate and count
-  caption = paste0(racenote,"<br><br>", sourcenote, "<br>","Analysis for all officer-initiated stops.","<br>"), # if necessary add a method note between the racenote and sourcenote with a line break, use racenote if graph includes data by race, and always use sourcenote. Each of these are standard objects across all charts
+  top_finding=paste0("SDPD officers assigned to gang enforcement disproportionately stop Black and Latinx people compared to other community members"), # this is the top finding from the chart that gets used like a title
+  subtitle= paste0("People stopped by the gang enforcement assignment by race"), # this is the more standard chart title that gets used as a subtitle
+  tooltip_text="Out of <b>{point.stop_total_count:.1f}</b> people stopped by officers assigned to gang enforcement, SDPD stopped <b>{point.stop_count:.1f}</b> people perceived as <b>{point.race_label_long:.1f}</b>, or <b>{point.stop_prc_rate:.1f}</b>% of all people stopped.", # customize your tooltip as a statement, calling out rate and count
+  caption = paste0(racenote,"<br><br>", sourcenote, "<br>","All officer-initiated stops made by officers assigned to gang enforcement.","<br>"), # if necessary add a method note between the racenote and sourcenote with a line break, use racenote if graph includes data by race, and always use sourcenote. Each of these are standard objects across all charts
   yaxis_label = "''", #format for your y axis labels
   export_data_label=list(pointFormat='{point.stop_rate_per1k:.1f} per 1K')
 )
