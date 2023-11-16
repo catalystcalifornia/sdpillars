@@ -20,24 +20,32 @@ pillars_conn <- connect_to_db("rjs_pillars")
 metadata_race_labels <-  dbGetQuery(pillars_conn, "SELECT * FROM metadata_race_labels") %>% select(race_base, race_label_short, race_label_long)
 
 ## Load in RJS Pillars data: Bubble Pop test ##
-df <- dbGetQuery(pillars_conn, "SELECT * FROM data.report_hitrates_race_person") %>% filter(race == "total")
+report_hitrates_race_person <- dbGetQuery(pillars_conn, "SELECT * FROM data.report_hitrates_race_person") %>% filter(race == "total")
 
+# filter for total
+df_no_contraband <- report_hitrates_race_person %>% mutate(label = "No Contraband or Evidence Found") %>% rename(count = no_contraband_count, rate = no_contraband_rate)
 
+# calculate contraband
+df_contraband <- report_hitrates_race_person %>% filter(race == "total") %>% mutate(label = "Contraband or Evidence Found", count = searches_count - no_contraband_count, rate = 100-no_contraband_rate) %>% select(-no_contraband_count, -no_contraband_rate)
+
+df <- rbind(df_no_contraband, df_contraband)
+  
+  
 chart <- 
 df %>%
   hchart(
     "pie", hcaes(x = label, y = rate),
     name = "",
-    tooltip = list(headerFormat="", pointFormat = "<b>{point.rate:.1f}%</b> of stops result in <b>{point.label}</b>, or a total of {point.count:,.1f} stops"),
+    tooltip = list(headerFormat="", pointFormat = "<b>{point.rate:.1f}%</b> of people searched by SDPD had <b>{point.label}</b>, a total of <b>{point.count:,.0f}</b>  people."),
      innerSize="65%",
      center = c(50, 50), 
     )%>% 
-  hc_title(text = "The majority of searches conducted by SDPD during traffic stops yield no evidence or contraband.",
+  hc_title(text = "Most searches conducted by SDPD yield no evidence or contraband.",
  align="left")%>%
-   hc_subtitle(text = "Percentage of searches resulting in the discovery of contraband/evidence compared to those where no contraband/evidence was found.",
+   hc_subtitle(text = "Percentage of searches by whether contraband or evidence was found",
                      align="left") %>%
   hc_caption(
-    text = paste0(sourcenote," Analysis for all stops."))%>%
+    text = paste0("<br><br>", sourcenote, "<br>"," Analysis for all officer-initiated stops."))%>%
   hc_plotOptions(
     innersize="50%", 
     startAngle=90, 
@@ -48,7 +56,7 @@ hc_add_theme(cc_theme)%>%
   hc_exporting(
     enabled = TRUE, sourceWidth=900, sourceHeight=600, 
     chartOptions=list(plotOptions=list(series=list(dataLabels=list(enabled=TRUE, format='{point.hours_rate_cap:.1f}%')))),
-    filename = paste0("Percent of hours spent on calls for service versus officer-initiated stops","_Catalyst California, catalystcalifornia.org, 2023.")
+    filename = paste0("Percentage of searches by whether contraband or evidence was found","_Catalyst California, catalystcalifornia.org, 2023.")
   )
 
 
