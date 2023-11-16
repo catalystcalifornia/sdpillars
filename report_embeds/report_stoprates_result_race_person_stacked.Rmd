@@ -19,34 +19,76 @@ pillars_conn <- connect_to_db("rjs_pillars")
 df <- dbGetQuery(pillars_conn, "SELECT * FROM report_stoprates_result_race_person") 
 meta<-dbGetQuery(pillars_conn, "SELECT * FROM metadata_race_labels")
 
-# Aggregate to combine No Action/Warning into one result: I don't find that these results are as compelling we don't see as many racial disparities across rates, I think I would vote to do the stacked bar graph route
-
-# df_combine<-df%>%
-#     filter(result_simple=="Warning (verbal or written)" | result_simple =="No Action")%>%
-#   group_by(race)%>%
-#   mutate(count_warningnoaction=sum(count),
-#          rate_warningnoaction=count_warningnoaction/total*100)%>%
-#   slice(1)
 
 # Stacked bar graph for Warning/No Action:
 
 df<-df%>%
  filter(result_simple=="Warning (verbal or written)" | result_simple =="No Action")%>%
 left_join(meta, by=c("race"="race_base"))%>%
-  filter(race!="aian" & race != "nhpi" & race != "sswana") # filter out aian/nhpi/sswana for now
+  filter(race!="aian" & race != "nhpi" & race != "sswana")%>% # filter out aian/nhpi/sswana for now
+  group_by(race)%>%
+  mutate(count_comb=sum(count),
+         rate_comb=count_comb/total*100)#aggregate No Action/Warning
 
 tooltip_text <- "For every 100 people <b>{point.race_label_short:.1f}</b> people in San Diego stopped for an officer-initiated stop, SDPD stopped <b>{point.rate:.1f}</b> people perceived as <b>{point.race_label_short:.1f}</b> for stops that resulted in  <b>{point.result_simple:.1f}</b>, a total of <b>{point.count:,0f}</b> people."
 
-chart <- fx_stackedbarchart(  
-  df = df,
-  x = 'race_label_short',
-  y = 'rate',
-  group_var = 'result_simple',
-  group_colors = group_colors_item,
-  top_finding = 'SDPD is most likely to stop Black and Latinx people for stops that then result in no action',
-  subtitle = 'Stop rates for officer-initiated stops that result in a warning or no action by race',
-  tooltip = tooltip_text,
-  caption = paste0(racenote,"<br><br>", sourcenote, "<br>","Analysis for all officer-initiated stops.","<br>"))
+ # custom order the groups on the stacked bar graph
+df <- within(df, result_simple <- factor(result_simple, levels=c("Warning (verbal or written)", "No Action")))
+
+
+# chart <- fx_stackedbarchart(  
+#   df = df,
+#   x = 'race_label_short',
+#   y = 'rate',
+#   group_var = 'result_simple',
+#   group_colors = group_colors_item,
+#   top_finding = 'SDPD is most likely to stop Black and Latinx people for stops that then result in no action',
+#   subtitle = 'Percent of officer-initiated stops that result in a warning or no action by race',
+#   tooltip = tooltip_text,
+#   caption = paste0(racenote,"<br><br>", sourcenote, "<br>","Analysis for all officer-initiated stops.","<br>"))
+
+
+## have to do it manually to get the order to work
+group_colors = group_colors_item
+
+chart<-hchart(df, 
+         "bar", hcaes(x = race_label_short, y = rate, group = result_simple),
+         stacking = "normal",
+         tooltip =  list(headerFormat='',pointFormat=tooltip_text)) %>%
+    
+    hc_title(
+      text = 'SDPD is most likely to stop Black and Latinx people for stops that then result in no action') %>%
+    
+    hc_subtitle(
+      text = 'Percent of officer-initiated stops that result in a warning or no action by race') %>%
+    
+    hc_caption(
+      text = paste0(racenote,"<br><br>", sourcenote, "<br>","Analysis for all officer-initiated stops.","<br>")) %>%
+    
+    hc_yAxis(title = list(text = paste0(""))) %>%
+    
+    hc_xAxis(categories = list("Black","Latinx", "AIAN", "Asian", "NHPI", "SWANA/SA", "Multiracial", "White"),
+             title = list(text = paste0(""),
+                          labels=list(position="bottom"))) %>%
+    
+    hc_legend(enabled = TRUE, 
+              reversed =  TRUE,
+              x=20)%>% 
+    
+    hc_add_theme(cc_theme)%>%
+    
+    hc_colors(group_colors) %>%
+    hc_chart(
+      marginRight=120) %>%
+    
+    hc_exporting(
+      enabled = TRUE, sourceWidth=900, sourceHeight=600, 
+      chartOptions=list(plotOptions=list(series=list(dataLabels=list(enabled=TRUE,format='{point.rate:.1f}%')))),
+      filename = paste0("Percent of officer-initiated stops that result in a warning or no action by race","_Catalyst California, catalystcalifornia.org, 2023."),
+      buttons=list(contextButton=list(menuItems=list('downloadPNG', 'downloadSVG',
+                                                     'downloadXLS', 'downloadCSV'))))
+
+
 
 dbDisconnect(pillars_conn)
 

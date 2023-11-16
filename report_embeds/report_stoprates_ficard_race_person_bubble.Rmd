@@ -18,9 +18,12 @@ meta<-dbGetQuery(pillars_conn, "SELECT * FROM metadata_race_labels")%>%
   mutate(race_label_short=ifelse(race_base %in% 'aian',"AIAN Alone or in Combination",
                                  ifelse(race_base %in% 'nhpi', "NHPI Alone or in Combination",
                                         ifelse(race_base %in% 'aian', 'AIAN Alone or in Combination', race_label_short))))%>%
-  filter(race_base!="nh_sswana" & race_base != "total")
+  filter(race_base!="nh_sswana" & race_base!= "total")
 
-pop<-dbGetQuery(pillars_conn, "SELECT * FROM report_stoprates_ficard_race_pop_person") %>%
+pop<-dbGetQuery(pillars_conn, "SELECT * FROM report_stoprates_ficard_race_pop_person") 
+  
+  
+test<-pop%>%
   left_join(meta, by=c("race"="race_base"))%>%
   arrange(-rate)
 
@@ -33,7 +36,7 @@ offit<-dbGetQuery(pillars_conn, "SELECT * FROM report_stoprates_ficard_race_offi
 title_text <- paste0("SDPD disproportionately conducts field interviews for Black people living in San Diego")
 
 # SUBTITLE
-subtitle_text <- paste0("Rate of stops that resulted in a field interview card by race per 1,000 people of that racial group in San Diego")
+subtitle_text <- paste0("Percent of stops that resulted in a field interview card by race per 1,000 people of that racial group in San Diego")
 
 # CAPTION
 caption_text <- paste0(racenote,"<br><br>", sourcenote, "<br>","Analysis for all officer-initiated stops resulting in a field interview card only.","<br>")
@@ -42,7 +45,7 @@ caption_text <- paste0(racenote,"<br><br>", sourcenote, "<br>","Analysis for all
 tooltip_text <- "Out of 1,000 <b>{point.race_label_short:.0f}</b> people in San Diego, <b>{point.rate:.1f}</b>  people perceived as <b>{point.race_label_short:.0f}</b> are stopped for an officer-initiated stop that results in a field interview card"
 
 chart <- fx_bubblepopchart(
-  df=pop,
+  df=test,
   x='race_label_short', # format for your data frame
   y='rate', # format for your data frame
   z='count', # format for your data frame

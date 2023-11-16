@@ -29,19 +29,66 @@ df$race<-factor(df$race, ordered=TRUE,
 
 
 
-tooltip_text <- "Across all field interviews of people <b> ages {point.age_bracket:.1f} </b>, SDPD stopped people perceived as <b>{point.race_label_short:.1f} {point.rate:.1f}% of the time.</b>"
+text <- "Across all field interviews of people <b> ages {point.age_bracket:.1f} </b>, SDPD stopped people perceived as <b>{point.race_label_short:.1f} {point.rate:.1f}% of the time.</b>"
 
-chart <- fx_stackedbarchart(  
-  df = df,
-  x = 'age_bracket',
-  y = 'rate',
-  group_var = 'race_label_long',
-  group_colors = c(meteorite, lavender, orange, peridot, ccblue, gainsboro, "#211447",
-                         "#FF9E0D", "#A8683C"),
-  top_finding = 'SDPD is disproportionately stopping and conducting field interview cards for Black and Latinx youth',
-  subtitle = 'Stops Resulting in a Field Interview Card by Age and Race',
-  tooltip = tooltip_text,
-  caption = paste0(racenote,"<br><br>", sourcenote, "<br>","Analysis for all officer-initiated stops that only resulted in a field interview card completed.","<br>"))
+tooltip_text <- sapply(strwrap(text, 110, simplify=FALSE), paste, collapse="<br>")
+
+# chart <- fx_stackedbarchart(  
+#   df = df,
+#   x = 'age_bracket',
+#   y = 'rate',
+#   group_var = 'race_label_long',
+#   group_colors = c(meteorite, lavender, orange, peridot, ccblue, gainsboro, "#211447",
+#                          "#FF9E0D", "#A8683C"),
+#   top_finding = 'SDPD is disproportionately stopping and conducting field interview cards for Black and Latinx youth',
+#   subtitle = 'Stops Resulting in a Field Interview Card by Age and Race',
+#   tooltip = tooltip_text,
+#   caption = paste0(racenote,"<br><br>", sourcenote, "<br>","Analysis for all officer-initiated stops that only resulted in a field interview card completed.","<br>"))
+
+
+
+## manual code to get the ylim in correct order ##
+
+group_colors <- c(meteorite, orange, peridot, lavender, ccblue, "#5F3B63","#A8683C", "#D58424", "#FF9900")
+
+
+chart<-hchart(df, 
+         "bar", hcaes(x = age_bracket, y = rate, group =race_label_short),
+         stacking = "normal",
+         tooltip =  list(headerFormat='',pointFormat=tooltip_text)) %>%
+    
+    hc_title(
+      text = "SDPD is disproportionately stopping and conducting field interview cards for Black and Latinx youth relative to general population") %>%
+    
+    hc_subtitle(
+      text = "Percent of stops resulting in a field interview card by age and race") %>%
+    
+    hc_caption(
+      text = paste0(racenote,"<br><br>", sourcenote, "<br>","Analysis for all officer-initiated stops that only resulted in a field interview card completed.","<br>")) %>%
+    
+    hc_yAxis(max=100,
+             title = list(text = paste0(""))) %>%
+    
+    hc_xAxis( categories=list("17 and under","18-24","25-34","35-44","45-54", "55-64", "65 and older"),
+              title = list(text = paste0(""),
+                          labels=list(position="bottom"))) %>%
+    
+    hc_legend(enabled = TRUE, 
+              reversed =  TRUE,
+              x=20)%>% 
+    
+    hc_add_theme(cc_theme)%>%
+    
+    hc_colors(group_colors) %>%
+    hc_chart(
+      marginRight=120) %>%
+    
+    hc_exporting(
+      enabled = TRUE, sourceWidth=900, sourceHeight=600, 
+      chartOptions=list(plotOptions=list(series=list(dataLabels=list(enabled=TRUE,format='{point.rate:.1f}%')))),
+      filename = paste0("Percent of stops resulting in a field interview card by age and race","_Catalyst California, catalystcalifornia.org, 2023."),
+      buttons=list(contextButton=list(menuItems=list('downloadPNG', 'downloadSVG',
+                                                     'downloadXLS', 'downloadCSV'))))
 
 dbDisconnect(pillars_conn)
 ```
