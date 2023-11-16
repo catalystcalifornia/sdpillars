@@ -25,6 +25,7 @@ pop<-dbGetQuery(pillars_conn, "SELECT * FROM report_stoprates_ficard_race_pop_pe
   
   
 test<-pop%>%
+  filter(race!="sswana" & race !="aian" & race !="nhpi")%>%
   left_join(meta, by=c("race"="race_base"))%>%
   arrange(-rate)
 
@@ -55,7 +56,7 @@ chart <- fx_bubblepopchart(
   tooltip_text=tooltip_text,
   caption = caption_text,
   yaxis_label = "''", # format for your y axis labels
-  export_data_label=list(pointFormat='{point.stop_rate_per1k:.1f} per 1K') # format for your data
+  export_data_label=list(pointFormat='{point.rate:.1f} per 1K') # format for your data
 ) 
 
 chart
