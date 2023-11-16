@@ -30,8 +30,8 @@ stops<-stops%>%
 person_age<-stops%>%
   left_join(person)%>%
   select(stop_id, person_id, Year, assignment, perceived_age)%>%
-  mutate(age_bracket=ifelse(perceived_age <=18, '18 and under',
-                            ifelse(perceived_age <=24 & perceived_age>18, '19-24',
+  mutate(age_bracket=ifelse(perceived_age <18, '17 and under',
+                            ifelse(perceived_age <=24 & perceived_age>=18, '18-24',
                                    ifelse(perceived_age <=34 & perceived_age>24, '25-34',
                                           ifelse(perceived_age <=44 & perceived_age>34, '35-44',
                                                  ifelse(perceived_age <=54 & perceived_age>44, '45-54',
