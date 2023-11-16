@@ -31,7 +31,9 @@ left_join(meta, by=c("race"="race_base"))%>%
   mutate(count_comb=sum(count),
          rate_comb=count_comb/total*100)#aggregate No Action/Warning
 
-tooltip_text <- "For every 100 people <b>{point.race_label_short:.1f}</b> people in San Diego stopped for an officer-initiated stop, SDPD stopped <b>{point.rate:.1f}</b> people perceived as <b>{point.race_label_short:.1f}</b> for stops that resulted in  <b>{point.result_simple:.1f}</b>, a total of <b>{point.count:,0f}</b> people."
+tooltip_text <- "For every 100 <b>{point.race_label_short:.1f}</b> people in San Diego stopped for an officer-initiated stop, SDPD stopped <b>{point.rate:.1f}</b> people perceived as <b>{point.race_label_short:.1f}</b> for stops that resulted in  <b>{point.result_simple:.1f}</b>, a total of <b>{point.count:,0f}</b> people."
+
+tooltip_text <- sapply(strwrap(tooltip_text, 110, simplify=FALSE), paste, collapse="<br>")
 
  # custom order the groups on the stacked bar graph
 df <- within(df, result_simple <- factor(result_simple, levels=c("Warning (verbal or written)", "No Action")))

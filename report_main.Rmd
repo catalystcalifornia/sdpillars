@@ -1,14 +1,14 @@
 ---
 title: "Joint Report on SDPD's Gang Enforcement"
 subtitle: "DRAFT"
-author: "Catalyst California & Pillars of the Community"
+author: "Catalyst California"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
 output:
   html_document:
     css: "W:\\RDA Team\\R\\cc_brandguide.css"
     toc: yes
     toc_depth: 2
     toc_float: yes
-date: "`r format(Sys.time(), '%d %B, %Y')`"
 ---
   
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
