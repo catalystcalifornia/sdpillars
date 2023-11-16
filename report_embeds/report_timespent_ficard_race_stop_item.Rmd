@@ -20,7 +20,8 @@ meta<-dbGetQuery(pillars_conn, "SELECT * FROM metadata_race_labels")%>%
 
 df <- dbGetQuery(pillars_conn, "SELECT * FROM report_timespent_ficard_race_stop") %>%
   left_join(meta, by=c("race"="race_base"))%>%
-  mutate(race_label_short=ifelse(race %in% "nh_multi_race", "Multiracial", race_label_short))
+  mutate(race_label_short=ifelse(race %in% "nh_multi_race", "Multiracial", race_label_short))%>%
+filter(race!="sswana" & race !="aian" & race !="nhpi")
 
   
 chart <- fx_itemchart(
@@ -29,11 +30,11 @@ chart <- fx_itemchart(
     y="duration_rate", 
     group_colors=group_colors_item,
     # row_nums=5, # integer
-    top_finding="SDPD disproportionately conducts field interview cards for SSWANA and Latinx people relative to other racial groups",
-    subtitle= "The percent of hours SDPD spent conducting officer-initiated stops that reulted in a field interview by race",
+    top_finding="SDPD disproportionately conducts field interview cards for Latinx and Black people relative to other racial groups",
+    subtitle= "Percent of hours officers spent conducting stops that resulted in a field interview card",
     tooltip_text="Out of 100 hours spent on <b>officer-initiated stops resulting in a field interview card</b>, SDPD spent <b>{point.duration_rate:.1f}</b> hours conducting field interviews on people perceived as <b>{point.race_label_short}</b>",
     legend_text="Single dot represents 1 hour out of 100 hours",
-    caption = paste0(sourcenote," Analysis for all officer-initiated stops RESULTING IN FIELD INTERVIEWS ONLY."))    
+    caption = paste0(sourcenote," Analysis for all officer-initiated stops resulting in a field interview card only. Officers spent a total of 121,594.5 hours on officer-initiated stops that resulted in a field interview card only in 2022"))    
 
 dbDisconnect(pillars_conn)
 ```
