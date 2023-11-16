@@ -24,13 +24,13 @@ meta<-dbGetQuery(pillars_conn, "SELECT * FROM metadata_race_labels")%>%
 pop<-dbGetQuery(pillars_conn, "SELECT * FROM report_stoprates_ficard_race_pop_person") 
   
   
-test<-pop%>%
+df<-pop%>%
   filter(race!="sswana" & race !="aian" & race !="nhpi")%>%
   left_join(meta, by=c("race"="race_base"))%>%
   arrange(-rate)
 
-offit<-dbGetQuery(pillars_conn, "SELECT * FROM report_stoprates_ficard_race_offit_person") %>%
-  left_join(meta, by=c("race"="race_base"))
+# offit<-dbGetQuery(pillars_conn, "SELECT * FROM report_stoprates_ficard_race_offit_person") %>%
+#   left_join(meta, by=c("race"="race_base"))
 
 # pop denominator--------
 
@@ -47,7 +47,7 @@ caption_text <- paste0(racenote,"<br><br>", sourcenote, "<br>","Analysis for all
 tooltip_text <- "Out of 1,000 <b>{point.race_label_short:.0f}</b> people in San Diego, <b>{point.rate:.1f}</b>  people perceived as <b>{point.race_label_short:.0f}</b> are stopped for an officer-initiated stop that results in a field interview card"
 
 chart <- fx_bubblepopchart(
-  df=test,
+  df=df,
   x='race_label_short', # format for your data frame
   y='rate', # format for your data frame
   z='count', # format for your data frame
