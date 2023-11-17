@@ -211,6 +211,12 @@ orange <- "#F25922"
 3. Others...
 
 
+# APPENDIX
+
+```{r stacked-chart, child= 'report_embeds/report_stoprates_ficard_reason_race.Rmd'}
+```
+
+
 # METHODOLOGY
 
 [link to methodology on GitHub]

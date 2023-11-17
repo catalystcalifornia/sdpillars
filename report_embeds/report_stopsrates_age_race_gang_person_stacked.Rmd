@@ -44,7 +44,7 @@ df$race<-factor(df$race, ordered=TRUE,
 #                                                levels=age_levels, labels=age_labels)
 
 
-text <- "Across all people ages <b>{point.age_bracket:.1f}</b> stopped by officers assigned to the gang enforcement assignment, officers stopped people perceived as <b>{point.race_label_short:.1f}</b> <b>{point.rate:.1f}% of the time</b>. <b>{point.race_label_short:.1f} people</b> ages <b>{point.age_bracket:.1f}</b> make up <b>{point.pop_rate:.1f}%</b> of the population in San Diego."
+text <- "Across all people ages <b>{point.age_bracket:.1f}</b> stopped by officers assigned to gang enforcement, officers stopped people perceived as <b>{point.race_label_short:.1f}</b> <b>{point.rate:.1f}% of the time</b>. By comparison, <b>{point.race_label_short:.1f} people</b> make up <b>{point.pop_rate:.1f}%</b> of the population ages <b>{point.age_bracket:.1f}</b> in San Diego."
 
 tooltip_text <- sapply(strwrap(text, 110, simplify=FALSE), paste, collapse="<br>")
 
