@@ -38,7 +38,7 @@ df<-pop%>%
 title_text <- paste0("SDPD disproportionately conducts field interviews for Black people living in San Diego")
 
 # SUBTITLE
-subtitle_text <- paste0("Percent of stops that resulted in a field interview card by race per 1,000 people of that racial group in San Diego")
+subtitle_text <- paste0("Number of people stopped for field interview cards per 1K people of the same race")
 
 # CAPTION
 caption_text <- paste0(racenote,"<br><br>", sourcenote, "<br>","Analysis for all officer-initiated stops resulting in a field interview card only.","<br>")

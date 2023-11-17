@@ -209,5 +209,5 @@ map
 ```
 
 <div align="left" style="line-height: 1em;"><span style="font-size: 10px;">Race/ethnicity: AIAN=American Indian or Alaska Native, NHPI=Native Hawaiian or Pacific Islander, MESA=Middle Eastern or South Asian; Observations by race may overlap in the point density map. </span> <br> 
-  <span style=' font-size: 10px;'>Catalyst California's calculations based on City of San Diego's Police Stop Data (2022); <u>[Catalyst California](https://www.catalystcalifornia.org)</u>, 2023. Analysis for all officer-initiated stops.</span> </div>
+  <span style=' font-size: 10px;'>Catalyst California's calculations based on City of San Diego's Police Stop Data (2022); <u>[Catalyst California](https://www.catalystcalifornia.org)</u>, 2023. Analysis for all officer-initiated stops that resulted in a field interview card and a search.</span> </div>
   

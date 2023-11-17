@@ -38,13 +38,13 @@ df$race<-factor(df$race, ordered=TRUE,
 
 
 
-age_levels<-c("17 and under","18-24","25-34","35-44","45-54", "55-64", "65 and older")
-age_labels<-c("17 and under","18-24","25-34","35-44","45-54", "55-64", "65 and older")
-df$age_bracket<-factor(df$age_bracket, ordered=TRUE, 
-                                               levels=age_levels, labels=age_labels)
+# age_levels<-c("17 and under","18-24","25-34","35-44","45-54", "55-64", "65 and older")
+# age_labels<-c("17 and under","18-24","25-34","35-44","45-54", "55-64", "65 and older")
+# df$age_bracket<-factor(df$age_bracket, ordered=TRUE, 
+#                                                levels=age_levels, labels=age_labels)
 
 
-text <- "Across all officer-initiated stops made by SDPD Gang Enforcement assignment of folks <b> ages {point.age_bracket:.1f}</b>, officers assigned to gang enforcement stopped <b>{point.race_label_short:.1f} people {point.rate:.1f}% of the time.</b>"
+text <- "Across all people between the <b> ages of {point.age_bracket:.1f}</b> stopped by officers assigned to the gang enforcement assignment, officers stopped <b>{point.race_label_short:.1f} people {point.rate:.1f}% of the time.</b>"
 
 tooltip_text <- sapply(strwrap(text, 110, simplify=FALSE), paste, collapse="<br>")
 
@@ -84,11 +84,11 @@ chart<-hchart(df,
       text = "Officers assigned to gang enforcement disproportionately stop people they perceive as Black and Latinx across all age groups") %>%
     
     hc_subtitle(
-      text = "Percent of officer-initiated stops made by officers assigned to Gang Enforcement for every race across age groups") %>%
+      text = "Percent of stops made by officers assigned to gang enforcement by race and age") %>%
 
     
     hc_caption(
-      text = paste0(racenote,"<br><br>", sourcenote, "<br>","Analysis for all officer-initiated stops made by officers assigned to Gang Enforcement.","<br>")) %>%
+      text = paste0(racenote,"<br><br>", sourcenote, "<br>","Analysis for all officer-initiated stops made by officers assigned to gang enforcement.","<br>")) %>%
     
     hc_yAxis(max=100,
              title = list(text = paste0(""))) %>%
@@ -110,7 +110,7 @@ chart<-hchart(df,
     hc_exporting(
       enabled = TRUE, sourceWidth=900, sourceHeight=600, 
       chartOptions=list(plotOptions=list(series=list(dataLabels=list(enabled=TRUE,format='{point.rate:.1f}%')))),
-      filename = paste0("Stop rates for officer-initiated stops made by officers assigned to Gang Enforcement for every race across age groups","_Catalyst California, catalystcalifornia.org, 2023."),
+      filename = paste0("Percent of stops made by officers assigned to gang enforcement by race and age","_Catalyst California, catalystcalifornia.org, 2023."),
       buttons=list(contextButton=list(menuItems=list('downloadPNG', 'downloadSVG',
                                                      'downloadXLS', 'downloadCSV'))))
 
