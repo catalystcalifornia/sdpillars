@@ -132,7 +132,7 @@ orange <- "#F25922"
 * Denial of PRA Request on Gang Unit is a form of secrecy (rather than transparency) used to hidecover  SDPD’s racially biased gang documentation practices.  This lack of transparency erodes both public trust in SDPD’s ability to advance and community safety.
 </div>
 
-### C. Beyond the gang enforcement assignment, an analysis of stops that result in field interview cards also show that SDPD targets young, Black people, unfairly labeling them as gang members. 
+### C. Beyond the gang enforcement assignment, an analysis of stops that result in field interview cards also show that SDPD targets Black and Latinx people, unfairly labeling them as gang members. 
 
 <p style="background-color:#F25922;font-size:14pt">FI Card explanation/definition</p>
 

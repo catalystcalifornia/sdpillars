@@ -22,11 +22,11 @@ chart <- fx_itemchart(
     y="duration_rate", 
     group_colors=group_colors_item,
     # row_nums=5, # integer
-    top_finding="Officers assigned to Gang Enforcement spend nearly 20% of their time on stops resulting in a field interview card",
-    subtitle= "The number of hours officers assigned to Gang Enforcement spent on officer-initiated stops by stop result",
-    tooltip_text="Out of 100 hours, LBPD officers with the Gang Enforcement assignment spent <b>{point.duration_rate:.1f}</b> hours on officer-initiated stops that resulted in <b>{point.stop_result_simple}</b>",
+    top_finding="Officers assigned to gang enforcement spend nearly 1 in 5 patrol hours on stops resulting in a field interview card",
+    subtitle= "Percent of hours officers assigned to gang enforcement spent on officer-initiated stops by stop result",
+    tooltip_text="Out of 100 hours,SDPD officers assigned to gang enforcement spent <b>{point.duration_rate:.1f}</b> hours on officer-initiated stops that resulted in <b>{point.stop_result_simple}</b>",
     legend_text="Single dot represents 1 hour out of 100 hours",
-    caption = paste0(sourcenote," Analysis for all officer-initiated stops made by the Gang Enforcement assignment"))    
+    caption = paste0(sourcenote," Analysis for all officer-initiated stops made by officers assigned to gang enforcement."))    
 
 dbDisconnect(pillars_conn)
 ```
