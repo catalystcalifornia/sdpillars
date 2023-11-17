@@ -30,8 +30,8 @@ chart <- fx_itemchart(
     y="duration_rate", 
     group_colors=group_colors_item,
     # row_nums=5, # integer
-    top_finding="SDPD disproportionately conducts field interview cards for Latinx and Black people relative to other racial groups",
-    subtitle= "Percent of hours officers spent conducting stops that resulted in a field interview card",
+    top_finding="SDPD disproportionately spends time on field interview cards for Latinx and Black people relative to their population and other groups",
+    subtitle= "Percent of hours officers spent conducting stops that resulted in a field interview card by race",
     tooltip_text="Out of 100 hours spent on <b>officer-initiated stops resulting in a field interview card</b>, SDPD spent <b>{point.duration_rate:.1f}</b> hours conducting field interviews on people perceived as <b>{point.race_label_short}</b>",
     legend_text="Single dot represents 1 hour out of 100 hours",
     caption = paste0(sourcenote," Analysis for all officer-initiated stops resulting in a field interview card only. Officers spent a total of 121,594.5 hours on officer-initiated stops that resulted in a field interview card only in 2022"))    
