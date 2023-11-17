@@ -1,0 +1,106 @@
+---
+title: ""
+output:
+  html_document:
+    css: "W:\\RDA Team\\R\\cc_brandguide.css"
+---
+<!-- link to Google Font -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+```{r, include=FALSE}
+
+#### Testing bubblepop ####
+library(RPostgreSQL)
+source("W:\\RDA Team\\R\\credentials_source.R")
+source("chart_functions.R")
+
+pillars_conn <- connect_to_db("rjs_pillars")
+
+df <- dbGetQuery(pillars_conn, "SELECT * FROM report_stoprates_reason_ficard_race_person")
+meta<-dbGetQuery(pillars_conn, "SELECT * FROM metadata_race_labels")
+
+df<-df%>%
+  left_join(meta, by=c("race"="race_base"))%>%
+  filter(race!='sswana' & race !="nhpi" & race != 'aian' & race!='total') %>%
+  mutate(reason_simple=ifelse(reason_simple=='Known to be on Parole / Probation / PRCS / Mandatory Supervision',
+                              'Probation/Parole',ifelse(reason_simple=='Investigation to determine whether the person was truant','Truancy Investigation',ifelse(reason_simple=="Consensual Encounter resulting in a search", "Consensual Encounter and Search",ifelse(reason_simple=="Knowledge of outstanding arrest warrant/wanted person","Outstanding Warrant",reason_simple)))))
+                                                                                                                                                                   ### Responding to QA: Filtering out for now
+
+
+text <- "Across all people perceived as <b>{point.race_label_short:.1f}</b> who had a field interview card completed, officers used <b>{point.reason_simple:.1f}</b> as the primary reason for the stop <b>{point.rate:.1f}%</b> of the time."
+
+tooltip_text <- sapply(strwrap(text, 110, simplify=FALSE), paste, collapse="<br>")
+
+# chart <- fx_stackedbarchart(  
+#   df = df,
+#   x = 'age_bracket',
+#   y = 'rate',
+#   group_var = 'race_label_long',
+#   group_colors = c(meteorite, lavender, orange, peridot, ccblue, gainsboro, "#211447",
+#                          "#FF9E0D", "#A8683C"),
+#   top_finding = 'SDPD is disproportionately stopping and conducting field interview cards for Black and Latinx youth',
+#   subtitle = 'Stops Resulting in a Field Interview Card by Age and Race',
+#   tooltip = tooltip_text,
+#   caption = paste0(racenote,"<br><br>", sourcenote, "<br>","Analysis for all officer-initiated stops that only resulted in a field interview card completed.","<br>"))
+
+
+
+## manual code to get the ylim in correct order ##
+
+group_colors <- c(meteorite, orange, peridot, lavender, ccblue, "#5F3B63")
+
+
+chart<-hchart(df, 
+         "bar", hcaes(x = race_label_short, y = rate, group =reason_simple),
+         stacking = "normal",
+         tooltip =  list(headerFormat='',pointFormat=tooltip_text)) %>%
+    
+    hc_title(
+      text = "SDPD disportionately uses traffic violations as a reason to stop people of color for field interview cards") %>%
+    
+    hc_subtitle(
+      text = "Percent of stops resulting in a field interview card by reason and race") %>%
+    
+    hc_caption(
+      text = paste0(racenote,"<br><br>", sourcenote, "<br>","Analysis for all officer-initiated stops that only resulted in a field interview card completed.","<br>")) %>%
+    
+    hc_yAxis(max=100,
+             title = list(text = paste0(""))) %>%
+    
+    hc_xAxis( 
+      # categories=list("White","Black","Latinx","Asian","NHPI","AIAN","SSWANA/SA","Multiracial"),
+              title = list(text = paste0(""),
+                          labels=list(position="bottom"))) %>%
+    
+    hc_legend(enabled = TRUE, 
+              reversed =  TRUE,
+              x=20)%>% 
+    
+    hc_add_theme(cc_theme)%>%
+    
+    hc_colors(group_colors) %>%
+    hc_chart(
+      marginRight=120) %>%
+    
+    hc_exporting(
+      enabled = TRUE, sourceWidth=900, sourceHeight=600, 
+      chartOptions=list(plotOptions=list(series=list(dataLabels=list(enabled=TRUE,format='{point.rate:.1f}%')))),
+      filename = paste0("Percent of stops resulting in a field interview card by reason and race","_Catalyst California, catalystcalifornia.org, 2023."),
+      buttons=list(contextButton=list(menuItems=list('downloadPNG', 'downloadSVG',
+                                                     'downloadXLS', 'downloadCSV'))))
+
+
+dbDisconnect(pillars_conn)
+```
+
+```{r, echo=FALSE}
+chart
+```
+
+<script>
+  widg = document.getElementsByClassName('html-widget'); //find widgets
+  for (let i = 0; i < widg.length; i++) { //loop through
+    document.getElementsByClassName('highchart')[i].style.width = '100%'; //adjust width
+    document.getElementsByClassName('highchart')[i].style.height = '100%'; //adjust height
+  }
+</script>
