@@ -15,17 +15,13 @@ source("chart_functions.R")
 
 pillars_conn <- connect_to_db("rjs_pillars")
 
-meta<-dbGetQuery(pillars_conn, "SELECT * FROM metadata_race_labels")%>%
-  mutate(race_label_short=ifelse(race_base %in% 'aian',"AIAN Alone or in Combination",
-                                 ifelse(race_base %in% 'nhpi', "NHPI Alone or in Combination",
-                                        ifelse(race_base %in% 'aian', 'AIAN Alone or in Combination', race_label_short))))%>%
-  filter(race_base!="nh_sswana" & race_base!= "total")
+meta<-dbGetQuery(pillars_conn, "SELECT * FROM metadata_race_labels")
 
 pop<-dbGetQuery(pillars_conn, "SELECT * FROM report_stoprates_ficard_race_pop_person") 
   
   
 df<-pop%>%
-  filter(race!="sswana" & race !="aian" & race !="nhpi")%>%
+  filter(race !="sswana" & race !="aian" & race !="nhpi")%>%
   left_join(meta, by=c("race"="race_base"))%>%
   arrange(-rate)
 

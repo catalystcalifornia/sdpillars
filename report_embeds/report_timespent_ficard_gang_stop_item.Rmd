@@ -16,17 +16,21 @@ source("chart_functions.R")
 pillars_conn <- connect_to_db("rjs_pillars")
 df <- dbGetQuery(pillars_conn, "SELECT * FROM report_timespent_ficard_gang_stop") 
 
+df<-df%>%
+  mutate(stop_result_simple_re=ifelse(stop_result_simple=="Custodial Arrest without warrant", "Arrest without warrant",
+                                      ifelse(stop_result_simple=="Warning (verbal or written)","Warning",ifelse(stop_result_simple=="Custodial Arrest pursuant to outstanding warrant","Arrest with warrant",ifelse(stop_result_simple=="Field interview card completed","Field interview card",stop_result_simple)))))
+
 chart <- fx_itemchart(
     df=df, 
-    x="stop_result_simple",
+    x="stop_result_simple_re",
     y="duration_rate", 
     group_colors=group_colors_item,
     # row_nums=5, # integer
     top_finding="Officers assigned to gang enforcement spend nearly 1 in 5 patrol hours on stops resulting in a field interview card",
-    subtitle= "Percent of hours officers assigned to gang enforcement spent on officer-initiated stops by stop result",
-    tooltip_text="Out of 100 hours,SDPD officers assigned to gang enforcement spent <b>{point.duration_rate:.1f}</b> hours on officer-initiated stops that resulted in <b>{point.stop_result_simple}</b>",
+    subtitle= "Percent of hours officers assigned to gang enforcement spent on stops by stop result",
+    tooltip_text="Out of 100 hours,SDPD officers assigned to gang enforcement spent <b>{point.duration_rate:.1f}</b> hours on stops that resulted in <b>{point.stop_result_simple}</b>",
     legend_text="Single dot represents 1 hour out of 100 hours",
-    caption = paste0(sourcenote," Analysis for all officer-initiated stops made by officers assigned to gang enforcement."))    
+    caption = paste0(sourcenote," <br>Analysis for all officer-initiated stops made by officers assigned to gang enforcement."))    
 
 dbDisconnect(pillars_conn)
 ```
