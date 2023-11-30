@@ -28,15 +28,12 @@ meta<-dbGetQuery(pillars_conn, "SELECT * FROM metadata_race_labels")
 df<-df%>%
   left_join(age)%>%
   left_join(meta, by=c("race"="race_base"))%>%
-  filter(race!='sswana' & race !="nhpi" & race != 'aian')### Responding to QA: Filtering out for now
+  filter(race!='sswana' & race !="nhpi" & race != 'aian')%>%
+mutate(across(where(is.numeric), ~round(., 1)))%>%
+  mutate(tooltip=ifelse(race %in% "nh_sswana", "",  paste0("By comparison, <b>",race_label_short, " people</b> make up <b>",pop_rate,"%</b> of the population ages <b>",age_bracket,"</b> in San Diego.")))
 
 
-race_levels<-c("latinx","nh_asian","nh_black","nh_white", "nh_aian", "nh_nhpi", "nh_sswana", "nh_twoormor")
-race_labels<-c("latinx","nh_asian","nh_black","nh_white", "nh_aian", "nh_nhpi", "nh_sswana", "nh_twoormor")
-df$race<-factor(df$race, ordered=TRUE, 
-                                               levels=race_levels, labels=race_labels)
-
-text <- "Across all people ages <b>{point.age_bracket:.1f}</b> stopped by officers assigned to gang enforcement, officers stopped people perceived as <b>{point.race_label_short:.1f}</b> <b>{point.rate:.1f}% of the time</b>. By comparison, <b>{point.race_label_short:.1f} people</b> make up <b>{point.pop_rate:.1f}%</b> of the population ages <b>{point.age_bracket:.1f}</b> in San Diego."
+text <- "Across all people ages <b>{point.age_bracket:.1f}</b> stopped by officers assigned to gang enforcement, officers stopped people perceived as <b>{point.race_label_short:.1f}</b> <b>{point.rate:.1f}% of the time</b>. {point.tooltip}"
 
 tooltip_text <- sapply(strwrap(text, 110, simplify=FALSE), paste, collapse="<br>")
 
