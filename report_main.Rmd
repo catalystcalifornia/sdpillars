@@ -213,7 +213,7 @@ orange <- "#F25922"
 
 # APPENDIX
 
-```{r stacked-chart, child= 'report_embeds/report_stoprates_ficard_reason_race.Rmd'}
+```{r stacked-chart, child= 'report_embeds/report_stoprates_ficard_reason_race_stacked.Rmd'}
 ```
 
 
