@@ -36,35 +36,11 @@ race_labels<-c("latinx","nh_asian","nh_black","nh_white", "nh_aian", "nh_nhpi", 
 df$race<-factor(df$race, ordered=TRUE, 
                                                levels=race_levels, labels=race_labels)
 
-
-
-# age_levels<-c("17 and under","18-24","25-34","35-44","45-54", "55-64", "65 and older")
-# age_labels<-c("17 and under","18-24","25-34","35-44","45-54", "55-64", "65 and older")
-# df$age_bracket<-factor(df$age_bracket, ordered=TRUE, 
-#                                                levels=age_levels, labels=age_labels)
-
-
 text <- "Across all people ages <b>{point.age_bracket:.1f}</b> stopped by officers assigned to gang enforcement, officers stopped people perceived as <b>{point.race_label_short:.1f}</b> <b>{point.rate:.1f}% of the time</b>. By comparison, <b>{point.race_label_short:.1f} people</b> make up <b>{point.pop_rate:.1f}%</b> of the population ages <b>{point.age_bracket:.1f}</b> in San Diego."
 
 tooltip_text <- sapply(strwrap(text, 110, simplify=FALSE), paste, collapse="<br>")
 
-
-# Using function: CANNOT get the age order to work
-
-# chart <- fx_stackedbarchart(  
-#   df = df,
-#   x = 'age_bracket',
-#   y = 'rate',
-#   group_var = 'race_label_short',
-#   group_colors = c(meteorite, lavender, orange, peridot, ccblue, gainsboro, "#211447",
-#                          "#FF9E0D", "#A8683C"),
-#   top_finding = 'Officers assigned to Gang Enforcement stop Black and Latinx youth at disproportionately high rates',
-#   subtitle = 'Stop rates for officer-initiated stops made by officers assigned to Gang Enforcement for every race across age groups',
-#   tooltip = tooltip_text,
-#   caption = paste0(racenote,"<br><br>", sourcenote, "<br>","Analysis for all officer-initiated stops made by officers assigned to Gang Enforcement.","<br>"))
-
-
-## manual code to get age brackets in correct order ##
+## Set colors ##
 
 group_colors <- c(meteorite, lavender, orange, peridot, ccblue, gainsboro, "#211447",
                          "#FF9E0D", "#A8683C")
@@ -84,7 +60,7 @@ chart<-hchart(df,
       text = "Officers assigned to gang enforcement disproportionately stop people they perceive as Black and Latinx across all age groups") %>%
     
     hc_subtitle(
-      text = "Percent of stops made by officers assigned to gang enforcement by race and age") %>%
+      text = "Percent of people stopped by officers assigned to gang enforcement by race and age") %>%
 
     
     hc_caption(
