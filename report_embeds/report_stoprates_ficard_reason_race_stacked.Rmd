@@ -41,7 +41,7 @@ chart<-hchart(df,
          tooltip =  list(headerFormat='',pointFormat=tooltip_text)) %>%
     
     hc_title(
-      text = "SDPD is more likely to use traffic violations to profile people of color for field interviews compared to White people.") %>%
+      text = "SDPD is more likely to use traffic violations to profile people of color for field interviews compared to others.") %>%
     
     hc_subtitle(
       text = "Percent of stops resulting in a field interview card by reason and race") %>%
