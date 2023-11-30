@@ -22,22 +22,21 @@ age<-dbGetQuery(pillars_conn, "SELECT * FROM population_age_race_sd_city")%>%
   rename("pop_count"="count",
          "pop_rate"="rate")
 
-
 meta<-dbGetQuery(pillars_conn, "SELECT * FROM metadata_race_labels")
 
-text <- "Across all field interviews of people ages <b>{point.age_bracket:.1f}</b>, SDPD stopped people perceived as <b>{point.race_label_short:.1f} {point.rate:.1f}% of the time.</b> By comparison, <b>{point.race_label_short:.1f} people</b> make up <b>{point.pop_rate:.1f}%</b> of the population ages <b>{point.age_bracket:.1f}</b> in San Diego."
+# join all tables
 
 df<-df%>%
     left_join(age)%>%
   left_join(meta, by=c("race"="race_base"))%>%
   filter(race!='sswana' & race !="nhpi" & race != 'aian')%>%
-  mutate(pop_rate=ifelse(race %in% "nh_sswana", "Data not available", pop_rate))%>%
-  mutate(tooltip=ifelse(race %in% "nh_sswana", 
-      paste0("Across all field interviews of people ages <b>{point.age_bracket:.1f}</b>, SDPD stopped people perceived as <b>{point.race_label_short:.1f} {point.rate:.1f}% of the time.</b>."),
-      paste0("Across all field interviews of people ages <b>{point.age_bracket:.1f}</b>, SDPD stopped people perceived as <b>{point.race_label_short:.1f} {point.rate:.1f}% of the time.</b> By comparison, <b>{point.race_label_short:.1f} people</b> make up <b>{point.pop_rate:.1f}%</b> of the population ages <b>{point.age_bracket:.1f}</b> in San Diego.")))
+mutate(across(where(is.numeric), ~round(., 1)))%>%
+  mutate(tooltip=ifelse(race %in% "nh_sswana", "",  paste0("By comparison, <b>",race_label_short, " people</b> make up <b>",pop_rate,"%</b> of the population ages <b>",age_bracket,"</b> in San Diego.")))
+                        
 
+# set tooltip
 
-text <- "Across all field interviews of people ages <b>{point.age_bracket:.1f}</b>, SDPD stopped people perceived as <b>{point.race_label_short:.1f} {point.rate:.1f}% of the time.</b> By comparison, <b>{point.race_label_short:.1f} people</b> make up <b>{point.pop_rate:.1f}%</b> of the population ages <b>{point.age_bracket:.1f}</b> in San Diego."
+text<-"Across all field interviews of people ages <b>{point.age_bracket:.1f}</b>, SDPD stopped people perceived as <b>{point.race_label_short:.1f} {point.rate:.1f}% of the time.</b> {point.tooltip}"
 
 tooltip_text <- sapply(strwrap(text, 110, simplify=FALSE), paste, collapse="<br>")
 
@@ -54,7 +53,7 @@ df <- within(df, race_label_short <- factor(race_label_short, levels=c("White","
 chart<-hchart(df, 
          "bar", hcaes(x = age_bracket, y = rate, group =race_label_short),
          stacking = "normal",
-          tooltip =  list(headerFormat='',pointFormat=df$tooltip)) %>%
+          tooltip =  list(headerFormat='',pointFormat=tooltip_text)) %>%
   
     hc_chart(events = list(load = JS("function() {
   var chart = this;
