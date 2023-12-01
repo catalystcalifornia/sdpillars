@@ -38,21 +38,9 @@ tooltip_text <- sapply(strwrap(tooltip_text, 110, simplify=FALSE), paste, collap
  # custom order the groups on the stacked bar graph
 df <- within(df, result_simple <- factor(result_simple, levels=c("Warning (verbal or written)", "No Action")))
 
+## graph
 
-# chart <- fx_stackedbarchart(  
-#   df = df,
-#   x = 'race_label_short',
-#   y = 'rate',
-#   group_var = 'result_simple',
-#   group_colors = group_colors_item,
-#   top_finding = 'SDPD is most likely to stop Black and Latinx people for stops that then result in no action',
-#   subtitle = 'Percent of officer-initiated stops that result in a warning or no action by race',
-#   tooltip = tooltip_text,
-#   caption = paste0(racenote,"<br><br>", sourcenote, "<br>","Analysis for all officer-initiated stops.","<br>"))
-
-
-## have to do it manually to get the order to work
-group_colors = group_colors_item
+group_colors = c(lavender, meteorite)
 
 chart<-hchart(df, 
          "bar", hcaes(x = race_label_short, y = rate, group = result_simple),
@@ -70,7 +58,7 @@ chart<-hchart(df,
     
     hc_yAxis(title = list(text = paste0(""))) %>%
     
-    hc_xAxis(categories = list("Black","Latinx", "AIAN", "Asian", "NHPI", "SWANA/SA", "Multiracial", "White"),
+    hc_xAxis(categories = list("Black","Latinx", "AIAN", 'White', "Asian", "NHPI", "SWANA/SA",  "Multiracial"),
              title = list(text = paste0(""),
                           labels=list(position="bottom"))) %>%
     
