@@ -20,6 +20,10 @@ df<-df%>%
   mutate(stop_result_simple_re=ifelse(stop_result_simple=="Custodial Arrest without warrant", "Arrest without warrant",
                                       ifelse(stop_result_simple=="Warning (verbal or written)","Warning",ifelse(stop_result_simple=="Custodial Arrest pursuant to outstanding warrant","Arrest with warrant",ifelse(stop_result_simple=="Field interview card completed","Field interview card",stop_result_simple)))))
 
+# custom item coloring
+group_colors_item <- c("#A8683C", orange, peridot, lavender, ccblue, "#5F3B63", meteorite, "#D58424", "#FF9900")
+
+
 chart <- fx_itemchart(
     df=df, 
     x="stop_result_simple_re",
@@ -32,7 +36,65 @@ chart <- fx_itemchart(
     legend_text="Single dot represents 1 hour out of 100 hours",
     caption = paste0(sourcenote," <br>Analysis for all officer-initiated stops made by officers assigned to gang enforcement."))    
 
+# custom item chart
+
+df$stop_result_simple_re <- factor(df$stop_result_simple_re, levels = c(  "Field interview card completed",
+      "Warning (verbal or written)",
+      "No Action",
+      "Custodial Arrest without warrant",
+      "Psychiatric hold",
+      "Custodial Arrest pursuant to outstanding warrant",
+      "Citation for infraction",
+      "Two or More Results",
+      "In-field cite and release"))
+
+
+  highchart() %>%
+    hc_add_series(df, 
+                  "item",
+                  rows=5,
+                  hcaes(name=stop_result_simple_re, 
+                        y=duration_rate,
+                        label=stop_result_simple_re),
+                  innerSize='96%',
+                  showInLegend=TRUE)%>% # disables tooltip from popping up when mouse moves over bars
+    hc_colors(group_colors_item) %>%
+    hc_xAxis( categories = list(
+      "Field interview card completed",
+      "Warning (verbal or written)",
+      "No Action",
+      "Custodial Arrest without warrant",
+      "Psychiatric hold",
+      "Custodial Arrest pursuant to outstanding warrant",
+      "Citation for infraction",
+      "Two or More Results",
+      "In-field cite and release"
+    ),
+    labels=list(
+      style=list(color=black,
+                 fontFamily = main_font, # font_x_label
+                 fontWeight = semi_bold_font_weight,
+                 fontSize="1.5vmin")),
+      lineColor=gainsboro) %>%
+    hc_title(text="Officers assigned to gang enforcement spend nearly 1 in 5 patrol hours on stops resulting in a field interview card") %>%
+    hc_subtitle(text="Percent of hours officers assigned to gang enforcement spent on stops by stop result") %>%
+    hc_caption(text=paste0(sourcenote," <br>Analysis for all officer-initiated stops made by officers assigned to gang enforcement.")) %>%
+    hc_add_theme(cc_theme_test)%>%
+    hc_legend(title=list(text=paste0('<span style="color: #000000; font-weight: bold">', "Single dot represents 1 hour out of 100 hours", '</span><br/><span style="color: #666; font-style: italic">Click to hide</span>')),
+              enable = TRUE,
+              labelFormat = paste0('{name} <span style="opacity: 0.4">{', df$duration_rate, ':.1f}</span>'))  %>%
+    hc_tooltip(headerFormat="",
+               pointFormat = "Out of 100 hours,SDPD officers assigned to gang enforcement spent <b>{point.duration_rate:.1f}</b> hours on stops that resulted in <b>{point.stop_result_simple}</b>") %>%
+    hc_exporting(enabled = TRUE, sourceWidth=900, sourceHeight=600,
+               chartOptions=list(plotOptions=list(series=list(dataLabels=list(enabled=TRUE,                                                           
+                                                                              format=paste0(list(pointFormat=paste0('{point.', df$duration_rate,':.1f}')))))),
+               filename = paste0("Percent of hours officers assigned to gang enforcement spent on stops by stop result","_Catalyst California, catalystcalifornia.org, 2023."))) %>%
+    hc_chart(
+      marginRight=50)
+
 dbDisconnect(pillars_conn)
+
+
 ```
 
 ```{r, echo=FALSE}
