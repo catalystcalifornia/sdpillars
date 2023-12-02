@@ -23,7 +23,10 @@ df <- dbGetQuery(pillars_conn, "SELECT * FROM report_timespent_ficard_race_stop"
   mutate(race_label_short=ifelse(race %in% "nh_multi_race", "Multiracial", race_label_short))%>%
 filter(race!="sswana" & race !="aian" & race !="nhpi")
 
-  
+# custom define item chart colors
+
+group_colors_item <- c(meteorite, lavender, orange,peridot, ccblue, "#5F3B63","#A8683C", "#D58424", "#FF9900")
+
 chart <- fx_itemchart(
     df=df, 
     x="race_label_short",
