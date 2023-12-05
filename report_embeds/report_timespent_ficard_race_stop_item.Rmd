@@ -23,10 +23,25 @@ df <- dbGetQuery(pillars_conn, "SELECT * FROM report_timespent_ficard_race_stop"
   mutate(race_label_short=ifelse(race %in% "nh_multi_race", "Multiracial", race_label_short))%>%
 filter(race!="sswana" & race !="aian" & race !="nhpi")
 
-# custom define item chart colors
+# Combine nh_twoormor and nh_multi_racial into one multiracial category with a combined duration_total and duration_rate.
+# Remove the original, separate nh_twoormor and nh_multi_racial after combining
 
-group_colors_item <- c(meteorite, lavender, orange,peridot, ccblue, "#5F3B63","#A8683C", "#D58424", "#FF9900")
+df<-df %>%
+  filter(race %in% c("nh_twoormor", "nh_multi_race")) %>%
+  summarize(race = "nh_combined", across(c(duration_count), sum)) %>%
+  mutate(level="Field interview card completed",
+         duration_total=118970.3,
+         duration_rate=duration_count/duration_total*100,
+         race_label_short="Multiracial"
+         )%>%
+  bind_rows(df, .)%>%
+  filter(!grepl("nh_twoormor|nh_multi_race", race))
 
+
+# custom item coloring
+group_colors_item <- c(meteorite,"#E9E9E9", peridot, "#F7FFBB", "#FFE4BB", "#FFEEAC", "#C1FFC5", "#C9E3FF","#E2D9FF")
+
+# graph
 chart <- fx_itemchart(
     df=df, 
     x="race_label_short",
@@ -37,7 +52,7 @@ chart <- fx_itemchart(
     subtitle= "Percent of hours officers spent conducting stops that resulted in a field interview card by race",
     tooltip_text="Out of 100 hours spent on <b>officer-initiated stops resulting in a field interview card</b>, SDPD spent <b>{point.duration_rate:.1f}</b> hours conducting field interviews on people perceived as <b>{point.race_label_short}</b>",
     legend_text="Single dot represents 1 hour out of 100 hours",
-    caption = paste0(sourcenote," Analysis for all officer-initiated stops resulting in a field interview card only. Officers spent a total of 121,594.5 hours on officer-initiated stops that resulted in a field interview card only in 2022"))    
+    caption = paste0(sourcenote," Analysis for all officer-initiated stops resulting in a field interview card only. Officers spent a total of 118,970.3 hours on officer-initiated stops that resulted in a field interview card only in 2022."))    
 
 dbDisconnect(pillars_conn)
 ```

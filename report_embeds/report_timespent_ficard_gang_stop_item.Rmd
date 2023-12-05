@@ -21,7 +21,7 @@ df<-df%>%
                                       ifelse(stop_result_simple=="Warning (verbal or written)","Warning",ifelse(stop_result_simple=="Custodial Arrest pursuant to outstanding warrant","Arrest with warrant",ifelse(stop_result_simple=="Field interview card completed","Field interview card",stop_result_simple)))))
 
 # custom item coloring
-group_colors_item <- c(meteorite, peridot,"#D6D6D6", "#F0FF85", "#FFD28F", "#FFE680",  "#733256", "#9BCCFF", "#BDAFE9")
+group_colors_item <- c("#E9E9E9", meteorite, peridot, "#F7FFBB", "#FFE4BB", "#FFEEAC", "#733256", "#C9E3FF","#E2D9FF")
 
 
 chart <- fx_itemchart(
@@ -34,7 +34,7 @@ chart <- fx_itemchart(
     subtitle= "Percent of hours officers assigned to gang enforcement spent on stops by stop result",
     tooltip_text="Out of 100 hours,SDPD officers assigned to gang enforcement spent <b>{point.duration_rate:.1f}</b> hours on stops that resulted in <b>{point.stop_result_simple}</b>",
     legend_text="Single dot represents 1 hour out of 100 hours",
-    caption = paste0(sourcenote," <br>Analysis for all officer-initiated stops made by officers assigned to gang enforcement."))    
+    caption = paste0(sourcenote," <br>Analysis for all officer-initiated stops made by officers assigned to gang enforcement. Officers assigned to gang enforcement spent a total of 10,975.6 hours on officer-initiated stops in 2022."))    
 
 # Trying to customize the order of the item chart ----------
 
