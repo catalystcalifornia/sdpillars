@@ -246,11 +246,12 @@ fx_bubblepopchart <- function(
     
     hc_xAxis(title = list(text = ""),
              type="category",
-             categories=df$x) %>%
+             categories=df$x,
+             labels=list(style=list(fontSize="12px"))) %>%
     
     hc_yAxis(title = list(text = ""),
-             labels = list(formatter = JS(yaxis_label_JS))
-    )  %>%
+             labels = list(formatter = JS(yaxis_label_JS),
+                           style=list(fontSize="12px")))  %>%
     
     hc_legend(enabled = TRUE, 
               width = '15%',
@@ -271,7 +272,7 @@ fx_bubblepopchart <- function(
                                    connectorColor=meteorite,
                                    labels = list(
                                      format="{value:,.0f} persons",
-                                     style=list(fontSize='1.25vmin')),
+                                     style=list(fontSize='10px')),
                                    marker = list(
                                      fillColor = lavender))) %>%
     
@@ -336,10 +337,12 @@ fx_stackedbarchart <- function(
     hc_caption(
       text = caption) %>%
     
-    hc_yAxis(title = list(text = paste0(""))) %>%
+    hc_yAxis(title = list(text = paste0(""),
+                          labels = list(style=list(fontSize="12px")))) %>%
     
     hc_xAxis(title = list(text = paste0(""),
-                          labels=list(position="bottom"))) %>%
+                          labels=list(position="bottom",
+                                      style=list(fontSize="12px")))) %>%
     
     hc_legend(enabled = TRUE, 
               reversed =  TRUE,
@@ -391,7 +394,7 @@ fx_itemchart <- function(
       style=list(color=black,
                  fontFamily = main_font, # font_x_label
                  fontWeight = semi_bold_font_weight,
-                 fontSize="1.5vmin")),
+                 fontSize="12px")),
       lineColor=gainsboro) %>%
     hc_title(text=top_finding) %>%
     hc_subtitle(text=subtitle) %>%
