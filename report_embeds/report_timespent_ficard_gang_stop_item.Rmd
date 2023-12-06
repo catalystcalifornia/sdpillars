@@ -21,7 +21,7 @@ df<-df%>%
                                       ifelse(stop_result_simple=="Warning (verbal or written)","Warning",ifelse(stop_result_simple=="Custodial Arrest pursuant to outstanding warrant","Arrest with warrant",ifelse(stop_result_simple=="Field interview card completed","Field interview card",stop_result_simple)))))
 
 # custom item coloring
-group_colors_item <- c("#E9E9E9", meteorite, peridot, "#F7FFBB", "#FFE4BB", "#FFEEAC", "#733256", "#C9E3FF","#E2D9FF")
+group_colors_item <- c("#D6D6D6", "#211447", meteorite,"#FFD28F", "#BABABA","#8E7ACA", "#BDAFE9", "#FFE680",  "#F0FF85")
 
 
 chart <- fx_itemchart(
