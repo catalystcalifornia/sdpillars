@@ -39,7 +39,7 @@ df<-df %>%
 
 
 # custom item coloring
-group_colors_item <- c(meteorite,"#E9E9E9", peridot, "#F7FFBB", "#FFE4BB", "#FFEEAC", "#C1FFC5", "#C9E3FF","#E2D9FF")
+group_colors_item <- c("#211447","#D6D6D6", meteorite, "#E2D9FF",peridot, "#E7FF39", "#F0FF85", "#BDAFE9")
 
 # graph
 chart <- fx_itemchart(
