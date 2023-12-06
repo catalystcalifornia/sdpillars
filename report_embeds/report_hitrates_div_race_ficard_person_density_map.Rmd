@@ -1,0 +1,159 @@
+---
+title: ""
+output:
+  html_document:
+    css: "W:\\RDA Team\\R\\cc_brandguide.css"
+---
+<!-- link to Google Font -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  
+
+```{r, include=FALSE}
+#### Map ###
+#### Load libraries ####
+library(usethis)
+library(tidyverse)
+library(sf)
+library(leaflet)
+library(sp)
+library(htmltools) # for html escape
+library(magrittr)
+library(RPostgreSQL)
+library(htmlwidgets)
+library(stringr)
+
+source("W:\\RDA Team\\R\\credentials_source.R")
+source("W:\\Project\\RJS\\Pillars\\GitHub\\HK\\sdpillars\\report_embeds\\chart_functions.R")
+
+pillars_conn <- connect_to_db("rjs_pillars")
+## load in race metadata
+metadata_race_labels <-  dbGetQuery(pillars_conn, "SELECT * FROM metadata_race_labels") %>% select(race_base, race_label_short, race_label_long)
+
+## Load in RJS Pillars data ##
+df_long <- dbGetQuery(pillars_conn, "SELECT * FROM data.report_hitrates_div_race_ficard_person") %>% filter(race == "total")
+div <- st_read(pillars_conn, query =  "SELECT * FROM data.sangis_sdpd_divisions_2023") 
+
+## change division name to sentence case
+df_long$div_name <- str_to_title(df_long$div_name)
+div$div_name <- str_to_title(div$div_name)
+
+
+## add contraband count/contraband prc rate
+df_long <- df_long %>% mutate(contraband_count = (stop_count-no_contraband_count), contraband_prc_rate = (100-no_contraband_prc_rate))
+
+# transform for leaflet
+
+div <- st_transform(div,4326)
+
+# go from long to wide
+
+df_wide <- df_long %>% pivot_wider(
+  names_from = race,
+  values_from = stop_count:no_contraband_prc_rate,
+  names_sep = "_"
+  
+)
+
+# merge division sf by df: this is only for the shapefile
+div_wide_sf <- div %>% left_join(df_wide)
+
+
+# the dot density needs the data to be long
+div_long_sf <- div %>% left_join(df_long)
+```
+
+
+```{r, include=FALSE}
+### Calculate dot density count ###
+no_contraband_dots = as_dot_density(
+  div_long_sf,
+  value = "no_contraband_count",
+  values_per_dot = 5, ## each dot represents 
+  group = "race"
+)
+
+contraband_dots = as_dot_density(
+  div_long_sf,
+  value = "contraband_count",
+  values_per_dot = 5, ## each dot represents 
+  group = "race"
+)
+
+
+## function to change the legend shape and color
+colors_function <- function(colors, sizes, borders, shapes) {
+  shapes <- gsub("circle", "100%", shapes)
+  shapes <- gsub("square", "100%", shapes)
+  paste0(colors, "; width:", sizes, "px; height:", sizes, "px; border:1px solid ", borders, "; border-radius:", shapes)
+}
+
+
+
+```
+
+
+```{r, include=FALSE}
+rate_popup <- paste0(
+  
+  
+  label = paste0(
+    "<div class='leaflet-popup-scrolled' style='max-width:800px;max-height:200px'>", 
+    
+    "In <span style='font-size: 14px; font-weight: bold;'>", div_wide_sf$div_name, " Division",  "(", div_wide_sf$div_num, ")",
+    
+    "</span>", "<br> <br> Out of ", "<span style='font-size: 14px; font-weight: bold;'>", div_wide_sf$stop_count_total,  "</span> people searched during stops where a field interview card was completed, SDPD found contraband/evidence in ", "<span style='font-size: 14px; font-weight: bold;'>", div_wide_sf$contraband_count, "</span>", " stops, a hit rate of ", "<span style='font-size: 14px; font-weight: bold;'>", round(div_wide_sf$contraband_prc_rate, digits = 1), "</span>",  "%.", " SDPD found no contraband or evidence on ", "<span style='font-size: 14px; font-weight: bold;'>", div_wide_sf$no_contraband_count_total, "</span>", " people searched, meaning SDPD  subjected ",  "<span style='font-size: 14px; font-weight: bold;'>", round(div_wide_sf$no_contraband_prc_rate_total, digits = 1), "% of people to unnecessary searches."
+    
+    )
+  )
+
+
+```
+
+In the Southeast Division, out of 312 people searched during stops where a field interview card was completed, SDPD found contraband or evidence on only 66 people searched, a 21.1% hit rate. SDPD found no contraband or evidence on 246 people searched, meaning SDPD subjected 78.8% of people to unnecessary searches.
+
+
+```{r, include=FALSE}
+# colors according to our brand guide: https://catalystcalifornia.sharepoint.com/sites/Portal/AP%20Projects/Forms/AllItems.aspx?FolderCTID=0x012000EF0283621C7FE048A8E68512F119353B&id=%2Fsites%2FPortal%2FAP%20Projects%2FCommunications%2FCatalyst%20California%2FBranding%20Materials%20%2B%20Templates%2FVisual%20Brand%20Guide%2FCatalyst%20California%20Brand%20Guide%5FSeptember%202022%2Epdf&viewid=1aaeb4a9%2D2232%2D41c7%2Da71c%2D727af9e1f5d7&parent=%2Fsites%2FPortal%2FAP%20Projects%2FCommunications%2FCatalyst%20California%2FBranding%20Materials%20%2B%20Templates%2FVisual%20Brand%20Guide
+
+# Base Color 00
+meteorite <- c('#3A207D') # no contraband
+peridot <- c('#CEEA01') # contraband
+
+
+
+### change size of legend
+
+map <-  leaflet(width = "100%", height = "600px") %>%
+  
+  
+  ## add contraband stops
+  
+  addCircleMarkers(data = no_contraband_dots, group = "No Contraband", label = NULL, weight = 2, fillOpacity = 1, radius = 2, color="white",  fillColor= meteorite, stroke = TRUE) %>% 
+  
+  ## add no contraband stops
+  
+  addCircleMarkers(data = contraband_dots, group = "Yes Contraband", label = NULL, weight = 2, fillOpacity = 1, radius = 2, color="white",  fillColor=  peridot,  stroke = TRUE) %>% 
+  
+  # add Division 
+  addPolygons(data = div_wide_sf, label=~htmlEscape(paste0(div_name, " Division ")),
+              color = "black", fillColor = "white", opacity = 1,  popup = ~paste0(rate_popup), 
+              weight = 2, smoothFactor = 0.5,  highlight = highlightOptions(color = "white", weight = 3, bringToFront = TRUE, sendToBack = FALSE)) %>%
+  
+  addLayersControl(overlayGroups = c("No Contraband", "Yes Contraband"),
+                   options = layersControlOptions(collapsed = FALSE)) %>%
+  
+  addProviderTiles("CartoDB.Positron") %>%
+  setView(-117.13395, 32.79923, zoom = 10)
+  
+ 
+
+```
+
+
+```{r, echo=FALSE}
+map
+```
+
+<div align="left" style="line-height: 1em;"><span style="font-size: 10px;">Race/ethnicity: AIAN=American Indian or Alaska Native, NHPI=Native Hawaiian or Pacific Islander, MESA=Middle Eastern or South Asian; Observations by race may overlap in the point density map. </span> <br> 
+  <span style=' font-size: 10px;'>Catalyst California's calculations based on City of San Diego's Police Stop Data (2022); <u>[Catalyst California](https://www.catalystcalifornia.org)</u>, 2023. Analysis for all officer-initiated stops that resulted in a field interview card and a search.</span> </div>
+  
