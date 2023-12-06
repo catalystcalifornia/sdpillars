@@ -175,7 +175,7 @@ orange <- "#F25922"
 
 `r lorem::ipsum(paragraphs = 1,sentences=NULL, avg_words_per_sentence=10)`
 
-```{r dot-map, child= 'report_embeds/report_hitrates_div_race_ficard_stop_density_map.Rmd'}
+```{r dot-map, child= 'report_embeds/report_hitrates_div_race_ficard_person_density_map.Rmd'}
 ```
 
 ## 3. These racially biased activities waste public resources.
