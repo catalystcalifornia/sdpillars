@@ -105,7 +105,7 @@ orange <- "#F25922"
 ```{r bubble-chart, child= 'report_embeds/report_stoprates_result_race_person_stacked.Rmd', echo=FALSE}
 ```
 
-### B. Available data show that SDPD’s gang enforcement assignment profiles young and Black people for gang activity.   
+### B. Available data show that SDPD’s gang enforcement assignment profiles Black and Latinx people for gang activity.   
 
 <p style="background-color:#CEEA01;font-size:14pt">Community quote or video
 </p>
@@ -116,9 +116,6 @@ orange <- "#F25922"
 ```
 
 `r lorem::ipsum(paragraphs = 1,sentences=NULL, avg_words_per_sentence=10)`
-
-```{r stacked-chart, child= 'report_embeds/report_stopsrates_age_race_gang_person_stacked.Rmd'}
-```
 
 <div style="background-color:#F25922">
 ### SDPD data are underinclusive and mask the extent of racially biased, gang profiling in San Diego.
@@ -147,9 +144,10 @@ orange <- "#F25922"
 
 `r lorem::ipsum(paragraphs = 1,sentences=NULL, avg_words_per_sentence=10)`
 
-```{r stacked-chart, child= 'report_embeds/report_stoprates_age_race_ficard_person_stacked.Rmd'}
-```
+[chart pending field interview cards by race and division]
 
+```{r stacked-chart, child= 'report_embeds/report_stoprates_ficard_reason_race_bubble.Rmd'}
+```
 
 ## 2. Such racially biased stops harm the Southeast community and undermine community safety.  
 
@@ -213,7 +211,11 @@ orange <- "#F25922"
 
 # APPENDIX
 
-```{r stacked-chart, child= 'report_embeds/report_stoprates_ficard_reason_race_stacked.Rmd'}
+```{r stacked-chart, child= 'report_embeds/report_stopsrates_age_race_gang_person_stacked.Rmd'}
+```
+
+
+```{r stacked-chart, child= 'report_embeds/report_stoprates_age_race_ficard_person_stacked.Rmd'}
 ```
 
 
