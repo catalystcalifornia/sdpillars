@@ -1,0 +1,206 @@
+---
+title: ""
+output:
+  html_document:
+    css: "W:\\RDA Team\\R\\cc_brandguide.css"
+---
+<!-- link to Google Font -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  
+
+```{r, include = FALSE}
+#### Map ###
+#### Load libraries ####
+library(usethis)
+library(tidyverse)
+library(sf)
+library(leaflet)
+library(sp)
+library(htmltools) # for html escape
+library(magrittr)
+library(RPostgreSQL)
+library(htmlwidgets)
+library(stringr)
+
+source("W:\\RDA Team\\R\\credentials_source.R")
+source("W:\\Project\\RJS\\Pillars\\GitHub\\HK\\sdpillars\\report_embeds\\chart_functions.R")
+
+pillars_conn <- connect_to_db("rjs_pillars")
+## load in race metadata
+metadata_race_labels <-  dbGetQuery(pillars_conn, "SELECT * FROM metadata_race_labels") %>% select(race_base, race_label_short, race_label_long)
+
+## Load in RJS Pillars data ##
+df_long <- dbGetQuery(pillars_conn, "SELECT * FROM data.report_stoprates_div_ficard_race_person")
+div <- st_read(pillars_conn, query =  "SELECT * FROM data.sangis_sdpd_divisions_2023") 
+
+## change division name to sentence case
+df_long$div_name <- str_to_title(df_long$div_name)
+div$div_name <- str_to_title(div$div_name)
+
+# transform for leaflet
+
+div <- st_transform(div,4326)
+
+# go from long to wide
+
+df_wide <- df_long %>% pivot_wider(
+  names_from = race,
+  values_from = total:rate,
+  names_sep = "_"
+  
+)
+
+# merge division sf by df: this is only for the shapefile
+div_wide_sf <- div %>% left_join(df_wide)
+
+
+# the dot density needs the data to be long
+div_long_sf <- div %>% left_join(df_long)
+```
+
+```{r, include=FALSE}
+### Calculate dot density count ###
+ficard_dots = as_dot_density(
+  div_long_sf,
+  value = "count",
+  values_per_dot = 5, ## each dot represents 10 values
+  group = "race"
+)
+# Filter for race groups
+df_long %>% as.data.frame() %>% group_by(race) %>% summarize(count = n())
+nh_black_dots <- ficard_dots %>% filter(race == "nh_black")
+nh_white_dots <- ficard_dots %>% filter(race == "nh_white")
+aian_dots <- ficard_dots %>%  filter(race == "aian")
+nh_aian_dots <- ficard_dots %>%  filter(race == "nh_aian")
+latinx_dots <- ficard_dots %>% filter(race == "latinx")
+#nh_sswana_dots <- ficard_dots %>% filter(race == "nh_sswana")
+sswana_dots <- ficard_dots %>% filter(race == "sswana")
+nh_asian_dots <- ficard_dots %>% filter(race == "nh_asian")
+nh_twoormor_dots <- ficard_dots %>% filter(race == "nh_twoormor")
+nhpi_dots <- ficard_dots %>% filter(race == "nhpi")
+nh_nhpi_dots <- ficard_dots %>% filter(race == "nh_nhpi")
+```
+
+
+
+
+```{r, include = FALSE}
+rate_popup <- paste0(
+  
+  
+  label = paste0(
+    "<div class='leaflet-popup-scrolled' style='max-width:800px;max-height:200px'>", 
+    
+    "In ", "<span style='font-size: 14px; font-weight: bold;'>", div_wide_sf$div_name, " Division",  "(", div_wide_sf$div_num, "),",
+    
+    "</span>", "<br> <br>", "<span style='font-size: 14px; font-weight: bold;'>", div_wide_sf$count_nh_black,  "</span>", " people perceived as ", "<span style='font-size: 14px; font-weight: bold;'>", "Black",  "</span>", " were stopped for an officer-initiated stop that resulted in a field interview card completed, a rate of ", "<span style='font-size: 14px; font-weight: bold;'>", round(div_wide_sf$rate_nh_black, digits = 1),  "</span>", "%. ",   "<span style='font-size: 14px; font-weight: bold;'>", div_wide_sf$total_nh_black, "</span>", " people in this division identify as Black.", "</br>",
+    
+    
+    "</span>", "<br> <br>", "<span style='font-size: 14px; font-weight: bold;'>", div_wide_sf$count_nh_white,  "</span>", " people perceived as ", "<span style='font-size: 14px; font-weight: bold;'>", "White",  "</span>", " were stopped for an officer-initiated stop that resulted in a field interview card completed, a rate of ", "<span style='font-size: 14px; font-weight: bold;'>", round(div_wide_sf$rate_nh_white, digits = 1),  "</span>", "%. ",  "<span style='font-size: 14px; font-weight: bold;'>", div_wide_sf$total_nh_white, "</span>", " people in this division identify as White.", "</br>",
+    
+    "</span>", "<br> <br>", "<span style='font-size: 14px; font-weight: bold;'>", div_wide_sf$count_aian,  "</span>", " people perceived as ", "<span style='font-size: 14px; font-weight: bold;'>", "American Indian and Alaska Native(AIAN)",  "</span>", " were stopped for an officer-initiated stop that resulted in a field interview card completed, a rate of ", "<span style='font-size: 14px; font-weight: bold;'>", round(div_wide_sf$rate_aian, digits = 1),  "</span>", "%. ",  "<span style='font-size: 14px; font-weight: bold;'>", div_wide_sf$total_aian, "</span>", " people in this division identify as AIAN.", "</br>",
+    
+    "</span>", "<br> <br>", "<span style='font-size: 14px; font-weight: bold;'>", div_wide_sf$count_nh_aian,  "</span>", " people perceived as ", "<span style='font-size: 14px; font-weight: bold;'>", "Non-Hispanic American Indian and Alaska Native (AIAN)",  "</span>", " were stopped for an officer-initiated stop that resulted in a field interview card completed, a rate of ", "<span style='font-size: 14px; font-weight: bold;'>", round(div_wide_sf$rate_nh_aian, digits = 1),  "</span>", "%. ",  "<span style='font-size: 14px; font-weight: bold;'>", div_wide_sf$total_nh_aian, "</span>", " people in this division identify as Non-Hispanic AIAN.", "</br>",
+    
+    "</span>", "<br> <br>", "<span style='font-size: 14px; font-weight: bold;'>", div_wide_sf$count_latinx,  "</span>", " people perceived as ", "<span style='font-size: 14px; font-weight: bold;'>", "Latinx",  "</span>", " were stopped for an officer-initiated stop that resulted in a field interview card completed, a rate of ", "<span style='font-size: 14px; font-weight: bold;'>", round(div_wide_sf$rate_latinx, digits = 1),  "</span>", "%. ",  "<span style='font-size: 14px; font-weight: bold;'>", div_wide_sf$total_latinx, "</span>", " people in this division identify as Latinx.", "</br>",
+    
+    "</span>", "<br> <br>", "<span style='font-size: 14px; font-weight: bold;'>", div_wide_sf$count_sswana,  "</span>", " people perceived as ", "<span style='font-size: 14px; font-weight: bold;'>", "Southwest Asian or North African/Middle Eastern or North African or South Asian (SSWANA)",  "</span>", " were stopped for an officer-initiated stop that resulted in a field interview card completed, a rate of ", "<span style='font-size: 14px; font-weight: bold;'>", round(div_wide_sf$rate_sswana, digits = 1),  "</span>", "%. ",  "<span style='font-size: 14px; font-weight: bold;'>", div_wide_sf$total_sswana, "</span>", " people in this division identify as SSWANA.", "</br>",
+    
+    "</span>", "<br> <br>", "<span style='font-size: 14px; font-weight: bold;'>", div_wide_sf$count_nh_asian,  "</span>", " people perceived as ", "<span style='font-size: 14px; font-weight: bold;'>", "Asian",  "</span>", " were stopped for an officer-initiated stop that resulted in a field interview card completed, a rate of ", "<span style='font-size: 14px; font-weight: bold;'>", round(div_wide_sf$rate_nh_asian, digits = 1),  "</span>", "%. ",  "<span style='font-size: 14px; font-weight: bold;'>", div_wide_sf$total_nh_asian, "</span>", " people in this division identify as Asian.", "</br>",
+    
+    "</span>", "<br> <br>", "<span style='font-size: 14px; font-weight: bold;'>", div_wide_sf$count_nh_twoormor,  "</span>", " people perceived as ", "<span style='font-size: 14px; font-weight: bold;'>", "Two or More Races",  "</span>", " were stopped for an officer-initiated stop that resulted in a field interview card completed, a rate of ", "<span style='font-size: 14px; font-weight: bold;'>", round(div_wide_sf$rate_nh_twoormor, digits = 1),  "</span>", "%. ",  "<span style='font-size: 14px; font-weight: bold;'>", div_wide_sf$total_nh_twoormor, "</span>", " people in this division identify as Multi-Racial.", "</br>",
+    
+    "</span>", "<br> <br>", "<span style='font-size: 14px; font-weight: bold;'>", div_wide_sf$count_nhpi,  "</span>", " people perceived as ", "<span style='font-size: 14px; font-weight: bold;'>", "Native Hawaiian or Pacific Islander (NHPI)",  "</span>", " were stopped for an officer-initiated stop that resulted in a field interview card completed, a rate of ", "<span style='font-size: 14px; font-weight: bold;'>", round(div_wide_sf$rate_nhpi, digits = 1),  "</span>", "%. ",  "<span style='font-size: 14px; font-weight: bold;'>", div_wide_sf$total_nhpi, "</span>", " people in this division identify as NHPI.", "</br>",
+    
+    "</span>", "<br> <br>", "<span style='font-size: 14px; font-weight: bold;'>", div_wide_sf$count_nh_nhpi,  "</span>", " people perceived as ", "<span style='font-size: 14px; font-weight: bold;'>", "Non-Hispanic Native Hawaiian or Pacific Islander (NHPI)",  "</span>", " were stopped for an officer-initiated stop that resulted in a field interview card completed, a rate of ", "<span style='font-size: 14px; font-weight: bold;'>", round(div_wide_sf$rate_nh_nhpi, digits = 1),  "</span>", "%. ", "<span style='font-size: 14px; font-weight: bold;'>", div_wide_sf$total_nh_nhpi, "</span>", " people in this division identify as Non-Hispanic NHPI."
+  )
+)
+
+```
+
+
+```{r, include=FALSE}
+# colors according to our brand guide: https://catalystcalifornia.sharepoint.com/sites/Portal/AP%20Projects/Forms/AllItems.aspx?FolderCTID=0x012000EF0283621C7FE048A8E68512F119353B&id=%2Fsites%2FPortal%2FAP%20Projects%2FCommunications%2FCatalyst%20California%2FBranding%20Materials%20%2B%20Templates%2FVisual%20Brand%20Guide%2FCatalyst%20California%20Brand%20Guide%5FSeptember%202022%2Epdf&viewid=1aaeb4a9%2D2232%2D41c7%2Da71c%2D727af9e1f5d7&parent=%2Fsites%2FPortal%2FAP%20Projects%2FCommunications%2FCatalyst%20California%2FBranding%20Materials%20%2B%20Templates%2FVisual%20Brand%20Guide
+
+# Base Color 00
+lime_green <- c('#0AB013')
+persian_indigo <- c('#211447')
+halloween_orange <- c('#DF4007')
+bitter_lemon <- c('#BCD313')
+blue <- c('#0860BC')
+dark_tangerine <- c('#EB8D00')
+american_yellow <- c('#EABB00')
+halaya_ube <- c('#601D42')
+
+#dark_silver <- c('#6F6F6F') ## remove these
+
+
+### change size of legend
+
+map <-  leaflet(width = "100%", height = "600px") %>%
+  
+  
+  ## add NH Black Stops
+  
+  addCircleMarkers(data = nh_black_dots, group = "Black", label = NULL, weight = 2, fillOpacity = 1, radius = 2, color="white",  fillColor=blue, stroke = TRUE) %>% 
+  
+  ## add NH White Stops
+  
+  addCircleMarkers(data = nh_white_dots, group = "White", label = NULL, weight = 2, fillOpacity = 1, radius = 2, color="white",  fillColor=  bitter_lemon,  stroke = TRUE) %>% 
+  
+  
+  ### add NH AIAN dots 
+  
+  addCircleMarkers(data = nh_aian_dots,  group = "Non-Hispanic AIAN", label = NULL, weight = 2, fillOpacity = 1, radius = 2, color="white",  fillColor= dark_tangerine, stroke = TRUE) %>% 
+  
+  ### add AIAN dots 
+  
+  addCircleMarkers(data = aian_dots,  group = "AIAN", label = NULL, weight = 2, fillOpacity = 1, radius = 2, color="white",  fillColor= dark_tangerine, stroke = TRUE) %>% 
+  
+  ### add latinx dots
+  
+  addCircleMarkers(data = latinx_dots, group = "Latinx", label = NULL, weight = 2, fillOpacity = 1, radius = 2, color="white",  fillColor= lime_green,  stroke = TRUE) %>% 
+  
+  ### add sswana dots
+  
+  addCircleMarkers(data = sswana_dots, group = "SSWANA", label = NULL, weight = 2, fillOpacity = 1, radius = 2, color="white",  fillColor= american_yellow, stroke = TRUE) %>% 
+  
+  ### add nh asian dots
+  
+  addCircleMarkers(data = nh_asian_dots, group = "Asian", label = NULL, weight = 2, fillOpacity = 1, radius = 2, color="white",  fillColor=  halloween_orange, stroke = TRUE) %>% 
+  
+  ### add nh two or more dots
+  
+  addCircleMarkers(data = nh_twoormor_dots, group = "Two or More Races", label = NULL, weight = 2, fillOpacity = 1, radius = 2, color="white",  fillColor= persian_indigo, stroke = TRUE) %>% 
+  
+  ### add nh_nhpi dots
+  
+  addCircleMarkers(data = nh_nhpi_dots, group = "Non-Hispanic NHPI", label = NULL, weight = 2, fillOpacity = 1, radius = 2, color="white",  fillColor= halaya_ube, stroke = TRUE) %>% 
+  
+  ### add nhpi dots
+  
+  addCircleMarkers(data = nhpi_dots, group = "NHPI", label = NULL, weight = 2, fillOpacity = 1, radius = 2, color="white",  fillColor= halaya_ube, stroke = TRUE) %>% 
+  
+  # add Division 
+  addPolygons(data = div_wide_sf, label=~htmlEscape(paste0(div_name, " Division ")),
+              color = "black", fillColor = "white", opacity = 1,  popup = ~paste0(rate_popup), 
+              weight = 2, smoothFactor = 0.5,  highlight = highlightOptions(color = "white", weight = 3, bringToFront = TRUE, sendToBack = FALSE)) %>%
+  
+  addLayersControl(overlayGroups = c("Black", "Latinx", "Asian", "White",  "SSWANA", "NHPI", "Non-Hispanic NHPI", "AIAN", "Non-Hispanic AIAN", "Two or More Races"),
+                   options = layersControlOptions(collapsed = FALSE)) %>%
+  
+  addProviderTiles("CartoDB.Positron") %>%
+  setView(-117.13395, 32.79923, zoom = 10) %>% #base and view 
+  
+  hideGroup(c("White", "AIAN", "NHPI"))   # hide white group
+
+```
+
+
+```{r, echo=FALSE}
+map
+```
+<div align="left" style="line-height: 1em;"><span style="font-size: 10px;">Searches are randomly placed within each division and do not indicate the exact location of the search.</span> <br> 
+<span style=' font-size: 10px;'>Catalyst California's calculations based on City of San Diego's Police Stop Data (2022); <u>[Catalyst California](https://www.catalystcalifornia.org)</u>, 2023. Analysis for all officer-initiated stops that resulted in a field interview card completed and a search.</span> </div>
+  
+  
