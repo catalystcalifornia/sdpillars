@@ -224,12 +224,12 @@ fx_bubblepopchart <- function(
         	return this.value +", yaxis_label, "}")
   
   # add line breaks to tooltip_text
-  drop_bold_tags <- gsub("<b>", "",
-                         gsub("</b>", '', tooltip_text, fixed=TRUE))
-  tooltip_text_wrapped <- sapply(strwrap(drop_bold_tags, 110, simplify=FALSE), paste, collapse="<br>" )
-  add_bold_start <- gsub("{", "<b>{", tooltip_text_wrapped, fixed=TRUE)
-  add_bold_end <- gsub("}", "}</b>", add_bold_start, fixed=TRUE)
-  tooltip_text_edited <- add_bold_end
+  # drop_bold_tags <- gsub("<b>", "",
+  #                        gsub("</b>", '', tooltip_text, fixed=TRUE))
+  # tooltip_text_wrapped <- sapply(strwrap(drop_bold_tags, 110, simplify=FALSE), paste, collapse="<br>" )
+  # add_bold_start <- gsub("{", "<b>{", tooltip_text_wrapped, fixed=TRUE)
+  # add_bold_end <- gsub("}", "}</b>", add_bold_start, fixed=TRUE)
+  # tooltip_text_edited <- add_bold_end
   
   df <-  df %>%
     arrange(desc(y))
@@ -246,7 +246,7 @@ fx_bubblepopchart <- function(
     
     hc_add_series(df, "bubble", invert=TRUE,
                   hcaes(x=!!rlang::ensym(x), y=!!rlang::ensym(y), size=!!rlang::ensym(z)), 
-                  maxSize="15%", tooltip =  list(pointFormat = tooltip_text_edited), showInLegend=FALSE,
+                  maxSize="15%", tooltip =  list(pointFormat = tooltip_text), showInLegend=FALSE,
                   clip=FALSE) %>%
     
     hc_xAxis(title = list(text = ""),
