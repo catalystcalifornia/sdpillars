@@ -47,7 +47,7 @@ cc_theme <- hc_theme(
   ),
   title = list(widthAdjust = -50,
                style = list(
-                 color = meteorite,
+                 color = black,
                  fontFamily = main_font, # font_title
                  fontWeight = black_font_weight,
                  textAlign="left",
@@ -56,7 +56,7 @@ cc_theme <- hc_theme(
   ),
   subtitle = list(
     style = list(
-      color = meteorite, 
+      color = black, 
       fontFamily = main_font, # font_subtitle
       fontWeight = regular_font_weight,
       fontSize='2vmin'),
@@ -64,7 +64,7 @@ cc_theme <- hc_theme(
   ),
   caption = list(
     style = list(
-      color = meteorite,
+      color = black,
       fontFamily = main_font, # font_caption
       fontWeight = regular_font_weight,
       fontSize = "1.25vmin",
@@ -133,7 +133,7 @@ cc_theme_test <- hc_theme(
   ),
   title = list(widthAdjust = -50,
                style = list(
-                 color = meteorite,
+                 color = black,
                  fontFamily = main_font, # font_title
                  fontWeight = black_font_weight,
                  textAlign="left",
@@ -142,7 +142,7 @@ cc_theme_test <- hc_theme(
   ),
   subtitle = list(
     style = list(
-      color = meteorite, 
+      color = black, 
       fontFamily = main_font, # font_subtitle
       fontWeight = regular_font_weight,
       fontSize='2vmin'),
@@ -150,7 +150,7 @@ cc_theme_test <- hc_theme(
   ),
   caption = list(
     style = list(
-      color = meteorite,
+      color = black,
       fontFamily = main_font, # font_caption
       fontWeight = regular_font_weight,
       fontSize = "1.25vmin",
@@ -224,7 +224,12 @@ fx_bubblepopchart <- function(
         	return this.value +", yaxis_label, "}")
   
   # add line breaks to tooltip_text
-  tooltip_text <- sapply(strwrap(tooltip_text, 110, simplify=FALSE), paste, collapse="<br>" )
+  # drop_bold_tags <- gsub("<b>", "",
+  #                        gsub("</b>", '', tooltip_text, fixed=TRUE))
+  # tooltip_text_wrapped <- sapply(strwrap(drop_bold_tags, 110, simplify=FALSE), paste, collapse="<br>" )
+  # add_bold_start <- gsub("{", "<b>{", tooltip_text_wrapped, fixed=TRUE)
+  # add_bold_end <- gsub("}", "}</b>", add_bold_start, fixed=TRUE)
+  # tooltip_text_edited <- add_bold_end
   
   df <-  df %>%
     arrange(desc(y))
