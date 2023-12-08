@@ -34,7 +34,7 @@ title_text<-paste0("SDPD is more likely to use traffic violations to profile peo
     
 subtitle_text<-paste0("Percent of people who were field interviewed and originally stopped for traffic violations by race")
     
-caption_text <- paste0(sourcenote,"<br>", racenote, "<br>","Analysis for all officer-initiated stops that only resulted in a field interview card completed.","<br>")
+methodnote <- "Analysis for all officer-initiated stops that only resulted in a field interview card completed."
 
 
 chart <- fx_bubblepopchart(
@@ -45,7 +45,7 @@ chart <- fx_bubblepopchart(
   top_finding=title_text,
   subtitle= subtitle_text,
   tooltip_text=tooltip_text,
-  caption = caption_text,
+  caption = paste(sourcenote, racenote, methodnote),
   yaxis_label = "''", # format for your y axis labels
   export_data_label=list(pointFormat='{point.rate:.1f}%') # format for your data
 )
