@@ -204,7 +204,7 @@ cc_theme_test <- hc_theme(
 
 #### Standard notes ####
 sourcenote<-paste0("Catalyst California's calculations based on City of San Diego's Police Stop Data (2022), catalystcalifornia.org, 2023.")
-racenote<-paste0("Race/ethnicity: AIAN=American Indian or Alaska Native, NHPI=Native Hawaiian or Pacific Islander, SSWANA=South Asian, Southwest <br>Asian, or North African.")
+racenote<-paste0("Race/ethnicity: AIAN=American Indian or Alaska Native, NHPI=Native Hawaiian or Pacific Islander, <br>SSWANA=South Asian, Southwest Asian, or North African.")
 
 #### Bubblepop Chart - Combined Bar and Bubble Charts ####
 

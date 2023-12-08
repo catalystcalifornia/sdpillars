@@ -34,7 +34,7 @@ title_text<-paste0("SDPD is more likely to use traffic violations to profile peo
     
 subtitle_text<-paste0("Percent of people who were field interviewed and originally stopped for traffic violations by race")
     
-caption_text <- paste0(racenote,"<br>", sourcenote, "<br>","Analysis for all officer-initiated stops that only resulted in a field interview card completed.","<br>")
+caption_text <- paste0(sourcenote,"<br>", racenote, "<br>","Analysis for all officer-initiated stops that only resulted in a field interview card completed.","<br>")
 
 
 chart <- fx_bubblepopchart(
