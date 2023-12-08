@@ -51,7 +51,7 @@ cc_theme <- hc_theme(
                  fontFamily = main_font, # font_title
                  fontWeight = black_font_weight,
                  textAlign="left",
-                 fontSize='3vmin'),
+                 fontSize='21px'),
                align = "left"
   ),
   subtitle = list(
@@ -59,7 +59,7 @@ cc_theme <- hc_theme(
       color = black, 
       fontFamily = main_font, # font_subtitle
       fontWeight = regular_font_weight,
-      fontSize='2vmin'),
+      fontSize='14px'),
     align='left'
   ),
   caption = list(
@@ -67,7 +67,7 @@ cc_theme <- hc_theme(
       color = black,
       fontFamily = main_font, # font_caption
       fontWeight = regular_font_weight,
-      fontSize = "1.25vmin",
+      fontSize = "10px",
       textAlign = "left",
       width = 50),
     useHTML = TRUE,
@@ -83,7 +83,7 @@ cc_theme <- hc_theme(
         width=120,  #argument to modify the width of the labels
         min=0,
         # spacingLeft = "150px",
-        fontSize="1.5vmin")),
+        fontSize="10px")),
     lineColor=gainsboro
   ),
   
@@ -93,7 +93,7 @@ cc_theme <- hc_theme(
         color=black,
         fontFamily = main_font, # font_axis_label
         fontWeight = regular_font_weight,
-        fontSize="1.5vmin",
+        fontSize="10px",
         margin = 50)),
     gridLineWidth=0, # removes vertical grid lines
     visible=TRUE, # makes axis line visible
@@ -109,7 +109,7 @@ cc_theme <- hc_theme(
       fontFamily = main_font, # font_axis_label
       fontWeight = regular_font_weight,
       color = black,
-      fontSize = '1.5vmin'
+      fontSize = '10px'
     ),
     
     itemHoverStyle = list(
@@ -137,7 +137,7 @@ cc_theme_test <- hc_theme(
                  fontFamily = main_font, # font_title
                  fontWeight = black_font_weight,
                  textAlign="left",
-                 fontSize='3vmin'),
+                 fontSize='21px'),
                align = "left"
   ),
   subtitle = list(
@@ -145,7 +145,7 @@ cc_theme_test <- hc_theme(
       color = black, 
       fontFamily = main_font, # font_subtitle
       fontWeight = regular_font_weight,
-      fontSize='2vmin'),
+      fontSize='14px'),
     align='left'
   ),
   caption = list(
@@ -153,7 +153,7 @@ cc_theme_test <- hc_theme(
       color = black,
       fontFamily = main_font, # font_caption
       fontWeight = regular_font_weight,
-      fontSize = "1.25vmin",
+      fontSize = "10px",
       textAlign = "left"),
     useHTML = TRUE,
     floating = FALSE
@@ -165,7 +165,7 @@ cc_theme_test <- hc_theme(
         color=black,
         fontFamily = main_font, # font_x_label
         fontWeight = semi_bold_font_weight,
-        fontSize="1.5vmin")),
+        fontSize="10px")),
     lineColor=gainsboro
   ),
   
@@ -175,7 +175,7 @@ cc_theme_test <- hc_theme(
         color=black,
         fontFamily = main_font, # font_axis_label
         fontWeight = regular_font_weight,
-        fontSize="1.5vmin")),
+        fontSize="10px")),
     gridLineWidth=0, # removes vertical grid lines
     visible=TRUE, # makes axis line visible
     lineWidth=1,
@@ -189,7 +189,7 @@ cc_theme_test <- hc_theme(
       fontFamily = main_font, # font_axis_label
       fontWeight = regular_font_weight,
       color = black,
-      fontSize = '1.5vmin'
+      fontSize = '10px'
     ),
     
     itemHoverStyle = list(
