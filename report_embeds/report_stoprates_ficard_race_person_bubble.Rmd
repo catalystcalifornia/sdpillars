@@ -33,8 +33,12 @@ title_text <- paste0("SDPD disproportionately conducts field interviews for Blac
 # SUBTITLE
 subtitle_text <- paste0("Number of people stopped for field interview cards per 1K people of the same race")
 
-# CAPTION
-caption_text <- paste0(racenote,"<br><br>", sourcenote, "<br>","Analysis for all officer-initiated stops resulting in a field interview card only.","<br>")
+# METHOD NOTE
+methodnote <- "Analysis for all officer-initiated stops resulting in a field interview card only."
+
+# CREATE CAPTION
+## create caption
+caption_text <- paste("<br><br>", racenote, sourcenote, methodnote)
 
 # TOOLTIP
 tooltip_text <- "Out of 1,000 <b>{point.race_label_short:.0f}</b> people in San Diego, <b>{point.rate:.1f}</b>  people perceived as <b>{point.race_label_short:.0f}</b> are stopped for an officer-initiated stop that results in a field interview card"

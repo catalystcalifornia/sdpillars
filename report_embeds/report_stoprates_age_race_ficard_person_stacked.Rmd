@@ -49,6 +49,11 @@ group_colors <- c(meteorite, orange, peridot, lavender, ccblue, "#5F3B63","#A868
 
 df <- within(df, race_label_short <- factor(race_label_short, levels=c("White","Multiracial", "SWANA/SA", "NHPI","AIAN", "Asian",  "Latinx","Black")))
 
+# add methodnote 
+methodnote <- "Analysis for all officer-initiated stops that only resulted in a field interview card completed."
+  
+# create caption
+caption_text <- paste("<br><br>", racenote, sourcenote, methodnote)
 
 chart<-hchart(df, 
          "bar", hcaes(x = age_bracket, y = rate, group =race_label_short),
@@ -68,7 +73,7 @@ chart<-hchart(df,
       text = "Percent of stops resulting in a field interview card by age and race") %>%
     
     hc_caption(
-      text = paste0(racenote,"<br><br>", sourcenote, "<br>","Analysis for all officer-initiated stops that only resulted in a field interview card completed.","<br>")) %>%
+      text = caption_text) %>%
     
     hc_yAxis(max=100,
              title = list(text = paste0(""))) %>%

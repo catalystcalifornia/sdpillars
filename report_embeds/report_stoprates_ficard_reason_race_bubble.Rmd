@@ -33,8 +33,12 @@ tooltip_text <- "Across all people perceived as <b>{point.race_label_short:.1f}<
 title_text<-paste0("SDPD is more likely to use traffic violations to profile people of color for field interviews compared to White people.")
     
 subtitle_text<-paste0("Percent of people who were field interviewed and originally stopped for traffic violations by race")
-    
-caption_text <- paste0(racenote,"<br>", sourcenote, "<br>","Analysis for all officer-initiated stops that only resulted in a field interview card completed.","<br>")
+
+# add methodnote
+methodnote <- "Analysis for all officer-initiated stops that only resulted in a field interview card completed."
+
+## create caption
+caption_text <- paste("<br><br>", racenote, sourcenote, methodnote)
 
 
 chart <- fx_bubblepopchart(

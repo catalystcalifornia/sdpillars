@@ -23,6 +23,12 @@ df<-df%>%
 # custom item coloring
 group_colors_item <- c("#D6D6D6", "#211447", meteorite,"#FFD28F", "#BABABA","#8E7ACA", "#BDAFE9", "#FFE680",  "#F0FF85")
 
+# add mwethodnote 
+methodnote <- "Analysis for all officer-initiated stops made by officers assigned to gang enforcement. Officers assigned to gang enforcement spent a total of 10,975.6 hours on officer-initiated stops in 2022."
+
+# create caption 
+caption_text <- paste("<br><br>", sourcenote, methodnote)
+
 
 chart <- fx_itemchart(
     df=df, 
@@ -34,7 +40,7 @@ chart <- fx_itemchart(
     subtitle= "Percent of hours officers assigned to gang enforcement spent on stops by stop result",
     tooltip_text="Out of 100 hours,SDPD officers assigned to gang enforcement spent <b>{point.duration_rate:.1f}</b> hours on stops that resulted in <b>{point.stop_result_simple}</b>",
     legend_text="Single dot represents 1 hour out of 100 hours",
-    caption = paste0(sourcenote," <br>Analysis for all officer-initiated stops made by officers assigned to gang enforcement. Officers assigned to gang enforcement spent a total of 10,975.6 hours on officer-initiated stops in 2022."))    
+    caption = caption_text)    
 
 # Trying to customize the order of the item chart ----------
 

@@ -15,7 +15,7 @@ lang$thousandsSep <- ","
 options(highcharter.lang = lang)
 
 ## COLORS ##
-orange <- "#F25922"
+papaya <- "#F25922"
 peridot <- "#CEEA01"
 lavender <- "#CEC4E2"
 meteorite <- "#3A207D"
@@ -26,8 +26,8 @@ alabaster<-"#FBFBFB"
 gainsboro <- "#DEDEDE"
 
 divergent_color_ramp <- c("#372278", "#5F3B63","#A8683C", "#D58424", "#FF9900") 
-grouped_color_ramp <-c(meteorite, orange, peridot, "#BDAFE9", "#E2D9FF")
-group_colors_item <- c(meteorite, orange, peridot, lavender, ccblue, "#5F3B63","#A8683C", "#D58424", "#FF9900")
+grouped_color_ramp <-c(meteorite, papaya, peridot, "#BDAFE9", "#E2D9FF")
+group_colors_item <- c(meteorite, papaya, peridot, lavender, ccblue, "#5F3B63","#A8683C", "#D58424", "#FF9900")
 ## FONTS ##
 main_font <- "Inter"
 regular_font_weight <- 400
@@ -36,7 +36,7 @@ semi_bold_font_weight <- 600
 
 # highchart theme 
 cc_theme <- hc_theme(
-  colors = c(meteorite, lavender, orange, peridot
+  colors = c(meteorite, lavender, papaya, peridot
   ),
   chart = list(
     backgroundColor = alabaster,
@@ -51,7 +51,7 @@ cc_theme <- hc_theme(
                  fontFamily = main_font, # font_title
                  fontWeight = black_font_weight,
                  textAlign="left",
-                 fontSize='3vmin'),
+                 fontSize='21px'),
                align = "left"
   ),
   subtitle = list(
@@ -59,7 +59,7 @@ cc_theme <- hc_theme(
       color = black, 
       fontFamily = main_font, # font_subtitle
       fontWeight = regular_font_weight,
-      fontSize='2vmin'),
+      fontSize='14px'),
     align='left'
   ),
   caption = list(
@@ -67,7 +67,7 @@ cc_theme <- hc_theme(
       color = black,
       fontFamily = main_font, # font_caption
       fontWeight = regular_font_weight,
-      fontSize = "1.25vmin",
+      fontSize = "10px",
       textAlign = "left",
       width = 50),
     useHTML = TRUE,
@@ -83,7 +83,7 @@ cc_theme <- hc_theme(
         width=120,  #argument to modify the width of the labels
         min=0,
         # spacingLeft = "150px",
-        fontSize="1.5vmin")),
+        fontSize="10px")),
     lineColor=gainsboro
   ),
   
@@ -93,7 +93,7 @@ cc_theme <- hc_theme(
         color=black,
         fontFamily = main_font, # font_axis_label
         fontWeight = regular_font_weight,
-        fontSize="1.5vmin",
+        fontSize="10px",
         margin = 50)),
     gridLineWidth=0, # removes vertical grid lines
     visible=TRUE, # makes axis line visible
@@ -109,7 +109,92 @@ cc_theme <- hc_theme(
       fontFamily = main_font, # font_axis_label
       fontWeight = regular_font_weight,
       color = black,
-      fontSize = '1.5vmin'
+      fontSize = '12px'
+    ),
+    
+    itemHoverStyle = list(
+      fontFamily = main_font, # font_table_text
+      fontWeight = regular_font_weight,
+      color = black
+    ),
+    plotLines=list(color=gainsboro)
+  )
+)
+
+cc_theme_donut <- hc_theme(
+  colors = c(meteorite, papaya, peridot, lavender),
+  chart = list(
+    backgroundColor = alabaster,
+    style = list(
+      fontFamily = main_font, # font_subtitle
+      color=alabaster
+    ) 
+  ),
+  title = list(widthAdjust = -50,
+               style = list(
+                 color = black,
+                 fontFamily = main_font, # font_title
+                 fontWeight = black_font_weight,
+                 textAlign="left",
+                 fontSize='21px'),
+               align = "left"
+  ),
+  subtitle = list(
+    style = list(
+      color = black, 
+      fontFamily = main_font, # font_subtitle
+      fontWeight = regular_font_weight,
+      fontSize='14px'),
+    align='left'
+  ),
+  caption = list(
+    style = list(
+      color = black,
+      fontFamily = main_font, # font_caption
+      fontWeight = regular_font_weight,
+      fontSize = "10px",
+      textAlign = "left",
+      width = 50),
+    useHTML = TRUE,
+    floating = FALSE
+  ),
+  
+  xAxis=list(
+    labels=list(
+      style=list(
+        color=black,
+        fontFamily = main_font, # font_x_label
+        fontWeight = semi_bold_font_weight,
+        width=120,  #argument to modify the width of the labels
+        min=0,
+        # spacingLeft = "150px",
+        fontSize="10px")),
+    lineColor=gainsboro
+  ),
+  
+  yAxis=list(
+    labels=list(
+      style=list(
+        color=black,
+        fontFamily = main_font, # font_axis_label
+        fontWeight = regular_font_weight,
+        fontSize="10px",
+        margin = 50)),
+    gridLineWidth=0, # removes vertical grid lines
+    visible=TRUE, # makes axis line visible
+    lineWidth=1,
+    lineColor=gainsboro,
+    min=0,
+    tickAmount=6,
+    tickWidth=1
+  ),
+  
+  legend = list(
+    itemStyle = list(
+      fontFamily = main_font, # font_axis_label
+      fontWeight = regular_font_weight,
+      color = black,
+      fontSize = '12px'
     ),
     
     itemHoverStyle = list(
@@ -122,7 +207,7 @@ cc_theme <- hc_theme(
 )
 
 cc_theme_test <- hc_theme(
-  colors = c(meteorite, lavender, orange, peridot
+  colors = c(meteorite, lavender, papaya, peridot
   ),
   chart = list(
     backgroundColor = alabaster,
@@ -137,7 +222,7 @@ cc_theme_test <- hc_theme(
                  fontFamily = main_font, # font_title
                  fontWeight = black_font_weight,
                  textAlign="left",
-                 fontSize='3vmin'),
+                 fontSize='21px'),
                align = "left"
   ),
   subtitle = list(
@@ -145,7 +230,7 @@ cc_theme_test <- hc_theme(
       color = black, 
       fontFamily = main_font, # font_subtitle
       fontWeight = regular_font_weight,
-      fontSize='2vmin'),
+      fontSize='14px'),
     align='left'
   ),
   caption = list(
@@ -153,7 +238,7 @@ cc_theme_test <- hc_theme(
       color = black,
       fontFamily = main_font, # font_caption
       fontWeight = regular_font_weight,
-      fontSize = "1.25vmin",
+      fontSize = "10px",
       textAlign = "left"),
     useHTML = TRUE,
     floating = FALSE
@@ -165,7 +250,7 @@ cc_theme_test <- hc_theme(
         color=black,
         fontFamily = main_font, # font_x_label
         fontWeight = semi_bold_font_weight,
-        fontSize="1.5vmin")),
+        fontSize="10px")),
     lineColor=gainsboro
   ),
   
@@ -175,7 +260,7 @@ cc_theme_test <- hc_theme(
         color=black,
         fontFamily = main_font, # font_axis_label
         fontWeight = regular_font_weight,
-        fontSize="1.5vmin")),
+        fontSize="10px")),
     gridLineWidth=0, # removes vertical grid lines
     visible=TRUE, # makes axis line visible
     lineWidth=1,
@@ -189,7 +274,7 @@ cc_theme_test <- hc_theme(
       fontFamily = main_font, # font_axis_label
       fontWeight = regular_font_weight,
       color = black,
-      fontSize = '1.5vmin'
+      fontSize = '12px'
     ),
     
     itemHoverStyle = list(
@@ -203,8 +288,8 @@ cc_theme_test <- hc_theme(
 
 
 #### Standard notes ####
-sourcenote<-paste0("Catalyst California's calculations based on City of San Diego's Police Stop Data (2022), catalystcalifornia.org, 2023.")
-racenote<-paste0("Race/ethnicity: AIAN=American Indian or Alaska Native, NHPI=Native Hawaiian or Pacific Islander, SSWANA=South Asian, Southwest <br>Asian, or North African.")
+sourcenote <- "Catalyst California's calculations based on City of San Diego's Police Stop Data (2022), catalystcalifornia.org, 2023."
+racenote <- "Race/ethnicity: AIAN=American Indian or Alaska Native, NHPI=Native Hawaiian or Pacific Islander, SSWANA=South Asian, Southwest Asian, or North African."
 
 #### Bubblepop Chart - Combined Bar and Bubble Charts ####
 
@@ -223,13 +308,15 @@ fx_bubblepopchart <- function(
   yaxis_label_JS <- paste0("function() {
         	return this.value +", yaxis_label, "}")
   
-  # add line breaks to tooltip_text
-  # drop_bold_tags <- gsub("<b>", "",
-  #                        gsub("</b>", '', tooltip_text, fixed=TRUE))
-  # tooltip_text_wrapped <- sapply(strwrap(drop_bold_tags, 110, simplify=FALSE), paste, collapse="<br>" )
-  # add_bold_start <- gsub("{", "<b>{", tooltip_text_wrapped, fixed=TRUE)
-  # add_bold_end <- gsub("}", "}</b>", add_bold_start, fixed=TRUE)
-  # tooltip_text_edited <- add_bold_end
+  formatted_caption <- sapply(strwrap(caption, 150, simplify=FALSE), paste, collapse="<br>" )
+  
+  # format tooltip
+  drop_bold_tags <- gsub("<b>", "",
+                         gsub("</b>", '', tooltip_text, fixed=TRUE))
+  tooltip_text_wrapped <- sapply(strwrap(drop_bold_tags, 110, simplify=FALSE), paste, collapse="<br>" )
+  add_bold_start <- gsub("{", "<b>{", tooltip_text_wrapped, fixed=TRUE)
+  add_bold_end <- gsub("}", "}</b>", add_bold_start, fixed=TRUE)
+  formatted_tooltip <- add_bold_end
   
   df <-  df %>%
     arrange(desc(y))
@@ -246,7 +333,7 @@ fx_bubblepopchart <- function(
     
     hc_add_series(df, "bubble", invert=TRUE,
                   hcaes(x=!!rlang::ensym(x), y=!!rlang::ensym(y), size=!!rlang::ensym(z)), 
-                  maxSize="15%", tooltip =  list(pointFormat = tooltip_text), showInLegend=FALSE,
+                  maxSize="15%", tooltip =  list(pointFormat = formatted_tooltip), showInLegend=FALSE,
                   clip=FALSE) %>%
     
     hc_xAxis(title = list(text = ""),
@@ -297,8 +384,9 @@ fx_bubblepopchart <- function(
     hc_subtitle(text = paste0(subtitle)) %>%
     
     hc_caption(
-      text = paste0(caption),
-      margin=30
+      text = formatted_caption,
+      margin=30,
+      useHTML=TRUE
     ) %>%
     
     hc_add_theme(cc_theme)%>%
