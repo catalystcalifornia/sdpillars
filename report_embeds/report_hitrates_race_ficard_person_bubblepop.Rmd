@@ -22,6 +22,9 @@ metadata_race_labels <-  dbGetQuery(pillars_conn, "SELECT * FROM metadata_race_l
 ##add methodnote
 methodnote <- "Analysis for all officer-initiated stops that resulted in a search and field interview card completed."
 
+## create caption
+caption_text <- paste("<br><br>", racenote, sourcenote, methodnote)
+
 ## Load in RJS Pillars data: Bubble Pop test ##
 df <- dbGetQuery(pillars_conn, "SELECT * FROM data.report_hitrates_race_ficard_person")  %>% 
   filter(race!="total" & race != "nhpi" & race!= "aian" & !is.na(stop_count))  %>% 
@@ -36,7 +39,7 @@ chart <- fx_bubblepopchart(
   top_finding=paste0("Most searches SDPD conducts during field interview cards yield no contraband and disproportionately target people of color."), # this is the top finding from the chart that gets used like a title
   subtitle= paste0("Percent of searches with no contraband/evidence found during field interview cards by race"), # this is the more standard chart title that gets used as a subtitle
   tooltip_text="For every 100 people SDPD chose to search during field interview cards of individuals perceived as <b>{point.race_label_short:.1f}</b>, SDPD found no contraband/evidence in <b>{point.no_contraband_prc_rate:.1f}</b> of people searched, a total of <b>{point.stop_count:,0f}</b> biased searches.", # customize your tooltip as a statement, calling out rate and count
-  caption = paste(sourcenote, racenote, methodnote), # if necessary add a method note between the racenote and sourcenote with a line break, use racenote if graph includes data by race, and always use sourcenote. Each of these are standard objects across all charts
+  caption = caption_text, # if necessary add a method note between the racenote and sourcenote with a line break, use racenote if graph includes data by race, and always use sourcenote. Each of these are standard objects across all charts
   yaxis_label = "''", #format for your y axis labels
   export_data_label=list(pointFormat='{point.stop_rate_per1k:.1f} per 1K')
 )

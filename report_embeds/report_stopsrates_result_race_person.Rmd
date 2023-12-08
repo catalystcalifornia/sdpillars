@@ -23,7 +23,7 @@ df <- dbGetQuery(pillars_conn, "SELECT * FROM report_stopsrates_result_race_pers
 methodnote <- "Analysis for all officer-initiated stops."
 
 ## create caption
-caption_text <- paste("<br><br>", sourcenote, racenote, methodnote)
+caption_text <- paste("<br><br>", racenote, sourcenote, methodnote)
 
 # For now, lets just filter and visualize result == Warning
 

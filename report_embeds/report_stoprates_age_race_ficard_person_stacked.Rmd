@@ -53,7 +53,7 @@ df <- within(df, race_label_short <- factor(race_label_short, levels=c("White","
 methodnote <- "Analysis for all officer-initiated stops that only resulted in a field interview card completed."
   
 # create caption
-caption_text <- paste("<br><br>", sourcenote, racenote, methodnote)
+caption_text <- paste("<br><br>", racenote, sourcenote, methodnote)
 
 chart<-hchart(df, 
          "bar", hcaes(x = age_bracket, y = rate, group =race_label_short),
