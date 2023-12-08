@@ -44,7 +44,7 @@ df %>%
    hc_subtitle(text = "Percent of people searched by whether contraband or evidence was found",
                      align="left") %>%
   hc_caption(
-    text = paste0("<br><br>", sourcenote, "<br>"," Analysis for all officer-initiated stops."))%>%
+    text = paste0("<br><br>", sourcenote, " Analysis for all officer-initiated stops."))%>%
   hc_plotOptions(
     innersize="50%", 
     startAngle=90, 
