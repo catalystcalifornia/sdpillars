@@ -109,7 +109,7 @@ cc_theme <- hc_theme(
       fontFamily = main_font, # font_axis_label
       fontWeight = regular_font_weight,
       color = black,
-      fontSize = '10px'
+      fontSize = '12px'
     ),
     
     itemHoverStyle = list(
@@ -189,7 +189,7 @@ cc_theme_test <- hc_theme(
       fontFamily = main_font, # font_axis_label
       fontWeight = regular_font_weight,
       color = black,
-      fontSize = '10px'
+      fontSize = '12px'
     ),
     
     itemHoverStyle = list(
