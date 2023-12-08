@@ -46,6 +46,12 @@ group_colors <- c(meteorite, lavender, orange, peridot, ccblue, gainsboro, "#211
 
 df <- within(df, race_label_short <- factor(race_label_short, levels=c("White","Multiracial", "SWANA/SA", "NHPI","AIAN", "Asian",  "Latinx","Black")))
 
+# add methodnote
+methodnote <- "Analysis for all officer-initiated stops made by officers assigned to gang enforcement."
+
+# create caption
+caption_text <- paste("<br><br>", sourcenote, racenote, methodnote)
+
 # graph
 
 chart<-hchart(df, 
@@ -61,7 +67,7 @@ chart<-hchart(df,
 
     
     hc_caption(
-      text = paste0(racenote,"<br><br>", sourcenote, "<br>","Analysis for all officer-initiated stops made by officers assigned to gang enforcement.","<br>")) %>%
+      text = caption_text) %>%
     
     hc_yAxis(max=100,
              title = list(text = paste0(""))) %>%
