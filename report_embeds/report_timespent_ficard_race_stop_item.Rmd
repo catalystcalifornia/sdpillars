@@ -41,6 +41,12 @@ df<-df %>%
 # custom item coloring
 group_colors_item <- c("#211447","#D6D6D6", meteorite, "#E2D9FF",peridot, "#E7FF39", "#F0FF85", "#BDAFE9")
 
+# add methodnote
+methodnote <- "Analysis for all officer-initiated stops resulting in a field interview card only. Officers spent a total of 118,970.3 hours on officer-initiated stops that resulted in a field interview card only in 2022."
+
+# create caption
+caption_text <- paste("<br><br>", sourcenote, methodnote)
+
 # graph
 chart <- fx_itemchart(
     df=df, 
@@ -52,7 +58,7 @@ chart <- fx_itemchart(
     subtitle= "Percent of hours officers spent conducting stops that resulted in a field interview card by race",
     tooltip_text="Out of 100 hours spent on <b>officer-initiated stops resulting in a field interview card</b>, SDPD spent <b>{point.duration_rate:.1f}</b> hours conducting field interviews on people perceived as <b>{point.race_label_short}</b>",
     legend_text="Single dot represents 1 hour out of 100 hours",
-    caption = paste0(sourcenote," Analysis for all officer-initiated stops resulting in a field interview card only. Officers spent a total of 118,970.3 hours on officer-initiated stops that resulted in a field interview card only in 2022."))    
+    caption = caption_text)    
 
 dbDisconnect(pillars_conn)
 ```
