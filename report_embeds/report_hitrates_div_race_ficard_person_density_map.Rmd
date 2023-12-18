@@ -148,7 +148,7 @@ map <-  leaflet(width = "100%", height = "600px") %>%
 
 ```
 
-## SDPD conducted the highest number of unnecessary searches during field interview card stops in the Southeastern Division.
+### SDPD conducted the highest number of unnecessary searches during field interview card stops in the Southeastern Division.
 ```{r, echo=FALSE}
 map
 ```
