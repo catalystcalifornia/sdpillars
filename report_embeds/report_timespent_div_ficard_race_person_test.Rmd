@@ -28,17 +28,40 @@ df <- dbGetQuery(pillars_conn, "SELECT * FROM report_timespent_div_ficard_race_p
 # Combine nh_twoormor and nh_multi_racial into one multiracial category with a combined duration_total and duration_rate.
 # Remove the original, separate nh_twoormor and nh_multi_racial after combining
 
-test<-df %>%
-  filter(race %in% c("nh_twoormor", "nh_multi_race")) %>%
-  group_by(div)%>%
-  summarize(race = "nh_combined", across(c(duration_count), sum)) %>%
-  mutate(level="Field interview card completed",
-         duration_total=118970.3,
-         duration_rate=duration_count/duration_total*100,
-         race_label_short="Multiracial"
-         )%>%
-  bind_rows(df, .)%>%
-  filter(!grepl("nh_twoormor|nh_multi_race", race))
+# test<-df %>%
+#   filter(race %in% c("nh_twoormor", "nh_multi_race")) %>%
+#   group_by(div)%>%
+#   summarize(race = "nh_combined", across(c(duration_count), sum)) %>%
+#   mutate(level="Field interview card completed",
+#          duration_total=118970.3,
+#          duration_rate=duration_count/duration_total*100,
+#          race_label_short="Multiracial"
+#          )%>%
+#   bind_rows(df, .)%>%
+#   filter(!grepl("nh_twoormor|nh_multi_race", race))
+
+# Option 1: Visualize duration rate/population as grouped bar graph just for all divisions only Latinx/NH Black -------
+
+# filter out Southeast San Diego division
+
+df1<-df%>%
+  filter(race=='latinx' | race == 'nh_black')
+
+# pivot table to longer for graphing
+
+test<-df1%>%
+  select(div_name, div, race, stop_result_simple, duration_rate, pop_rate)%>%
+  mutate(pop_rate=pop_rate*100)%>%
+  filter(stop_result_simple=="Field interview card completed")%>%
+    pivot_longer(5:6, names_to = "measure", values_to = "value")%>%
+  filter(!is.na(value)) # no pop estimates for nh_sswana & nh_multi_race
+
+# graph
+
+test %>% 
+  filter(race=='nh_black')%>%
+  hchart('column', hcaes(x = div_name, y = value, group = measure)) %>%
+  hc_colors(c("#211447", peridot))
 
 
 # custom item coloring
