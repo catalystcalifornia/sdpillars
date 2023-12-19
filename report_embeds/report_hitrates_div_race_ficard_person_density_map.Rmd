@@ -123,14 +123,17 @@ peridot <- c('#F25922') # contraband
 
 map <-  leaflet(width = "100%", height = "600px") %>%
   
+    ## add no contraband stops
+  
+  addCircleMarkers(data = no_contraband_dots, group = "No Contraband Found", label = NULL, weight = 3,  opacity = 0,
+                   fillOpacity = 1, radius = 2, color="white",  fillColor= meteorite, stroke = TRUE) %>% 
   
   ## add contraband stops
   
-  addCircleMarkers(data = contraband_dots, group = "Yes Contraband Found", label = NULL, weight = 3, fillOpacity = 1, radius = 2, color="white",  fillColor=  peridot,  stroke = TRUE) %>% 
+  addCircleMarkers(data = contraband_dots, group = "Yes Contraband Found", label = NULL, weight = 3, opacity = 0, 
+                   fillOpacity = 1, radius = 2, color="white",  fillColor=  peridot,  stroke = TRUE) %>% 
   
-  ## add no contraband stops
-  
-  addCircleMarkers(data = no_contraband_dots, group = "No Contraband Found", label = NULL, weight = 3, fillOpacity = 1, radius = 2, color="white",  fillColor= meteorite, stroke = TRUE) %>% 
+
 
   
   # add Division 
@@ -141,6 +144,14 @@ map <-  leaflet(width = "100%", height = "600px") %>%
   addLayersControl(overlayGroups = c("No Contraband Found", "Yes Contraband Found"),
                    options = layersControlOptions(collapsed = FALSE)) %>%
   
+  
+  ## add Legend
+  
+  
+  addLegend("bottomleft", title= paste0("1 dot = 5 field interview card stops and a search"), colors = colors_function(colors = c(meteorite, peridot), sizes = "10", shapes = "circle", borders = NULL),
+            labels= c("No Contraband Found",  "Yes Contraband Found"),
+            opacity = 0.7, labFormat = labelFormat(digits = 0)) %>% 
+  
   addProviderTiles("CartoDB.Positron") %>%
   setView(-117.13395, 32.79923, zoom = 10)
   
@@ -149,6 +160,9 @@ map <-  leaflet(width = "100%", height = "600px") %>%
 ```
 
 ### SDPD conducted the highest number of unnecessary searches during field interview card stops in the Southeastern Division.
+
+## Dot density map of hit/no-hit rate across SDPD divisions
+
 ```{r, echo=FALSE}
 map
 ```
