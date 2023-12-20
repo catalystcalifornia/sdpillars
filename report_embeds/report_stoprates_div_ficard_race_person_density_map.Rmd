@@ -58,6 +58,8 @@ div_wide_sf <- div %>% left_join(df_wide)
 div_long_sf <- div %>% left_join(df_long)
 ```
 
+
+
 ```{r, include=FALSE}
 ### Calculate dot density count ###
 ficard_dots = as_dot_density(
@@ -76,6 +78,15 @@ sswana_dots <- ficard_dots %>% filter(race == "sswana")
 nh_asian_dots <- ficard_dots %>% filter(race == "nh_asian")
 nh_twoormor_dots <- ficard_dots %>% filter(race == "nh_twoormor")
 nh_nhpi_dots <- ficard_dots %>% filter(race == "nh_nhpi")
+
+## function to change the legend shape and color
+colors_function <- function(colors, sizes, borders, shapes) {
+  shapes <- gsub("circle", "100%", shapes)
+  shapes <- gsub("square", "100%", shapes)
+  paste0(colors, "; width:", sizes, "px; height:", sizes, "px; border:1px solid ", borders, "; border-radius:", shapes)
+}
+
+
 ```
 
 
@@ -140,41 +151,42 @@ halaya_ube <- c('#601D42')
 
 map <-  leaflet(width = "100%", height = "600px") %>%
   
+  ### add NH AIAN dots 
+  
+  addCircleMarkers(data = nh_aian_dots,  group = "AIAN", label = NULL, weight = 2, opacity = 0.2, fillOpacity = 1, radius = 2, color="white",  fillColor= dark_tangerine, stroke = TRUE) %>%
+  
+  ### add nh_nhpi dots
+  
+  addCircleMarkers(data = nh_nhpi_dots, group = "NHPI", label = NULL, weight = 2, opacity = 0.2, fillOpacity = 1, radius = 2, color="white",  fillColor= halaya_ube, stroke = TRUE) %>% 
+  
+    
+  ### add sswana dots
+  
+  addCircleMarkers(data = sswana_dots, group = "SWANA/SA", label = NULL, weight = 2, opacity = 0.2, fillOpacity = 1, radius = 2, color="white",  fillColor= american_yellow, stroke = TRUE) %>% 
+  
+  
+  ### add nh asian dots
+  
+  addCircleMarkers(data = nh_asian_dots, group = "Asian", label = NULL, weight = 2, opacity = 0.2, fillOpacity = 1, radius = 2, color="white",  fillColor=  halloween_orange, stroke = TRUE) %>% 
   
   ## add NH Black Stops
   
-  addCircleMarkers(data = nh_black_dots, group = "Black", label = NULL, weight = 2, fillOpacity = 1, radius = 2, color="white",  fillColor=blue, stroke = TRUE) %>% 
-  
-  ## add NH White Stops
-  
-  addCircleMarkers(data = nh_white_dots, group = "White", label = NULL, weight = 2, fillOpacity = 1, radius = 2, color="white",  fillColor=  bitter_lemon,  stroke = TRUE) %>% 
-  
-  
-  ### add NH AIAN dots 
-  
-  addCircleMarkers(data = nh_aian_dots,  group = "AIAN", label = NULL, weight = 2, fillOpacity = 1, radius = 2, color="white",  fillColor= dark_tangerine, stroke = TRUE) %>% 
+  addCircleMarkers(data = nh_black_dots, group = "Black", label = NULL, weight = 2, opacity = 0.2, fillOpacity = 1, radius = 2, color="white",  fillColor=blue, stroke = TRUE) %>% 
   
   
   ### add latinx dots
   
-  addCircleMarkers(data = latinx_dots, group = "Latinx", label = NULL, weight = 2, fillOpacity = 1, radius = 2, color="white",  fillColor= lime_green,  stroke = TRUE) %>% 
+  addCircleMarkers(data = latinx_dots, group = "Latinx", label = NULL, weight = 2, opacity = 0.2, fillOpacity = 1, radius = 2, color="white",  fillColor= lime_green,  stroke = TRUE) %>% 
   
-  ### add sswana dots
-  
-  addCircleMarkers(data = sswana_dots, group = "SWANA/SA", label = NULL, weight = 2, fillOpacity = 1, radius = 2, color="white",  fillColor= american_yellow, stroke = TRUE) %>% 
-  
-  ### add nh asian dots
-  
-  addCircleMarkers(data = nh_asian_dots, group = "Asian", label = NULL, weight = 2, fillOpacity = 1, radius = 2, color="white",  fillColor=  halloween_orange, stroke = TRUE) %>% 
   
   ### add nh two or more dots
   
-  addCircleMarkers(data = nh_twoormor_dots, group = "Two or More Races", label = NULL, weight = 2, fillOpacity = 1, radius = 2, color="white",  fillColor= persian_indigo, stroke = TRUE) %>% 
+  addCircleMarkers(data = nh_twoormor_dots, group = "Two or More Races", label = NULL, weight = 2, opacity = 0.2, fillOpacity = 1, radius = 2, color="white",  fillColor= persian_indigo, stroke = TRUE) %>% 
+
   
-  ### add nh_nhpi dots
+  ## add NH White Stops
   
-  addCircleMarkers(data = nh_nhpi_dots, group = "NHPI", label = NULL, weight = 2, fillOpacity = 1, radius = 2, color="white",  fillColor= halaya_ube, stroke = TRUE) %>% 
-  
+  addCircleMarkers(data = nh_white_dots, group = "White", label = NULL, weight = 2, opacity = 0.2, fillOpacity = 1, radius = 2, color="white",  fillColor=  bitter_lemon,  stroke = TRUE) %>% 
   # add Division 
   addPolygons(data = div_wide_sf, label=~htmlEscape(paste0(div_name, " Division ")),
               color = "black", fillColor = "white", opacity = 1,  popup = ~paste0(rate_popup), 
@@ -182,20 +194,34 @@ map <-  leaflet(width = "100%", height = "600px") %>%
   
   addLayersControl(overlayGroups = c("AIAN",  "NHPI", "SWANA/SA", "Asian",  "Black", "Latinx", "Two or More Races", "White"),
                    options = layersControlOptions(collapsed = FALSE)) %>%
+   
   
+  ## add Legend
+  
+  
+  addLegend("bottomleft", title= paste0("1 dot = 5 field interview card stops"), colors = colors_function(colors = c(dark_tangerine, halaya_ube, american_yellow, halloween_orange, blue,lime_green, persian_indigo, bitter_lemon), sizes = "10", shapes = "circle", borders = NULL),
+            labels= c("AIAN",  "NHPI", "SWANA/SA", "Asian",  "Black", "Latinx", "Two or More Races", "White"),
+            opacity = 0.7, labFormat = labelFormat(digits = 0)) %>% 
+
   addProviderTiles("CartoDB.Positron") %>%
   setView(-117.13395, 32.79923, zoom = 10) %>% #base and view 
   
   hideGroup(c("White"))   # hide white group
 
+  
+  invisible(dbDisconnect(pillars_conn))
+
 ```
 
-### SDPD disproportionately conducts field interviews for people of color in the Southeastern Division.
+
+
+### SDPD disproportionately conducts field interviews for people of color in the Southeastern and Central Division.
+
+## Dot density map of field interview stops by race across divisions
 
 ```{r, echo=FALSE}
 map
 ```
-<div align="left" style="line-height: 1em;"><span style="font-size: 10px;">Stops are randomly placed within each division and do not indicate the exact location of the search.</span> <br> 
-<span style=' font-size: 10px;'>Catalyst California's calculations based on City of San Diego's Police Stop Data (2022); <u>[Catalyst California](https://www.catalystcalifornia.org)</u>, 2023. Analysis for all officer-initiated stops that resulted in a field interview card completed.</span> <br> 
-<span style=' font-size: 10px;'>Race/ethnicity: AIAN=American Indian or Alaska Native, NHPI=Native Hawaiian or Pacific Islander, SWANA/SA=South Asian, Southwest <br>Asian, or North African.</span> </div>
+<div align="left" style="line-height: 1em;"><span style=' font-size: 10px;'>Race/ethnicity: AIAN=American Indian or Alaska Native, NHPI=Native Hawaiian or Pacific Islander, SWANA/SA=Southwest Asian or North African/Middle Eastern or North African or South Asian.</span> <span style="font-size: 10px;">Stops are randomly placed within each division and do not indicate the exact location of the stop.</span> <span style=' font-size: 10px;'>Catalyst California's calculations based on City of San Diego's Police Stop Data (2022); <u>[Catalyst California](https://www.catalystcalifornia.org)</u>, 2023. Analysis for all officer-initiated stops that resulted in a field interview card completed.</span> 
+
   
