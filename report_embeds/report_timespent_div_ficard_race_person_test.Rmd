@@ -10,19 +10,15 @@ output:
 ```{r, include=FALSE}
 
 library(RPostgreSQL)
+library(tidyverse)
 source("W:\\RDA Team\\R\\credentials_source.R")
 source("chart_functions.R")
 
 pillars_conn <- connect_to_db("rjs_pillars")
 
-meta<-dbGetQuery(pillars_conn, "SELECT * FROM metadata_race_labels")%>%
-  mutate(race_label_short=ifelse(race_base %in% "nh_twoormor", "Two or more", race_label_short))
-
 df <- dbGetQuery(pillars_conn, "SELECT * FROM report_timespent_div_ficard_race_person") 
 
-# Option 1: Visualize duration rate/population as grouped bar graph just for all divisions only Latinx/NH Black ------------
-
-# filter out Latinx/Black
+# filter out Latinx/Black only
 
 df1<-df%>%
   filter(race=='latinx' | race == 'nh_black')
@@ -36,22 +32,18 @@ df1<-df1%>%
     pivot_longer(5:6, names_to = "measure", values_to = "value")%>%
   filter(!is.na(value)) # no pop estimates for nh_sswana & nh_multi_race
 
-```
+# join wide version table back to it because we need those separate columns for the tooltip later
 
-```{r}
+df1<-df1%>%
+  left_join(df)%>%
+  mutate(pop_rate=pop_rate*100)%>%
+     mutate(div_name=str_to_title(div_name))
 
-#Option 1 Graph: Nh_Black only
-
-graph_b<-df1 %>% 
-  filter(race=='nh_black')%>%
-  hchart('column', hcaes(x = div_name, y = value, group = measure)) %>%
-  hc_colors(c("#211447", peridot))
-
-graph_b
 
 ```
 
-```{r}
+
+```{r, include=FALSE}
 
 # Option 1 Graph: Latinx only
 
@@ -64,52 +56,29 @@ graph_l
 
 ```
 
-```{r}
-
-# Option 2: Focusing on a division -------------------
 
 
-df2<-df%>%
-  filter(div=='4')
-
-# pivot table to longer for graphing
-
-df2<-df2%>%
-  select(div_name, div, race, stop_result_simple, duration_rate, pop_rate)%>%
-  mutate(pop_rate=pop_rate*100)%>%
-  filter(stop_result_simple=="Field interview card completed")%>%
-    pivot_longer(5:6, names_to = "measure", values_to = "value")%>%
-  filter(!is.na(value)) # no pop estimates for nh_sswana & nh_multi_race
-
-# graph
-
-graph_d<-df2 %>% 
-  hchart('column', hcaes(x = race, y = value, group = measure)) %>%
-  hc_colors(c("#211447", peridot))
-
-graph_d
-
-```
-
-```{r}
+```{r, include=FALSE}
 ##   FINAL CHOICE: I think the graph from Option 1 -NH Black only --is the most compelling. We can see across all divisions that people perceived as Nh_Black are stopped for FI cards at higher percentages relative to their population
 
 
 # add methodnote
-methodnote <- "Analysis for all officer-initiated stops resulting in a field interview card only. Officers spent a total of 118,970.3 hours on officer-initiated stops that resulted in a field interview card only in 2022."
+methodnote <- "Analysis for all officer-initiated stops resulting in a field interview card only in each SDPD division. Officers spent a total of 118,970.3 hours on officer-initiated stops that resulted in a field interview card only in 2022."
 
 # create caption
 caption_text <- paste("<br><br>", sourcenote, methodnote)
 
 # add title and subtitle
-top_finding<-"SDPD disproportionately stops people perceived as Black for stops with Field Interview Cards"
-subtitle<-"Percent of stops resulting in a field interview card by race"
+top_finding<-"Across all SDPD divisions, SDPD disproportionately spends time on field interview cards for Black people relative to their population"
+subtitle<-"Percent of hours officers spent conducting stops that resulted in a field interivew card by division and race"
 
 # tooltip
 
-tooltip_text<- paste0("Out of 100 hours spent on <b>officer-initiated stops resulting in a field interview card</b> in <b>{point.div}</b>, SDPD spent <b>{point.duration_rate:.1f}</b> hours conducting field interviews on people perceived as <b>{point.race_label_short}</b>. <b>{point.race_label_short}</b>. make up <b>{point.race_label_short}</b>.")
+tooltip_text<- paste0("Out of 100 hours spent on <b>officer-initiated stops resulting in a field interview card</b> in the <b>{point.div_name} Division (Division {point.div})</b>, SDPD spent <b>{point.duration_rate:.1f}</b> hours conducting field interviews on people perceived as <b>Black</b>. <b>Black people</b> make up <b>{point.pop_rate:.1f}%</b> of the total population in the <b>{point.div_name} Division (Division {point.div})</b>")
 
-# Final Graph
+# Final Graph----------------
+
+# set ordering
 
 df1<-df1%>%
         mutate(measure=ifelse(measure %in% 'pop_rate','Percent of total population','Percent time spent'))
@@ -117,7 +86,8 @@ df1<-df1%>%
 df1$measure <- factor(df1$measure, levels = c("Percent time spent", "Percent of total population"))
 
 
-df1 %>% 
+
+chart<-df1 %>% 
   arrange(div, -value)%>%
   filter(race=='nh_black')%>%
   hchart('bar', hcaes(x = div_name, y = value, group = measure),
@@ -136,15 +106,18 @@ df1 %>%
                           labels=list(position="bottom",
                                       style=list(fontSize="12px")),
     categories = list(
-      "SOUTHEASTERN",
-      "MID-CITY",
-      "CENTRAL",
-      "EASTERN",
-      "NORTHEASTERN",
-      "WESTERN",
-      "NORTHWESTERN",
-      "NORTHERN",
-      "SOUTHERN"
+
+      "Southeastern",
+      "Mid-City",
+      "Central",
+      "Eastern",
+      "Northeastern",
+      "Western",
+      "Northwestern",
+      "Northern",
+      "Southern"
+      
+      
     ))%>%
    hc_yAxis(title = list(text = paste0(""),
                           labels = list(style=list(fontSize="12px"))))%>%
