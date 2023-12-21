@@ -83,7 +83,7 @@ df2<-df2%>%
 
 # graph
 
-graph_d<-test2 %>% 
+graph_d<-df2 %>% 
   hchart('column', hcaes(x = race, y = value, group = measure)) %>%
   hc_colors(c("#211447", peridot))
 
