@@ -30,9 +30,9 @@ df<-df%>%filter(reason_simple=="Traffic Violation")%>%arrange(-rate)
 
 tooltip_text <- "Across all people perceived as <b>{point.race_label_short:.1f}</b> who had a field interview card completed, officers used <b>{point.reason_simple:.1f}s</b> as the primary reason for the stop <b>{point.rate:.1f}%</b> of the time."
 
-title_text<-paste0("SDPD is more likely to use traffic violations to profile people of color for field interviews compared to White people.")
+title_text<-paste0("SDPD is more likely to use traffic violations to profile people of color for field interviews compared to White people")
     
-subtitle_text<-paste0("Percent of people who were field interviewed and originally stopped for traffic violations by race")
+subtitle_text<-paste0("Percent of people who are field interviewed and originally stopped for traffic violations by race")
 
 # add methodnote
 methodnote <- "Analysis for all officer-initiated stops that only resulted in a field interview card completed."
