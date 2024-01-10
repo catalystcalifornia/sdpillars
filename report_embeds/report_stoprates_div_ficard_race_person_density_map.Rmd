@@ -215,7 +215,7 @@ map <-  leaflet(width = "100%", height = "600px") %>%
 
 
 
-### SDPD disproportionately conducts field interviews for people of color in the Southeastern and Central Division.
+### SDPD disproportionately conducts field interviews for people of color in the Southeastern and Central Division
 
 ## Dot density map of field interview stops by race across divisions
 

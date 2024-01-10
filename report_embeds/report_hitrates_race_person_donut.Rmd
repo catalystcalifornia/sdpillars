@@ -35,13 +35,13 @@ df %>%
   hchart(
     "pie", hcaes(x = label, y = rate),
     name = "",
-    tooltip = list(headerFormat="", pointFormat = "<b>{point.rate:.1f}%</b> of people searched by SDPD had <b>{point.label}</b>, a total of <b>{point.count:,.0f}</b>  people needlessly searched."),
+    tooltip = list(headerFormat="", pointFormat = "<b>{point.rate:.1f}%</b> of people searched by SDPD had <b>{point.label}</b>, for a total of <b>{point.count:,.0f}</b>  people needlessly searched."),
      innerSize="65%",
      center = c(50, 50), 
     )%>% 
-  hc_title(text = "Most searches conducted by SDPD yield no evidence or contraband.",
+  hc_title(text = "Most searches SDPD conducts yield no evidence or contraband",
  align="left")%>%
-   hc_subtitle(text = "Percent of people searched by whether contraband or evidence was found",
+   hc_subtitle(text = "Percent of people searched by whether contraband or evidence is found",
                      align="left") %>%
   hc_caption(
     text = paste0("<br><br>", sourcenote, " Analysis for all officer-initiated stops."))%>%

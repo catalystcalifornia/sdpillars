@@ -31,19 +31,19 @@ df<-df%>%
   left_join(meta, by=c("race"="race_base"))%>%
   filter(race!='sswana' & race !="nhpi" & race != 'aian')%>%
 mutate(across(where(is.numeric), ~round(., 1)))%>%
-  mutate(tooltip=ifelse(race %in% "nh_sswana", "",  paste0("By comparison, <b>",race_label_short, " people</b> make up <b>",pop_rate,"%</b> of the population ages <b>",age_bracket,"</b> in San Diego.")))
+  mutate(tooltip=ifelse(race %in% "nh_sswana", "",  paste0("By comparison, <b>",race_label_short, " people</b> made up <b>",pop_rate,"%</b> of the population aged <b>",age_bracket,"</b> in San Diego.")))
                         
 
 # set tooltip
 
-text<-"Across all field interviews of people ages <b>{point.age_bracket:.1f}</b>, SDPD stopped people perceived as <b>{point.race_label_short:.1f} {point.rate:.1f}% of the time.</b> {point.tooltip}"
+text<-"Across all field interviews of people aged <b>{point.age_bracket:.1f}</b>, SDPD stopped people perceived as <b>{point.race_label_short:.1f} {point.rate:.1f}% of the time.</b> {point.tooltip}"
 
 tooltip_text <- sapply(strwrap(text, 110, simplify=FALSE), paste, collapse="<br>")
 
 
 ## Graph ##
 
-group_colors <- c(meteorite, orange, peridot, lavender, ccblue, "#5F3B63","#A8683C", "#D58424", "#FF9900")
+group_colors <- c(meteorite, papaya, peridot, lavender, ccblue, "#5F3B63","#A8683C", "#D58424", "#FF9900")
 
 # set order of stacking within bars
 
@@ -67,7 +67,7 @@ chart<-hchart(df,
   
     
     hc_title(
-      text = "SDPD disproportionately stops and conducts field interview cards of Black people of all ages and Latinx young adults.") %>%
+      text = "SDPD disproportionately stops and conducts field interview cards of Black people of all ages and Latinx young adults") %>%
     
     hc_subtitle(
       text = "Percent of stops resulting in a field interview card by age and race") %>%

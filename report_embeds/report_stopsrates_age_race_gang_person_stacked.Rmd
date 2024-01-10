@@ -33,13 +33,13 @@ mutate(across(where(is.numeric), ~round(., 1)))%>%
   mutate(tooltip=ifelse(race %in% "nh_sswana", "",  paste0("By comparison, <b>",race_label_short, " people</b> make up <b>",pop_rate,"%</b> of the population ages <b>",age_bracket,"</b> in San Diego.")))
 
 
-text <- "Across all people ages <b>{point.age_bracket:.1f}</b> stopped by officers assigned to gang enforcement, officers stopped people perceived as <b>{point.race_label_short:.1f}</b> <b>{point.rate:.1f}% of the time</b>. {point.tooltip}"
+text <- "Across all people aged <b>{point.age_bracket:.1f}</b> stopped by officers assigned to gang enforcement, officers stopped people perceived as <b>{point.race_label_short:.1f}</b> <b>{point.rate:.1f}% of the time</b>. {point.tooltip}"
 
 tooltip_text <- sapply(strwrap(text, 110, simplify=FALSE), paste, collapse="<br>")
 
 ## Set colors ##
 
-group_colors <- c(meteorite, lavender, orange, peridot, ccblue, gainsboro, "#211447",
+group_colors <- c(meteorite, lavender, papaya, peridot, ccblue, gainsboro, "#211447",
                          "#FF9E0D", "#A8683C")
 
 # set order of stacking within bars
@@ -63,7 +63,7 @@ chart<-hchart(df,
       text = "Officers assigned to gang enforcement disproportionately stop people they perceive as Black and Latinx across all age groups") %>%
     
     hc_subtitle(
-      text = "Percent of people stopped by officers assigned to gang enforcement by race and age") %>%
+      text = "Percent of people who are stopped by officers assigned to gang enforcement by race and age") %>%
 
     
     hc_caption(
