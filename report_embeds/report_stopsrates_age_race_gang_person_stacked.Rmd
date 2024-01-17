@@ -28,9 +28,9 @@ meta<-dbGetQuery(pillars_conn, "SELECT * FROM metadata_race_labels")
 df<-df%>%
   left_join(age)%>%
   left_join(meta, by=c("race"="race_base"))%>%
-  filter(race!='sswana' & race !="nhpi" & race != 'aian')%>%
+  filter(race!='nh_sswana' & race !="nhpi" & race != 'aian')%>%
 mutate(across(where(is.numeric), ~round(., 1)))%>%
-  mutate(tooltip=ifelse(race %in% "nh_sswana", "",  paste0("By comparison, <b>",race_label_short, " people</b> make up <b>",pop_rate,"%</b> of the population ages <b>",age_bracket,"</b> in San Diego.")))
+  mutate(tooltip=ifelse(race %in% "sswana", "",  paste0("By comparison, <b>",race_label_short, " people</b> make up <b>",pop_rate,"%</b> of the population ages <b>",age_bracket,"</b> in San Diego.")))
 
 
 text <- "Across all people aged <b>{point.age_bracket:.1f}</b> stopped by officers assigned to gang enforcement, officers stopped people perceived as <b>{point.race_label_short:.1f}</b> <b>{point.rate:.1f}% of the time</b>. {point.tooltip}"
