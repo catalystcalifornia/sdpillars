@@ -1,0 +1,115 @@
+---
+title: ""
+output:
+  html_document:
+    css: "W:\\RDA Team\\R\\cc_brandguide.css"
+---
+<!-- link to Google Font -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+```{r, include=FALSE}
+
+library(RPostgreSQL)
+source("W:\\RDA Team\\R\\credentials_source.R")
+source("chart_functions.R")
+
+#### Load libraries ####
+library(extrafont)
+library(usethis)
+library(dplyr)
+library(highcharter)
+library(tidyverse)
+library(htmltools) 
+library(htmlwidgets)
+# remotes::install_github("jthomasmock/gtExtras")
+library(gtExtras)
+library(gt)
+library(readxl)
+
+pillars_conn <- connect_to_db("rjs_pillars")
+
+### Step 1 -- Read in calgang data ####
+
+df<- read_xlsx("W:\\Project\\RJS\\Pillars\\Data\\calgang-ag-dataset-2022.xlsx", sheet = "FULL")
+
+names(df) <- gsub("\\s+", "", names(df)) #Remove spaces from column names
+
+
+#### Step 2-- Clean and prep final table for visualizing####
+
+# Table: SDPD entries by race
+
+df_race<-df%>%
+  filter(Category=="Race"|Category=="All")%>%
+  filter(Agency == "San Diego Police Department")%>%
+  mutate(Percent=TotalRecords/1554*100)%>%
+  mutate("Count (%)"=paste0(TotalRecords," (",round(Percent,0),"%)")," "=Percent)%>%
+  arrange(-TotalRecords)
+
+
+#### Step 3:  Create table ####
+
+
+# select just columns of interest, specify header and footer
+table_race<-df_race%>%
+  rename(Race = CategoryLevel)%>%
+    mutate(Race=ifelse(Race %in% "Hispanic", "Latinx", 
+                       ifelse(Race %in% "Multiple", "Multiracial",
+                              Race)))%>%
+    filter(!grepl('Total',Race))%>%
+  select(Race, `Count (%)`," ")%>%
+  gt()%>%
+  # question
+  tab_header(title=glue::glue("SDPD enters more people perceived as Latinx and Black into the CalGang Database compared to all other racial groups"))%>%
+  # any data notes in footer
+  tab_footnote(footnote=html("Race is defined by the stopping officer and reflects their perception of a person's race. Data downloaded from https://oag.ca.gov/calgang/reports (2022)"),placement="left")
+
+
+#### Step 4: Add preset styling ####  
+# no modifications needed here unless you need to modify column widths
+
+  table_race<-table_race%>%
+  gt_plt_bar_pct(column=" ", scaled=FALSE, fill=meteorite,background="transparent")%>%
+  # if needed modify column widths here
+  cols_width(1~px(210),2~px(100),
+             3~px(125))%>%
+  opt_align_table_header("left")%>%
+  opt_table_font(font=c(google_font(name="Inter"),locations=NULL,default_fonts()))%>%
+  tab_options(table.background.color=alabaster,
+    column_labels.background.color = "transparent",
+    table.font.size = px(12),
+    column_labels.font.size = px(12),
+    heading.align = "left",
+    table.font.names = "Inter",
+    heading.title.font.size = px(20),
+    heading.subtitle.font.size = px(13),
+    heading.border.bottom.color = "transparent",
+    column_labels.border.bottom.width = px(3),
+    column_labels.border.bottom.color = gainsboro,
+    table.border.top.color = "transparent",
+    table.border.bottom.color = "transparent",
+    table.border.bottom.width = px(3),
+    data_row.padding = px(3),
+    footnotes.font.size = px(10),
+    footnotes.border.bottom.color = "transparent",
+    table.align='center')%>%
+  tab_style(style=
+            cell_borders(sides=c("top","bottom"),color=gainsboro,style="solid",weight=px(1)),locations=cells_body())%>%
+   tab_style(style=
+            cell_text(font=c(google_font(name="Inter"),default_fonts()),weight=900, color="black"),locations=cells_title())
+
+
+dbDisconnect(pillars_conn)
+```
+
+```{r, echo=FALSE}
+table_race
+```
+
+<script>
+  widg = document.getElementsByClassName('html-widget'); //find widgets
+  for (let i = 0; i < widg.length; i++) { //loop through
+    document.getElementsByClassName('highchart')[i].style.width = '100%'; //adjust width
+    document.getElementsByClassName('highchart')[i].style.height = '100%'; //adjust height
+  }
+</script>
