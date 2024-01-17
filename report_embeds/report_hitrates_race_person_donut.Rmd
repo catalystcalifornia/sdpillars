@@ -35,7 +35,7 @@ df %>%
   hchart(
     "pie", hcaes(x = label, y = rate),
     name = "",
-    tooltip = list(headerFormat="", pointFormat = "<b>{point.rate:.1f}%</b> of people searched by SDPD had <b>{point.label}</b>, for a total of <b>{point.count:,.0f}</b>  people needlessly searched."),
+    tooltip = list(headerFormat="", pointFormat = "<b>{point.rate:.1f}%</b> of people SDPD searched had <b>{point.label}</b>, for a total of <b>{point.count:,.0f}</b>  people needlessly searched."),
      innerSize="65%",
      center = c(50, 50), 
     )%>% 
