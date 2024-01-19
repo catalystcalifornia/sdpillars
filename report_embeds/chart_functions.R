@@ -34,7 +34,7 @@ regular_font_weight <- 400
 black_font_weight <- 800
 semi_bold_font_weight <- 600
 
-# highchart theme 
+##### highchart theme #####
 cc_theme <- hc_theme(
   colors = c(meteorite, lavender, papaya, peridot
   ),
@@ -121,6 +121,8 @@ cc_theme <- hc_theme(
   )
 )
 
+##### donut hc theme #####
+
 cc_theme_donut <- hc_theme(
   colors = c(meteorite, papaya, peridot, lavender),
   chart = list(
@@ -206,92 +208,12 @@ cc_theme_donut <- hc_theme(
   )
 )
 
-cc_theme_test <- hc_theme(
-  colors = c(meteorite, lavender, papaya, peridot
-  ),
-  chart = list(
-    backgroundColor = alabaster,
-    style = list(
-      fontFamily = main_font, # font_subtitle
-      color=alabaster
-    ) 
-  ),
-  title = list(widthAdjust = -50,
-               style = list(
-                 color = black,
-                 fontFamily = main_font, # font_title
-                 fontWeight = black_font_weight,
-                 textAlign="left",
-                 fontSize='21px'),
-               align = "left"
-  ),
-  subtitle = list(
-    style = list(
-      color = black, 
-      fontFamily = main_font, # font_subtitle
-      fontWeight = regular_font_weight,
-      fontSize='14px'),
-    align='left'
-  ),
-  caption = list(
-    style = list(
-      color = black,
-      fontFamily = main_font, # font_caption
-      fontWeight = regular_font_weight,
-      fontSize = "10px",
-      textAlign = "left"),
-    useHTML = TRUE,
-    floating = FALSE
-  ),
-  
-  xAxis=list(
-    labels=list(
-      style=list(
-        color=black,
-        fontFamily = main_font, # font_x_label
-        fontWeight = semi_bold_font_weight,
-        fontSize="10px")),
-    lineColor=gainsboro
-  ),
-  
-  yAxis=list(
-    labels=list(
-      style=list(
-        color=black,
-        fontFamily = main_font, # font_axis_label
-        fontWeight = regular_font_weight,
-        fontSize="10px")),
-    gridLineWidth=0, # removes vertical grid lines
-    visible=TRUE, # makes axis line visible
-    lineWidth=1,
-    lineColor=gainsboro,
-    tickAmount=6,
-    tickWidth=1
-  ),
-  
-  legend = list(
-    itemStyle = list(
-      fontFamily = main_font, # font_axis_label
-      fontWeight = regular_font_weight,
-      color = black,
-      fontSize = '12px'
-    ),
-    
-    itemHoverStyle = list(
-      fontFamily = main_font, # font_table_text
-      fontWeight = regular_font_weight,
-      color = black
-    ),
-    plotLines=list(color=gainsboro)
-  )
-)
 
-
-#### Standard notes ####
+##### Standard notes #####
 sourcenote <- "Catalyst California's calculations based on City of San Diego's Police Stop Data (2022), catalystcalifornia.org, 2023."
 racenote <- "Race/ethnicity: AIAN=American Indian or Alaska Native, NHPI=Native Hawaiian or Pacific Islander, SWANA/SA=Southwest Asian (Middle Eastern) or North African, or South Asian."
 
-#### Bubblepop Chart - Combined Bar and Bubble Charts ####
+##### Bubblepop Chart - Combined Bar and Bubble Charts #####
 
 fx_bubblepopchart <- function(
     df, # name of dataframe
@@ -404,7 +326,7 @@ fx_bubblepopchart <- function(
 
 
 
-#### Stacked Bar Chart ####
+##### Stacked Bar Chart #####
 fx_stackedbarchart <- function(
     df,
     x, # independent variable
@@ -456,7 +378,7 @@ fx_stackedbarchart <- function(
 }
 
 
-#### Item Chart ####
+##### Item Chart #####
 fx_itemchart <- function(
     df, # name of dataframe
     x, # category - will appear on y-axis
@@ -506,5 +428,3 @@ fx_itemchart <- function(
       marginRight=50)
 }
   
-
-
