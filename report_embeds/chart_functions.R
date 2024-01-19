@@ -230,7 +230,7 @@ fx_bubblepopchart <- function(
   yaxis_label_JS <- paste0("function() {
         	return this.value +", yaxis_label, "}")
   
-  formatted_caption <- sapply(strwrap(caption, 150, simplify=FALSE), paste, collapse="<br>" )
+  # formatted_caption <- sapply(strwrap(caption, 150, simplify=FALSE), paste, collapse="<br>" )
   
   # format tooltip
   drop_bold_tags <- gsub("<b>", "",
@@ -306,7 +306,7 @@ fx_bubblepopchart <- function(
     hc_subtitle(text = paste0(subtitle)) %>%
     
     hc_caption(
-      text = formatted_caption,
+      text = caption,
       margin=30,
       useHTML=TRUE
     ) %>%
