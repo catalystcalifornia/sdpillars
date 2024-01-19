@@ -9,7 +9,6 @@ output:
 
 ```{r, include=FALSE}
 
-#### Testing bubblepop ####
 library(RPostgreSQL)
 source("W:\\RDA Team\\R\\credentials_source.R")
 source("chart_functions.R")
