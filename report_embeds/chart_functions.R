@@ -267,25 +267,22 @@ fx_bubblepopchart <- function(
              labels = list(formatter = JS(yaxis_label_JS),
                            style=list(fontSize="12px")))  %>%
     
-    hc_legend(enabled = TRUE, 
-              width = '15%',
+    hc_legend(title=list(text=paste0('<span style="color: #000000; font-weight: 400; font-size:10px;"><b>Line shows<br>    <i>the rate.</i></b><br><b>Bubble shows<br>    <i>total people.</i></b></span>')),
+              enable = TRUE,
               align = "right", 
-              verticalAlign="bottom",
-              y=10,
+              verticalAlign="middle",
+              width="12%",
               layout="vertical",
-              floating=TRUE,
               borderColor=gainsboro,
               borderWidth=1,
               borderRadius=5,
-              itemWidth=120,
-              padding=4,
-              itemMarginBottom=20,
+              itemMarginBottom=10,
               bubbleLegend =  list(enabled = TRUE,
                                    connectorDistance=20,
                                    borderColor=meteorite,
                                    connectorColor=meteorite,
                                    labels = list(
-                                     format="{value:,.0f} persons",
+                                     format="{value:,.0f}",
                                      style=list(fontSize='10px')),
                                    marker = list(
                                      fillColor = lavender))) %>%
@@ -307,7 +304,6 @@ fx_bubblepopchart <- function(
     
     hc_caption(
       text = caption,
-      margin=30,
       useHTML=TRUE
     ) %>%
     
@@ -414,7 +410,7 @@ fx_itemchart <- function(
     hc_title(text=top_finding) %>%
     hc_subtitle(text=subtitle) %>%
     hc_caption(text=caption) %>%
-    hc_add_theme(cc_theme_test)%>%
+    hc_add_theme(cc_theme)%>%
     hc_legend(title=list(text=paste0('<span style="color: #000000; font-weight: bold">', legend_text, '</span><br/><span style="color: #666; font-style: italic">Click to hide</span>')),
               enable = TRUE,
               labelFormat = paste0('{name} <span style="opacity: 0.4">{', y, ':.1f}</span>'))  %>%
