@@ -21,7 +21,7 @@ meta<-dbGetQuery(pillars_conn, "SELECT * FROM metadata_race_labels")%>%
 df <- dbGetQuery(pillars_conn, "SELECT * FROM report_timespent_ficard_race_stop") %>%
   left_join(meta, by=c("race"="race_base"))%>%
   mutate(race_label_short=ifelse(race %in% "nh_multi_race", "Multiracial", race_label_short))%>%
-filter(race!="nh_sswana" & race !="aian" & race !="nhpi")
+filter(race!="sswana" & race !="aian" & race !="nhpi")
 
 # Combine nh_twoormor and nh_multi_racial into one multiracial category with a combined duration_total and duration_rate.
 # Remove the original, separate nh_twoormor and nh_multi_racial after combining
