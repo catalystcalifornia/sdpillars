@@ -34,6 +34,7 @@ library(magrittr)
 library(flextable)
 library(lorem)
 library(htmlwidgets)
+library(vembedr)
 
 #### Add database connection ####
 source("W:\\RDA Team\\R\\credentials_source.R")
@@ -56,19 +57,20 @@ orange <- "#F25922"
 
 [this report section–add info about this work, partners, etc.]
 
-
-<p style="background-color:#CEEA01;font-size:14pt">Community quote or video
-</p>
-
 # ACKNOWLEDGEMENTS
 
 [Acknowledgements–Acknowledge and thank people of Southeast San Diego for sharing their stories. Include acknowledgement of funding from Microsoft/Urban]
 
-# CONTEXT
-
 <html>
 <iframe src="https://drive.google.com/file/d/1gn5c8mytLXBpWlYKphRTI_jZyxUYpPvh/preview" width="640" height="480" allow="autoplay"></iframe>
 </html>
+
+```{r,include=FALSE}
+embed_url("https://www.youtube.com/watch?v=q1gicHIVxV8")
+
+```
+
+# CONTEXT
 
 Law enforcement agencies throughout California have a long history of unjustly criminalizing people of color—especially  those who are Black and/or Latinx—by documenting them as a member or affiliate of a gang and placing their identities in electronic gang databases.  In 1987, for instance, the Los Angeles Sheriff’s Department and the Law Enforcement Communication Network (NALECOM) – a rapid interstate law enforcement communications system^[https://www.ojp.gov/ncjrs/virtual-library/abstracts/national-law-enforcement-communication-network-nalecom-users] – jointly developed a database used to collect, retain, and analyze information about alleged gang members.^[See Tracked & Trapped at 2.] Over the next decade, law enforcement agencies throughout California refined and expanded gang databases.^[Id. at 3.]
 
@@ -78,9 +80,6 @@ In 1997, a company called CSRA International, Inc. (“CSRA”) used funding fro
 ```
 
 Research shows that many people have been added to gang databases without prior knowledge and without being arrested for any crime.  Officers often conduct pretextual stops of Black and Latinx people, interrogate them, and document their personal information on a Field Interview (FI) card.  The information collected may include, but not be limited to, the person’s name, date of birth, race, gender, nicknames, their family members and friends, their place of residence, the community where they live, photos, tattoos, clothing color, vehicles, and suspected gang affiliation.^[Tracked & Trapped at 4-5. State Auditor at 11.]
-
-<p style="background-color:#CEEA01;font-size:14pt">Community quote or video
-</p>
 
 <p style="background-color:#F25922;font-size:14pt">Criminalization occurs when people are turned into criminals by making their alleged activities illegal, even if the activities are ordinary or not harmful to others.^[https://www.oed.com/search/dictionary/?scope=Entries&q=criminalization+ ; https://www.merriam-webster.com/dictionary/criminalize] SDPD criminalizes community members from Southeast San Diego by documenting them as gang members. This inflicts devastating harms, direct and indirect, on Southeast community members and their families.</p>
 
