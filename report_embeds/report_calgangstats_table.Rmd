@@ -62,7 +62,7 @@ table_race<-df_race%>%
   # question
   tab_header(title=glue::glue("SDPD enters more people perceived as Latinx and Black into the CalGang Database compared to all other racial groups"))%>%
   # any data notes in footer
-  tab_footnote(footnote=html("Race is defined by the stopping officer and reflects their perception of a person's race. Data downloaded from https://oag.ca.gov/calgang/reports (2022)"),placement="left")
+  tab_footnote(footnote=html("Race is defined by the stopping officer and reflects their perception of a person's race. Numbers do not add to 100% due to persons reported as more than one race. Data downloaded from https://oag.ca.gov/calgang/reports (2022)"),placement="left")
 
 
 #### Step 4: Add preset styling ####  
@@ -71,8 +71,8 @@ table_race<-df_race%>%
   table_race<-table_race%>%
   gt_plt_bar_pct(column=" ", scaled=FALSE, fill=meteorite,background="transparent")%>%
   # if needed modify column widths here
-  cols_width(1~px(210),2~px(100),
-             3~px(125))%>%
+  cols_width(1~px(175),2~px(160),
+             3~px(250))%>%
   opt_align_table_header("left")%>%
   opt_table_font(font=c(google_font(name="Inter"),locations=NULL,default_fonts()))%>%
   tab_options(table.background.color=alabaster,
