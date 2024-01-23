@@ -18,16 +18,10 @@ pillars_conn <- connect_to_db("rjs_pillars")
 
 df <- dbGetQuery(pillars_conn, "SELECT * FROM report_timespent_div_ficard_race_person") 
 
-# filter out Latinx/Black only
-
-df1<-df%>%
-  filter(race=='latinx' | race == 'nh_black')
-
 # Pivot table to longer for graphing
 
-df1<-df1%>%
+df1<-df%>%
   select(div_name, div, race, stop_result_simple, duration_rate, pop_rate)%>%
-  mutate(pop_rate=pop_rate*100)%>%
   filter(stop_result_simple=="Field interview card completed")%>%
     pivot_longer(5:6, names_to = "measure", values_to = "value")%>%
   filter(!is.na(value)) # no pop estimates for nh_sswana & nh_multi_race
@@ -36,7 +30,6 @@ df1<-df1%>%
 
 df1<-df1%>%
   left_join(df)%>%
-  mutate(pop_rate=pop_rate*100)%>%
      mutate(div_name=str_to_title(div_name))
 
 
@@ -44,23 +37,6 @@ df1<-df1%>%
 
 
 ```{r, include=FALSE}
-
-# Option 1 Graph: Latinx only
-
-graph_l<-df1 %>% 
-  filter(race=='latinx')%>%
-  hchart('column', hcaes(x = div_name, y = value, group = measure)) %>%
-  hc_colors(c("#211447", peridot))
-
-graph_l
-
-```
-
-
-
-```{r, include=FALSE}
-##   FINAL CHOICE: I think the graph from Option 1 -NH Black only --is the most compelling. We can see across all divisions that people perceived as Nh_Black are stopped for FI cards at higher percentages relative to their population
-
 
 # add methodnote
 methodnote <- "Analysis for all officer-initiated stops resulting in a field interview card only in each SDPD division. Officers spent a total of 118,970.3 hours on officer-initiated stops that resulted in a field interview card only in 2022."
@@ -74,7 +50,7 @@ subtitle<-"Percent of hours officers spent conducting stops that resulted in a f
 
 # tooltip
 
-tooltip_text<- paste0("Out of 100 hours spent on <b>officer-initiated stops resulting in a field interview card</b> in the <b>{point.div_name} Division (Division {point.div})</b>, SDPD spent <b>{point.duration_rate:.1f}</b> hours conducting field interviews on people perceived as <b>Black</b>. <b>Black people</b> make up <b>{point.pop_rate:.1f}%</b> of the total population in the <b>{point.div_name} Division (Division {point.div})</b>")
+tooltip_text<- paste0("Out of all hours spent on <b>officer-initiated stops resulting in a field interview card</b> in the <b>{point.div_name} Division (Division {point.div})</b>, SDPD spent <b>{point.duration_rate:.1f}%</b> of those hours conducting field interviews on people perceived as <b>Black</b>. By comparison, <b>Black people</b> make up just <b>{point.pop_rate:.1f}%</b> of the total population in the <b>{point.div_name} Division</b>")
 
 # Final Graph----------------
 
@@ -84,7 +60,6 @@ df1<-df1%>%
         mutate(measure=ifelse(measure %in% 'pop_rate','Percent of total population','Percent time spent'))
 
 df1$measure <- factor(df1$measure, levels = c("Percent time spent", "Percent of total population"))
-
 
 
 chart<-df1 %>% 
