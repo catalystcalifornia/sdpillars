@@ -35,6 +35,7 @@ library(flextable)
 library(lorem)
 library(htmlwidgets)
 library(vembedr)
+library(knitr)
 
 #### Add database connection ####
 source("W:\\RDA Team\\R\\credentials_source.R")
@@ -61,12 +62,9 @@ orange <- "#F25922"
 
 [Acknowledgements–Acknowledge and thank people of Southeast San Diego for sharing their stories. Include acknowledgement of funding from Microsoft/Urban]
 
-<html>
-<iframe src="https://drive.google.com/file/d/1gn5c8mytLXBpWlYKphRTI_jZyxUYpPvh/preview" width="640" height="480" allow="autoplay"></iframe>
-</html>
 
-```{r,include=FALSE}
-embed_url("https://www.youtube.com/watch?v=q1gicHIVxV8")
+```{r}
+embed_url("https://youtu.be/cWlR-a1bm5w")
 
 ```
 
@@ -83,9 +81,11 @@ Research shows that many people have been added to gang databases without prior 
 
 <p style="background-color:#F25922;font-size:14pt">Criminalization occurs when people are turned into criminals by making their alleged activities illegal, even if the activities are ordinary or not harmful to others.^[https://www.oed.com/search/dictionary/?scope=Entries&q=criminalization+ ; https://www.merriam-webster.com/dictionary/criminalize] SDPD criminalizes community members from Southeast San Diego by documenting them as gang members. This inflicts devastating harms, direct and indirect, on Southeast community members and their families.</p>
 
-<html>
-<iframe src="https://drive.google.com/file/d/1z2fxt1zI10t0MbE4ekskMV-cRlGjjVgT/preview" width="640" height="480" allow="autoplay"></iframe>
-</html>
+
+```{r}
+embed_url("https://www.youtube.com/watch?v=FTqt90YJ_V4")
+
+```
 
 # FINDINGS
 
@@ -95,9 +95,11 @@ Research shows that many people have been added to gang databases without prior 
 
 In Southeast San Diego, SDPD’s practice of racial profiling people for gang activity is far too common and affects the daily lives of many community members. Both lived experiences and police stop data reveal racial disparities and harms caused by these practices.
 
-<html>
-<iframe src="https://drive.google.com/file/d/1J9_1B30d145x20qVFcjMo6B1-R6EGE11/preview" width="640" height="480" allow="autoplay"></iframe>
-</html>
+
+```{r}
+embed_url("https://www.youtube.com/watch?v=arZekGIgIrw")
+
+```
 
 ### A. Data show that stops made by the SDPD are racially biased.
 
@@ -117,9 +119,11 @@ In San Diego, Black and Latinx people are disproportionately subjected to office
 
 Stories from community members indicate the practices of SDPD’s Gang Suppression Unit are even more troubling. Gang enforcement officers target and harass Black and Latinx people and the Southeast community and label them as gang members.
 
-<html>
-<iframe src="https://drive.google.com/file/d/16hHoLrYxwmL8ZiVOs8DUfy6t4gMSv-R0/preview" width="640" height="480" allow="autoplay"></iframe>
-</html>
+
+```{r}
+embed_url("https://www.youtube.com/watch?v=Dd-e07UT6-Y")
+
+```
 
 Analysis shows that officers assigned to gang enforcement at the time of the stop target Latinx and Black people. Specifically, amongst all people stopped by officers assigned to gang enforcement, 40.1% are people officers perceived as Latinx and 32.4% are people perceived as Black. Compared to their share of the San Diego population, Black and Latinx people are 5.7 and 1.3 times overrepresented in people stopped by officers assigned to gang enforcement.  
 
@@ -141,17 +145,19 @@ To account for this, the authors of this report submitted two public records to 
 Because SDPD refused to provide data specific to its Gang Suppression Unit, we use stops that result in a field interview card as a proxy for identifying  gang suppression activity by SDPD. We combine this data with stories from impacted community members to show the extent of this harmful practice.
 </div>
 
-<html>
-<iframe src="https://drive.google.com/file/d/1-SVjkbS3zQtwH_ikKBi2SIF5vOQIIUUf/preview" width="640" height="480" allow="autoplay"></iframe>
-</html>
+```{r}
+embed_url("https://www.youtube.com/watch?v=sD5libtgXfI")
+
+```
 
 ### C. Beyond officers assigned to gang enforcement, an analysis of stops that result in field interview cards also show that SPDP targets Black and Latinx people and labels them as gang members. 
 
 Community members’ experiences show how SDPD’s gang profiling activity subjects them to traumatic encounters that go far beyond  what SDPD reports. These encounters often include field interview cards that are used to enter community members into California’s Cal Gang database. 
 
-<html>
-<iframe src="https://drive.google.com/file/d/1LPkK-TUHj0WQ7pHk6IcoEGlRKizMkvB6/preview" width="640" height="480" allow="autoplay"></iframe>
-</html>
+```{r}
+embed_url("https://www.youtube.com/watch?v=oOmzLOEOFGM")
+
+```
 
 Data shows that SDPD stops people they perceive as Black for field interview cards at the highest rate compared to all other racial groups. Despite Black people making up only 5.6% of San Diego’s total population, the rate at which SDPD stops people they perceive as Black for field interview cards is 5 times more than the rate at which they stop people perceived as White. Meanwhile, White people make up 42% of the city population.  
 
@@ -176,9 +182,10 @@ Despite the high rate of people of color stopped with field interview cards comp
 
 SDPD’s gang profiling activity subjects community members to unnecessary contact with armed officers and undermines the public and individual safety of the community. Stories from community members show that they are often harassed, interrogated, physically searched, and subjected to other degrading and dehumanizing treatment by officers. This results in numerous harms, including feeling a lack of safety from the institution chartered to protect them. In addition, being a documented as a gang member can have devastating impacts on a person being charged with an alleged crime because of sentencing enhancements for gang membership (or “gang enhancements”). Specifically, under the STEP Act, the application of a gang enhancement adds an additional two years to life imprisonment to a person’s sentence. The added time runs consecutive (rather than concurrent) to the punishment for the underlying felony.^[Yoshino at 119.] The potential for such added harm often has devastating impacts on people facing relatively low charges because the threat of far more lengthy imprisonment impacts plea bargaining, charging decisions, juror perspectives, among other things.
 
-<html>
-<iframe src="https://drive.google.com/file/d/1k8JKn6R22oKArmrx5WNl9A8kw_T8x0g4/preview" width="640" height="480" allow="autoplay"></iframe>
-</html>
+```{r}
+embed_url("https://www.youtube.com/watch?v=e1KxqPIKjeo")
+
+```
 
 ### A. When searches are conducted as a part of gang profiling, they are largely ineffective and biased.  
 
@@ -196,9 +203,10 @@ This is also the case for searches done during field interview card stops. When 
 
 While these SDPD practices occur throughout San Diego, data and stories from the Southeast community show the prevalence of these searches in Southeast San Diego. Community members describe how these searches are overwhelmingly prevalent in their neighborhoods and expose them to contact with police that unduly creates trauma and harm for the community. 
 
-<html>
-<iframe src="https://drive.google.com/file/d/1SzCa50E3FC0AKbSZFi6l89iO-DtWE3gt/preview" width="640" height="480" allow="autoplay"></iframe>
-</html>
+```{r}
+embed_url("https://www.youtube.com/watch?v=KzE0t3U4Sk0")
+
+```
 
 Analysis of searches done during field interview card stops further demonstrates the extent of this harmful practice and how it targets people of color in San Diego, and particularly, the Southeast community. In all of San Diego, there were 2,936 people who were searched, field interviewed, and found to have no contraband. Of these people, around 66 percent were in the Southeastern, Central, and Mid-City divisions of San Diego, areas that have a higher concentration of people of color in San Diego compared to the Northern regions of San Diego.  
 
@@ -211,9 +219,11 @@ The Southeast Division has the highest number of people searched during field in
 
 Like most police departments in California, a significant portion of public dollars goes to SDPD. The narrative pushed by police departments is that a huge amount of funding is needed to keep communities safe. However, data shows that police spend their time on activities that are not preventing crime or keeping the public safe. SDPD is no exception to this.
 
-<html>
-<iframe src="https://drive.google.com/file/d/1xTibKteCXov0n5SeDy5PibCJmgCzK2Zs/preview" width="640" height="480" allow="autoplay"></iframe>
-</html>
+
+```{r}
+embed_url("https://www.youtube.com/watch?v=W_j4T1uOQhY")
+
+```
 
 ### A. Based on available data, SDPD spends a disproportionate amount of time on profiling people of color for gang activity.
 
