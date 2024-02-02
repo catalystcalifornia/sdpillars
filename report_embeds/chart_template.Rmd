@@ -12,7 +12,7 @@ output:
 library(RPostgreSQL)
 source("W:\\RDA Team\\R\\credentials_source.R")
 source("chart_functions.R")
-pillars_conn <- connect_to_db("rjs_pillars")
+conn <- connect_to_db("rjs_pillars")
 
 ```
 
@@ -25,7 +25,7 @@ pillars_conn <- connect_to_db("rjs_pillars")
 
 # Pull df from postgres (filter, format, and reorder as needed)
 
-df <-dbGetQuery(con, "SQL QUERY HERE") 
+df <-dbGetQuery(conn, "SQL QUERY HERE") 
 
 
 ```
@@ -76,11 +76,13 @@ chart <- fx_bubblepopchart(
   export_data_label=list(pointFormat='{point.stop_rate_per1k:.1f} per 1K') # format for your data
 )
 
+chart
+
 ```
 
 ```{r, include = FALSE}
 # STEP 5: CLOSE postgres connection
-dbDisconnect(pillars_conn) 
+dbDisconnect(conn) 
 ```
 
 <script>
