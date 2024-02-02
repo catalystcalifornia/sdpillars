@@ -233,12 +233,13 @@ fx_bubblepopchart <- function(
   # formatted_caption <- sapply(strwrap(caption, 150, simplify=FALSE), paste, collapse="<br>" )
   
   # format tooltip
-  drop_bold_tags <- gsub("<b>", "",
-                         gsub("</b>", '', tooltip_text, fixed=TRUE))
-  tooltip_text_wrapped <- sapply(strwrap(drop_bold_tags, 110, simplify=FALSE), paste, collapse="<br>" )
-  add_bold_start <- gsub("{", "<b>{", tooltip_text_wrapped, fixed=TRUE)
-  add_bold_end <- gsub("}", "}</b>", add_bold_start, fixed=TRUE)
-  formatted_tooltip <- add_bold_end
+  # drop_bold_tags <- gsub("<b>", "",
+  #                        gsub("</b>", '', tooltip_text, fixed=TRUE))
+  # tooltip_text_wrapped <- sapply(strwrap(drop_bold_tags, 110, simplify=FALSE), paste, collapse="<br>" )
+  # add_bold_start <- gsub("{", "<b>{", tooltip_text_wrapped, fixed=TRUE)
+  # add_bold_end <- gsub("}", "}</b>", add_bold_start, fixed=TRUE)
+  # formatted_tooltip <- add_bold_end
+  formatted_tooltip <- tooltip_text
   
   df <-  df %>%
     arrange(desc(y))
@@ -389,7 +390,7 @@ fx_itemchart <- function(
 
   
   # add line breaks to tooltip_text
-  tooltip_text <- sapply(strwrap(tooltip_text, 110, simplify=FALSE), paste, collapse="<br>" )
+  # tooltip_text <- sapply(strwrap(tooltip_text, 110, simplify=FALSE), paste, collapse="<br>" )
   
   highchart() %>%
     hc_add_series(df, 
