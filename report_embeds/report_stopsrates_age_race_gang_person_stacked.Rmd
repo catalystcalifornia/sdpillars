@@ -35,7 +35,7 @@ mutate(across(where(is.numeric), ~round(., 1)))%>%
 
 text <- "Across all people aged <b>{point.age_bracket:.1f}</b> stopped by officers assigned to gang enforcement, officers stopped people perceived as <b>{point.race_label_short:.1f}</b> <b>{point.rate:.1f}% of the time</b>. {point.tooltip}"
 
-tooltip_text <- sapply(strwrap(text, 110, simplify=FALSE), paste, collapse="<br>")
+tooltip_text <- text
 
 ## Set colors ##
 
