@@ -124,7 +124,7 @@ cc_theme <- hc_theme(
 ##### donut hc theme #####
 
 cc_theme_donut <- hc_theme(
-  colors = c(meteorite, papaya, peridot, lavender),
+  colors = c(meteorite, lavender, papaya, peridot),
   chart = list(
     backgroundColor = alabaster,
     style = list(
