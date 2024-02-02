@@ -37,7 +37,7 @@ mutate(across(where(is.numeric), ~round(., 1)))%>%
 
 text<-"Across all field interviews of people aged <b>{point.age_bracket:.1f}</b>, SDPD stopped people perceived as <b>{point.race_label_short:.1f} {point.rate:.1f}% of the time.</b> {point.tooltip}"
 
-tooltip_text <- sapply(strwrap(text, 110, simplify=FALSE), paste, collapse="<br>")
+tooltip_text <- text
 
 
 ## Graph ##
