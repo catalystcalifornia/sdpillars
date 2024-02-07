@@ -46,7 +46,7 @@ caption_text <- paste("<br><br>", sourcenote, methodnote)
 
 # add title and subtitle
 top_finding<-"Across all SDPD divisions, SDPD disproportionately spends time on field interview cards for Black people relative to their population"
-subtitle<-"Percent of hours officers spent conducting stops that resulted in a field interivew card by division and race"
+subtitle<-"Percent of hours officers spent stopping people they perceived as Black that resulted in a field interview card by SDPD division"
 
 # tooltip
 
