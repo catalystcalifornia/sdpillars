@@ -35,7 +35,7 @@ chart <- fx_bubblepopchart(
   z='stop_count',
   top_finding=paste0("SDPD stops Black and NHPI people at higher rates than other community members"), 
   subtitle= paste0("Number of people who are stopped during officer-initiated stops per 1K people of the same race"), 
-  tooltip_text="For every 1K <b>{point.race_label_short:.1f}</b> people in San Diego, SDPD stopped <b>{point.stop_per1k_rate:.1f}</b> people perceived as <b>{point.race_label_short:.1f}</b>, for a total of <b>{point.stop_count:,0f}</b> people.", # customize your tooltip as a statement, calling out rate and count
+  tooltip_text="For every 1K <b>{point.race_label_short:.1f}</b> people in San Diego, SDPD stopped <b>{point.stop_per1k_rate:.1f}</b> people<br>perceived as <b>{point.race_label_short:.1f}</b>, for a total of <b>{point.stop_count:,0f}</b> people.", # customize your tooltip as a statement, calling out rate and count
   caption = caption_text, # if necessary add a method note between the racenote and sourcenote with a line break, use racenote if graph includes data by race, and always use sourcenote. Each of these are standard objects across all charts
   yaxis_label = "''", #format for your y axis labels
   export_data_label=list(pointFormat='{point.stop_rate_per1k:.1f} per 1K')
