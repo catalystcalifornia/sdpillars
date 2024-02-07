@@ -56,7 +56,7 @@ chart <- fx_itemchart(
     # row_nums=5, # integer
     top_finding="SDPD spends most of their time on field interview cards for Latinx and Black people relative to their population and other groups",
     subtitle= "Percent of hours officers spend conducting stops resulting in a field interview card by race",
-    tooltip_text="Out of 100 hours spent on <b>officer-initiated stops resulting in a field interview card</b>, SDPD spent <b>{point.duration_rate:.1f}</b> hours conducting field interviews for people perceived as <b>{point.race_label_short}</b>",
+    tooltip_text="Out of 100 hours spent on <b>officer-initiated stops resulting in a field<br>interview card</b>, SDPD spent <b>{point.duration_rate:.1f}</b> hours conducting field interviews<br>on people perceived as <b>{point.race_label_short}</b>.",
     legend_text="Single dot represents 1 hour out of 100 hours",
     caption = caption_text)    
 

@@ -383,9 +383,6 @@ fx_itemchart <- function(
     caption = "") {
 
   
-  # add line breaks to tooltip_text
-  # tooltip_text <- sapply(strwrap(tooltip_text, 110, simplify=FALSE), paste, collapse="<br>" )
-  
   highchart() %>%
     hc_add_series(df, 
                   "item",
