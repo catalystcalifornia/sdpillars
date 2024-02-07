@@ -38,7 +38,7 @@ chart <- fx_itemchart(
     # row_nums=5, # integer
     top_finding="Officers assigned to gang enforcement spend nearly 1 in 5 patrol hours on stops resulting in a field interview card",
     subtitle= "Percent of hours officers assigned to gang enforcement spend on stops by stop result",
-    tooltip_text="Out of 100 hours,SDPD officers assigned to gang enforcement spent <b>{point.duration_rate:.1f}</b> hours on stops that resulted in <b>{point.stop_result_simple}</b>",
+    tooltip_text="Out of 100 hours, SDPD officers assigned to gang enforcement spent <b>{point.duration_rate:.1f}</b> hours on stops that resulted in <b>{point.stop_result_simple}</b>.",
     legend_text="Single dot represents 1 hour out of 100 hours",
     caption = caption_text)    
 

@@ -41,7 +41,7 @@ methodnote <- "Analysis for all officer-initiated stops resulting in a field int
 caption_text <- paste("<br><br>", racenote, sourcenote, methodnote)
 
 # TOOLTIP
-tooltip_text <- "Out of 1,000 <b>{point.race_label_short:.0f}</b> people in San Diego, SDPD stopped <b>{point.rate:.1f}</b> people perceived as <b>{point.race_label_short:.0f}</b> for an officer-initiated stop that resulted in a field interview card"
+tooltip_text <- "Out of 1,000 <b>{point.race_label_short:.0f}</b> people in San Diego, SDPD stopped<br><b>{point.rate:.1f}</b> people perceived as <b>{point.race_label_short:.0f}</b> for an officer-initiated<br>stop that resulted in a field interview card"
 
 chart <- fx_bubblepopchart(
   df=df,

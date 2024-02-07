@@ -50,7 +50,7 @@ subtitle<-"Percent of hours officers spent stopping people they perceived as Bla
 
 # tooltip
 
-tooltip_text<- paste0("Out of all hours spent on <b>officer-initiated stops resulting in a field interview card</b> in the <b>{point.div_name} Division (Division {point.div})</b>, SDPD spent <b>{point.duration_rate:.1f}%</b> of those hours conducting field interviews on people perceived as <b>Black</b>. By comparison, <b>Black people</b> make up just <b>{point.pop_rate:.1f}%</b> of the total population in the <b>{point.div_name} Division</b>")
+tooltip_text<- paste0("Out of all hours spent on <b>officer-initiated stops resulting in a field<br>interview card</b> in the <b>{point.div_name} Division (Division {point.div})</b>, SDPD spent<br><b>{point.duration_rate:.1f}%</b> of those hours conducting field interviews on people perceived<br>as <b>Black</b>. By comparison, <b>Black people</b> make up just <b>{point.pop_rate:.1f}%</b> of the total<br>population in the <b>{point.div_name} Division</b>")
 
 # Final Graph----------------
 

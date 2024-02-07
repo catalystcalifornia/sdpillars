@@ -124,7 +124,7 @@ cc_theme <- hc_theme(
 ##### donut hc theme #####
 
 cc_theme_donut <- hc_theme(
-  colors = c(meteorite, papaya, peridot, lavender),
+  colors = c(meteorite, lavender, papaya, peridot),
   chart = list(
     backgroundColor = alabaster,
     style = list(
@@ -230,22 +230,13 @@ fx_bubblepopchart <- function(
   yaxis_label_JS <- paste0("function() {
         	return this.value +", yaxis_label, "}")
   
-  # formatted_caption <- sapply(strwrap(caption, 150, simplify=FALSE), paste, collapse="<br>" )
-  
-  # format tooltip
-  drop_bold_tags <- gsub("<b>", "",
-                         gsub("</b>", '', tooltip_text, fixed=TRUE))
-  tooltip_text_wrapped <- sapply(strwrap(drop_bold_tags, 110, simplify=FALSE), paste, collapse="<br>" )
-  add_bold_start <- gsub("{", "<b>{", tooltip_text_wrapped, fixed=TRUE)
-  add_bold_end <- gsub("}", "}</b>", add_bold_start, fixed=TRUE)
-  formatted_tooltip <- add_bold_end
-  
   df <-  df %>%
     arrange(desc(y))
   
   highchart() %>%
     
     hc_tooltip(headerFormat='', # removes series label from top of tooltip
+               pointFormat = tooltip_text,
                useHTML=TRUE) %>%  # allows tooltip to read <br> html in reformatted tooltip_text 
     
     hc_add_series(df, "bar", invert=TRUE,
@@ -254,8 +245,12 @@ fx_bubblepopchart <- function(
                   enableMouseTracking=FALSE)%>% # disables tooltip from popping up when mouse moves over bars
     
     hc_add_series(df, "bubble", invert=TRUE,
-                  hcaes(x=!!rlang::ensym(x), y=!!rlang::ensym(y), size=!!rlang::ensym(z)), 
-                  maxSize="15%", tooltip =  list(pointFormat = formatted_tooltip), showInLegend=FALSE,
+                  hcaes(x=!!rlang::ensym(x), 
+                        y=!!rlang::ensym(y), 
+                        size=!!rlang::ensym(z)), 
+                  maxSize="15%", 
+                  # tooltip =  list(pointFormat = formatted_tooltip), 
+                  showInLegend=FALSE,
                   clip=FALSE) %>%
     
     hc_xAxis(title = list(text = ""),
@@ -337,7 +332,7 @@ fx_stackedbarchart <- function(
   hchart(df, 
          "bar", hcaes(x = !!rlang::ensym(x), y = !!rlang::ensym(y), group = !!rlang::ensym(group_var)),
          stacking = "normal",
-         tooltip =  list(headerFormat='',pointFormat=tooltip_text)) %>%
+         tooltip =  list(headerFormat='', pointFormat=tooltip_text)) %>%
     
     hc_title(
       text = top_finding) %>%
@@ -387,9 +382,6 @@ fx_itemchart <- function(
     legend_text="", # states what 1 dot represents
     caption = "") {
 
-  
-  # add line breaks to tooltip_text
-  tooltip_text <- sapply(strwrap(tooltip_text, 110, simplify=FALSE), paste, collapse="<br>" )
   
   highchart() %>%
     hc_add_series(df, 

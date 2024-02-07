@@ -30,14 +30,14 @@ df<-df%>%
   left_join(meta, by=c("race"="race_base"))%>%
   filter(race!='sswana' & race !="nhpi" & race != 'aian')%>%
 mutate(across(where(is.numeric), ~round(., 1)))%>%
-  mutate(tooltip=ifelse(race %in% "nh_sswana", "",  paste0("By comparison, <b>",race_label_short, " people</b> made up <b>",pop_rate,"%</b> of the population aged <b>",age_bracket,"</b> in San Diego.")))
+  mutate(tooltip=ifelse(race %in% "nh_sswana", "",  paste0("By comparison, <b>",race_label_short, "<br>people</b> made up <b>",pop_rate,"%</b> of the population aged <b>",age_bracket,"</b> in San Diego.")))
                         
 
 # set tooltip
 
-text<-"Across all field interviews of people aged <b>{point.age_bracket:.1f}</b>, SDPD stopped people perceived as <b>{point.race_label_short:.1f} {point.rate:.1f}% of the time.</b> {point.tooltip}"
+text<-"Across all field interviews of people aged <b>{point.age_bracket:.1f}</b>, SDPD stopped<br>people perceived as <b>{point.race_label_short:.1f} {point.rate:.1f}% of the time.</b> {point.tooltip}"
 
-tooltip_text <- sapply(strwrap(text, 110, simplify=FALSE), paste, collapse="<br>")
+tooltip_text <- text
 
 
 ## Graph ##
