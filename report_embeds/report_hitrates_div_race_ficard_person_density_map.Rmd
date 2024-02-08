@@ -160,7 +160,7 @@ output:
 ```
   
 <h3 class="leaflet-map-title">SDPD conducts the highest number of unnecessary searches during field interview card stops in the Southeastern Division</h3>
-<h4 class="leaflet-map-subtitle">People searched during field interviews by division and search result</h2>
+<h4 class="leaflet-map-subtitle">People searched during field interviews by division and search result</h4>
     
     
 ```{r, echo=FALSE}

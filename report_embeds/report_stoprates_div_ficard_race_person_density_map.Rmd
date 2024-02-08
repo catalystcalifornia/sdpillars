@@ -210,7 +210,7 @@ output:
 ```
   
 <h3 class="leaflet-map-title">SDPD disproportionately conducts field interviews for people of color in the Southeastern and Central Division</h3>
-<h4 class="leaflet-map-subtitle">People officers field interviewed by race and division</h2>
+<h4 class="leaflet-map-subtitle">People officers field interviewed by race and division</h4>
     
 ```{r, echo=FALSE}
   map
