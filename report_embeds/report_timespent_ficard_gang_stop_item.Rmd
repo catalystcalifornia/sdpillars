@@ -18,12 +18,13 @@ pillars_conn <- connect_to_db("rjs_pillars")
 df <- dbGetQuery(pillars_conn, "SELECT * FROM report_timespent_ficard_gang_stop")
 
 df <- df%>%
+# create short stop result labels for item chart legend
  mutate(stop_result_simple_labels=case_when(stop_result_simple=="Custodial Arrest without warrant" ~ "Arrest without warrant",
                                             stop_result_simple=="Warning (verbal or written)" ~ "Warning",
                                             stop_result_simple=="Custodial Arrest pursuant to outstanding warrant" ~ "Arrest with warrant",
                                             stop_result_simple=="Field interview card completed"~"Field interview card",
                                             .default=stop_result_simple))
-
+# Create ordered list for factor levels/legend
 ordered_labels_list <- c("Field interview card",
                         "Warning",
                         "Citation for infraction",
@@ -34,12 +35,15 @@ ordered_labels_list <- c("Field interview card",
                         "Arrest without warrant",
                         "Arrest with warrant")
 
+# create the factor column and assign levels using ordered list above
 df$ordered_labels <- factor(df$stop_result_simple_labels, 
                             levels=ordered_labels_list)
 
+# arrange df by the factor levels
 df <- arrange(df, match(df$ordered_labels, levels(df$ordered_labels)))
 
-View(df)
+# MAKE SURE: the entire df was arranged and that ALL columns are correct
+# View(df)
 
 
 # custom item coloring
