@@ -14,100 +14,66 @@ source("W:\\RDA Team\\R\\credentials_source.R")
 source("chart_functions.R")
 
 pillars_conn <- connect_to_db("rjs_pillars")
-df <- dbGetQuery(pillars_conn, "SELECT * FROM report_timespent_ficard_gang_stop") 
 
-df<-df%>%
-  mutate(stop_result_simple_re=ifelse(stop_result_simple=="Custodial Arrest without warrant", "Arrest without warrant",
-                                      ifelse(stop_result_simple=="Warning (verbal or written)","Warning",ifelse(stop_result_simple=="Custodial Arrest pursuant to outstanding warrant","Arrest with warrant",ifelse(stop_result_simple=="Field interview card completed","Field interview card",stop_result_simple)))))
+df <- dbGetQuery(pillars_conn, "SELECT * FROM report_timespent_ficard_gang_stop")
+
+df <- df%>%
+# create short stop result labels for item chart legend
+ mutate(stop_result_simple_labels=case_when(stop_result_simple=="Custodial Arrest without warrant" ~ "Arrest without warrant",
+                                            stop_result_simple=="Warning (verbal or written)" ~ "Warning",
+                                            stop_result_simple=="Custodial Arrest pursuant to outstanding warrant" ~ "Arrest with warrant",
+                                            stop_result_simple=="Field interview card completed"~"Field interview card",
+                                            .default=stop_result_simple))
+
+# Create ordered list for factor levels/legend
+ordered_labels_list <- c("Field interview card",
+                        "Warning",
+                        "Citation for infraction",
+                        "No Action",
+                        "Psychiatric hold",
+                        "Two or More Results",
+                        "In-field cite and release",
+                        "Arrest without warrant",
+                        "Arrest with warrant")
+
+# create the factor column and assign levels using ordered list above
+df$ordered_labels <- factor(df$stop_result_simple_labels, 
+                            levels=ordered_labels_list)
+
+# arrange df by the factor levels
+df <- arrange(df, match(df$ordered_labels, levels(df$ordered_labels)))
+
+# MAKE SURE: the entire df was arranged and that ALL columns are correct
+# View(df)
 
 # custom item coloring
-group_colors_item <- c("#D6D6D6", "#211447", meteorite,"#FFD28F", "#BABABA","#8E7ACA", "#BDAFE9", "#FFE680",  "#F0FF85")
+group_colors_item <- c("#211447", "#3A207D","#8E7ACA", "#BDAFE9", "#FFD28F", "#FFE680", "#F0FF85", "#BABABA", "#D6D6D6")
 
-# add mwethodnote 
+# add methodnote 
 methodnote <- "Analysis for all officer-initiated stops made by officers assigned to gang enforcement. Officers assigned to gang enforcement spent a total of 10,975.6 hours on officer-initiated stops in 2022."
 
 # create caption 
 caption_text <- paste("<br><br>", sourcenote, methodnote)
 
-
+# create chart
 chart <- fx_itemchart(
     df=df, 
-    x="stop_result_simple_re",
+    x="ordered_labels",
     y="duration_rate", 
     group_colors=group_colors_item,
-    # row_nums=5, # integer
     top_finding="Officers assigned to gang enforcement spend nearly 1 in 5 patrol hours on stops resulting in a field interview card",
     subtitle= "Percent of hours officers assigned to gang enforcement spend on stops by stop result",
     tooltip_text="Out of 100 hours, SDPD officers assigned to gang enforcement spent <br><b>{point.duration_rate:.1f}</b> hours on stops that resulted in <b>{point.stop_result_simple}</b>.",
     legend_text="Single dot represents 1 hour out of 100 hours",
     caption = caption_text)    
 
-# Trying to customize the order of the item chart ----------
-
-df$stop_result_simple_re <- factor(df$stop_result_simple_re, levels = c(  "Field interview card completed",
-      "Warning (verbal or written)",
-      "No Action",
-      "Custodial Arrest without warrant",
-      "Psychiatric hold",
-      "Custodial Arrest pursuant to outstanding warrant",
-      "Citation for infraction",
-      "Two or More Results",
-      "In-field cite and release"))
-
-
-  # highchart() %>%
-  #   hc_add_series(df, 
-  #                 "item",
-  #                 dataSorting=list(enabled=TRUE),
-  #                 rows=5,
-  #                 hcaes(name=stop_result_simple_re, 
-  #                       y=duration_rate,
-  #                       label=stop_result_simple_re),
-  #                 innerSize='96%',
-  #                 showInLegend=TRUE)%>% # disables tooltip from popping up when mouse moves over bars
-  #   hc_colors(group_colors_item) %>%
-  #   hc_xAxis( categories = list(
-  #     "Field interview card completed",
-  #     "Warning (verbal or written)",
-  #     "No Action",
-  #     "Custodial Arrest without warrant",
-  #     "Psychiatric hold",
-  #     "Custodial Arrest pursuant to outstanding warrant",
-  #     "Citation for infraction",
-  #     "Two or More Results",
-  #     "In-field cite and release"
-  #   ),
-  #   labels=list(
-  #     style=list(color=black,
-  #                fontFamily = main_font, # font_x_label
-  #                fontWeight = semi_bold_font_weight,
-  #                fontSize="1.5vmin")),
-  #     lineColor=gainsboro) %>%
-  #   hc_title(text="Officers assigned to gang enforcement spend nearly 1 in 5 patrol hours on stops resulting in a field interview card") %>%
-  #   hc_subtitle(text="Percent of hours officers assigned to gang enforcement spent on stops by stop result") %>%
-  #   hc_caption(text=paste0(sourcenote," <br>Analysis for all officer-initiated stops made by officers assigned to gang enforcement.")) %>%
-  #   hc_add_theme(cc_theme_test)%>%
-  #   hc_legend(title=list(text=paste0('<span style="color: #000000; font-weight: bold">', "Single dot represents 1 hour out of 100 hours", '</span><br/><span style="color: #666; font-style: italic">Click to hide</span>')),
-  #             enable = TRUE,
-  #             labelFormat = paste0('{name} <span style="opacity: 0.4">{', df$duration_rate, ':.1f}</span>'))  %>%
-  #   hc_tooltip(headerFormat="",
-  #              pointFormat = "Out of 100 hours,SDPD officers assigned to gang enforcement spent <b>{point.duration_rate:.1f}</b> hours on stops that resulted in <b>{point.stop_result_simple}</b>") %>%
-  #   hc_exporting(enabled = TRUE, sourceWidth=900, sourceHeight=600,
-  #              chartOptions=list(plotOptions=list(series=list(dataLabels=list(enabled=TRUE,                                                           
-  #                                                                             format=paste0(list(pointFormat=paste0('{point.', df$duration_rate,':.1f}')))))),
-  #              filename = paste0("Percent of hours officers assigned to gang enforcement spent on stops by stop result","_Catalyst California, catalystcalifornia.org, 2023."))) %>%
-  #   hc_chart(
-  #     marginRight=50)
-
 dbDisconnect(pillars_conn)
-
 
 ```
 
 ```{r, echo=FALSE}
 chart
 ```
-
 <script>
   widg = document.getElementsByClassName('html-widget'); //find widgets
   for (let i = 0; i < widg.length; i++) { //loop through
