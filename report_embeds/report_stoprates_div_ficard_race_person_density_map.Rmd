@@ -99,7 +99,7 @@ output:
     label = paste0(
       "<div class='leaflet-popup-scrolled' style='max-width:800px;max-height:200px'>", 
       
-      "In ", "<span style='font-size: 14px; font-weight: bold;'>", div_wide_sf$div_name, " Division",  "(", div_wide_sf$div_num, "),", "</span>", 
+      "In the", "<span style='font-size: 14px; font-weight: bold;'>", div_wide_sf$div_name, " Division",  " (Division ", div_wide_sf$div_num, "),", "</span>", 
       
       "<br>",  "Officers stopped ", "<span style='font-size: 14px; font-weight: bold;'>", div_wide_sf$count_nh_black,  "</span>", " people perceived as ", "<span style='font-size: 14px; font-weight: bold;'>", "Black",  "</span>", " for stops that resulted in a field interview card completed, or ", "<span style='font-size: 14px; font-weight: bold;'>", round(div_wide_sf$rate_nh_black, digits = 1),  "</span>", "% of Black people stopped. ", "</br>",
       
@@ -210,12 +210,12 @@ output:
 ```
   
 <h3 class="leaflet-map-title">SDPD disproportionately conducts field interviews for people of color in the Southeastern and Central Division</h3>
-<h2 class="leaflet-map-subtitle">People officers field interviewed by race and division</h2>
+<h4 class="leaflet-map-subtitle">People officers field interviewed by race and division</h4>
     
 ```{r, echo=FALSE}
   map
 ```
-  <div align="left" style="line-height: 1em;"><span style=' font-size: 10px;'>Race/ethnicity: AIAN=American Indian or Alaska Native, NHPI=Native Hawaiian or Pacific Islander, SWANA/SA=Southwest Asian or North African, or South Asian.</span> <span style="font-size: 10px;">Stops are randomly placed within each division and do not indicate the exact location of the stop.</span> <span style=' font-size: 10px;'>Catalyst California's calculations based on City of San Diego's Police Stop Data (2022); <u>[Catalyst California](https://www.catalystcalifornia.org)</u>, 2023. Analysis for all officer-initiated stops that resulted in a field interview card completed.</div>
+  <div align="left" style="line-height: 1em;"><span style=' font-size: 10px;'>Race/ethnicity: AIAN=American Indian or Alaska Native, NHPI=Native Hawaiian or Pacific Islander, SWANA/SA=Southwest Asian (Middle Eastern) or North African, or South Asian.</span> <span style="font-size: 10px;">Stops are randomly placed within each division and do not indicate the exact location of the stop.</span> <span style=' font-size: 10px;'>Catalyst California's calculations based on City of San Diego's Police Stop Data (2022); <u>[Catalyst California](https://www.catalystcalifornia.org)</u>, 2023. Analysis for all officer-initiated stops that resulted in a field interview card completed.</div>
     
     
   
