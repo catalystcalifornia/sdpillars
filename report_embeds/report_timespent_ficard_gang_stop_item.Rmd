@@ -16,14 +16,42 @@ source("chart_functions.R")
 pillars_conn <- connect_to_db("rjs_pillars")
 df <- dbGetQuery(pillars_conn, "SELECT * FROM report_timespent_ficard_gang_stop") 
 
-df<-df%>%
-  mutate(stop_result_simple_re=ifelse(stop_result_simple=="Custodial Arrest without warrant", "Arrest without warrant",
-                                      ifelse(stop_result_simple=="Warning (verbal or written)","Warning",ifelse(stop_result_simple=="Custodial Arrest pursuant to outstanding warrant","Arrest with warrant",ifelse(stop_result_simple=="Field interview card completed","Field interview card",stop_result_simple)))))
+df <- df%>%
+  # Shorten stop_result names
+  mutate(stop_result_simple_labels=case_when(stop_result_simple=="Custodial Arrest without warrant" ~ "Arrest without warrant",
+                                             stop_result_simple=="Warning (verbal or written)" ~ "Warning",
+                                             stop_result_simple=="Custodial Arrest pursuant to outstanding warrant" ~ "Arrest with warrant",
+                                             stop_result_simple=="Field interview card completed"~"Field interview card",
+                                             .default=stop_result_simple))
+# create list of categories in preferred order
+ordered_labels_list <- c("Field interview card",
+                         "Warning",
+                         "Citation for infraction",
+                         "No Action",
+                         "Psychiatric hold",
+                         "Two or More Results",
+                         "Arrest without warrant",
+                         "In-field cite and release",
+                         "Arrest with warrant")
+
+# create a factor column of the stop_result categories
+df$ordered_labels <- as.factor(df$stop_result_simple_labels)
+# set the factor levels with the ordered list above
+levels(df$ordered_labels) <- ordered_labels_list
+# confirm levels are in the right order
+levels(df$ordered_labels)
+
+# arrange the df according to factor levels
+df <- df %>%
+  arrange(ordered_labels)
+
+# View(df)
 
 # custom item coloring
-group_colors_item <- c("#D6D6D6", "#211447", meteorite,"#FFD28F", "#BABABA","#8E7ACA", "#BDAFE9", "#FFE680",  "#F0FF85")
+# order colors to align with factor levels (if needed)
+group_colors_item <- c("#211447", "#3A207D","#8E7ACA", "#BDAFE9", "#FFD28F", "#FFE680", "#F0FF85", "#BABABA", "#D6D6D6")
 
-# add mwethodnote 
+# add methodnote 
 methodnote <- "Analysis for all officer-initiated stops made by officers assigned to gang enforcement. Officers assigned to gang enforcement spent a total of 10,975.6 hours on officer-initiated stops in 2022."
 
 # create caption 
@@ -32,28 +60,14 @@ caption_text <- paste("<br><br>", sourcenote, methodnote)
 
 chart <- fx_itemchart(
     df=df, 
-    x="stop_result_simple_re",
+    x="ordered_labels",
     y="duration_rate", 
     group_colors=group_colors_item,
-    # row_nums=5, # integer
     top_finding="Officers assigned to gang enforcement spend nearly 1 in 5 patrol hours on stops resulting in a field interview card",
     subtitle= "Percent of hours officers assigned to gang enforcement spend on stops by stop result",
     tooltip_text="Out of 100 hours, SDPD officers assigned to gang enforcement spent <br><b>{point.duration_rate:.1f}</b> hours on stops that resulted in <b>{point.stop_result_simple}</b>.",
     legend_text="Single dot represents 1 hour out of 100 hours",
     caption = caption_text)    
-
-# Trying to customize the order of the item chart ----------
-
-df$stop_result_simple_re <- factor(df$stop_result_simple_re, levels = c("Field interview card completed",
-      "Warning (verbal or written)",
-      "No Action",
-      "Custodial Arrest without warrant",
-      "Psychiatric hold",
-      "Custodial Arrest pursuant to outstanding warrant",
-      "Citation for infraction",
-      "Two or More Results",
-      "In-field cite and release"))
-
 
 dbDisconnect(pillars_conn)
 
@@ -63,7 +77,6 @@ dbDisconnect(pillars_conn)
 ```{r, echo=FALSE}
 chart
 ```
-
 <script>
   widg = document.getElementsByClassName('html-widget'); //find widgets
   for (let i = 0; i < widg.length; i++) { //loop through
