@@ -84,12 +84,12 @@ embed_url("https://www.youtube.com/watch?v=FTqt90YJ_V4")
 
 ```
 
-<p style="background-color:#F25922;font-size:14pt">
+<div style="background-color:#F25922">
 ## The devastating impact of criminalizing people
 Criminalization occurs when people are turned into criminals by making their alleged activities illegal, even if the activities are ordinary or not harmful to others.^[https://www.oed.com/search/dictionary/?scope=Entries&q=criminalization+ ; https://www.merriam-webster.com/dictionary/criminalize] SDPD criminalizes community members from Southeast San Diego by documenting them as gang members. This inflicts devastating harms, direct and indirect, on Southeast community members and their families–including physical, mental, and emotional trauma.  
 
 In addition, being documented as a gang member can have devastating impacts on a person being charged with an alleged crime because of sentencing enhancements for gang membership (or “gang enhancements”). Specifically, under the STEP Act, the application of a gang enhancement adds an additional two years to life imprisonment to a person’s sentence.  The added time runs consecutive (rather than concurrent) to the punishment for an underlying felony.^[Yoshino at 119.] The potential for such added harm often has devastating impacts on people facing relatively low charges because the threat of far more lengthy imprisonment impacts plea bargaining, charging decisions, juror perspectives, among other things.   
-</p>
+</div>
 
 
 # BRIEF METHODOLOGY
