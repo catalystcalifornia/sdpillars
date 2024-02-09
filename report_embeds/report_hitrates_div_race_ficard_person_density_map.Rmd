@@ -139,7 +139,8 @@ Out of <span class='stop-count-total' style='font-size: 14px; font-weight: bold;
 
 <br>
 
-SDPD found no contraband or evidence on <span class='no-contraband-count-total' style='font-size: 14px; font-weight: bold;'></span> people, meaning SDPD  subjected <span class='no-contrband-prc-rate-total' style='font-size: 14px; font-weight: bold;'></span>% of people to unnecessary searches."
+SDPD found no contraband or evidence on <span class='no-contraband-count-total' style='font-size: 14px; font-weight: bold;'></span> people, meaning SDPD  subjected <span class='no-contrband-prc-rate-total' style='font-size: 14px; font-weight: bold;'></span>% of people to unnecessary searches.
+</div>"
 
 ```
   
