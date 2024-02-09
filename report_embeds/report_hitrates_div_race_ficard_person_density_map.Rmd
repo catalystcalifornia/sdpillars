@@ -78,14 +78,15 @@ contraband_dots = as_dot_density(div_long_sf,
                                  value = "contraband_count",
                                  values_per_dot = 5, ## each dot represents
                                  group = "race")
+```
 
-
+```{r}
 ### Map components prep
 
 ## Set CC Brand Colors for contraband layers
 # Base Color 00
 meteorite <- c('#3A207D') # no contraband
-peridot <- c('#F25922') # contraband
+papaya <- c('#F25922') # contraband
 
 ## function to change the legend shape and color
 colors_function <- function(colors, sizes, borders, shapes) {
@@ -114,27 +115,32 @@ data_popup <- paste0("<div class='pointdensity'> <div class='leaflet-data' data-
 # Note: the <span> "class" names are using the SAME naming as in the data_popup (only difference is no "data-" prefix) - this is a convenience for the JS (end of script)
 rate_popup <- "<div class='leaflet-popup-scrolled point-density-sidebar'><div class='popup-instruction'>Please click on a police division to see stop data below.</div><div class ='division-header'><span class='division-name'></span> Division (Division <span class='division-number'></span>)</div></div><br>Out of <span class='stop-count-total data-emphasis'></span> people searched during stops where a field interview card was completed:<br><br>SDPD found contraband/evidence on <span class='yes-contraband-count data-emphasis'></span> people, a hit rate of <span class='yes-contraband-prc-rate data-emphasis'></span>%.<br><br>SDPD found no contraband or evidence on <span class='no-contraband-count data-emphasis'></span> people, meaning SDPD  subjected <span class='no-contraband-prc-rate data-emphasis'></span>% of people to unnecessary searches.
 <br><br><div class='legend'><div class='legend-note'>1 dot = 5 field interview card stops and a search</div><br><span class='no-contraband-dot'></span> No Contraband Found <br><span class='yes-contraband-dot'></span> Yes Contraband Found</div></div><br>"
+```
 
+```{r}
 
 ### Build map
 map <- leaflet(width = "100%", height = "600px",
                options = leafletOptions(zoomControl = FALSE, minZoom=10, maxZoom=10)) %>%
   
+  ## add Division polygons
+  # add polygons first - if the fillColor is white and it is added below/after markers, the marker colors will get washed out (dull)
+  addPolygons(data = div_wide_sf, label=~htmlEscape(paste0(div_name, " Division ")),
+              color = "black", fillColor = "white", opacity = 1,  popup = ~paste0(data_popup),
+              weight = 2, smoothFactor = 0.5, highlight = highlightOptions(color = "white", 
+                                                                           weight = 3, 
+                                                                           # Use these settings otherwise highlight will change marker colors
+                                                                           bringToFront = TRUE, sendToBack = TRUE)) %>%
+  
   ## add no contraband stop markers
   addCircleMarkers(data = no_contraband_dots, group = "No Contraband Found",
                    label = NULL, weight = 3,  opacity = 0, fillOpacity = 1, 
-                   radius = 2, color="white",  fillColor= meteorite, stroke = TRUE) %>% 
+                   radius = 2, fillColor= meteorite, stroke = TRUE) %>% 
     
   ## add contraband stop markers
   addCircleMarkers(data = contraband_dots, group = "Yes Contraband Found",
                    label = NULL, weight = 3, opacity = 0, fillOpacity = 1,
-                   radius = 2, color="white",  fillColor=  peridot,  stroke = TRUE) %>% 
-    
-  ## add Division polygons
-  addPolygons(data = div_wide_sf, label=~htmlEscape(paste0(div_name, " Division ")),
-              color = "black", fillColor = "white", opacity = 1,  popup = ~paste0(data_popup),
-              weight = 2, smoothFactor = 0.5, highlight = highlightOptions(color = "white", 
-                                                                           weight = 3, bringToFront = TRUE, sendToBack = FALSE)) %>%
+                   radius = 2, fillColor=  papaya,  stroke = TRUE) %>% 
 
   ## Add selection control for contraband/no contraband layers
   addLayersControl(overlayGroups = c("No Contraband Found", "Yes Contraband Found"),
