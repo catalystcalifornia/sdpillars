@@ -131,7 +131,7 @@ data_popup <- paste0("<div class='pointdensity'> <div class='leaflet-data' data-
 
 merged_rate_popup <- "<div class='leaflet-popup-scrolled point-density-sidebar' style='max-width:800px;max-height:200px'><div class='popup-instruction'><b>Please click on a police division to see stop data below.</b></div>
 
-<div class ='division-header' style='font-size: 14px; font-weight: bold;'><span class='division-name'></span> Division (Division <span class='division-number'></span></div></div>
+<div class ='division-header' style='font-size: 14px; font-weight: bold;'><span class='division-name'></span> Division (Division <span class='division-number'></span>)</div></div>
 
 <br><br>
 
@@ -192,6 +192,7 @@ map <- leaflet(width = "100%", height = "600px") %>%
   map
 ```
 <div align="left" style="line-height: 1em;"><span style="font-size: 10px;">Searches are randomly placed within each division and do not indicate the exact location of the search.</span> <span style=' font-size: 10px;'>Catalyst California's calculations based on City of San Diego's Police Stop Data (2022); <u>[Catalyst California](https://www.catalystcalifornia.org)</u>, 2023. Analysis for all officer-initiated stops that resulted in a field interview card completed and a search.</span> </div>
+
 
 <style type="text/css">
 
@@ -268,7 +269,6 @@ map <- leaflet(width = "100%", height = "600px") %>%
 </style
 
 ```{js}
-```{js}
 <!-- This function is used to format SDPD RIPA data in the point density map "popup"/sidebar feature -->
 
 <!-- Captures  -->
@@ -279,29 +279,23 @@ L.Map.addInitHook(function () {
     map.on('popupopen', (e) => {
     
     let popups = document.querySelectorAll('.leaflet-data');
-    console.log(popups);
+    // console.log(popups);
 
-document.querySelectorAll('.pointdensity').forEach(pointdensity => {
-pointdensity.parentElement.parentElement.parentElement.classList.add('hidden')
-})
-  
-popups.forEach((popup) => {
-division = popup.getAttribute('data-division-name')
-document.querySelectorAll('.division-name').forEach(node => node.innerHTML = division)
-document.querySelector('.division-number').innerHTML = popup.getAttribute('data-division-number')
-document.querySelector('.stop-count-total').innerHTML = popup.getAttribute('data-stop-count-total')
-document.querySelector('.yes-contraband-count').innerHTML = popup.getAttribute('data-yes-contraband-count')
-document.querySelector('.yes-contraband-prc-rate').innerHTML = popup.getAttribute('data-yes-contraband-prc-rate')
-document.querySelector('.no-contraband-count').innerHTML = popup.getAttribute('data-no-contraband-count')
-document.querySelector('.no-contraband-prc-rate').innerHTML = popup.getAttribute('data-no-contraband-prc-rate')
+    document.querySelectorAll('.pointdensity').forEach(pointdensity => {
+    pointdensity.parentElement.parentElement.parentElement.classList.add('hidden')
+  })
+  //console.log('click')
+  let popup = popups[popups.length-1]
+  document.querySelector('.division-name').innerHTML = popup.getAttribute('data-division-name')
+  document.querySelector('.division-number').innerHTML = popup.getAttribute('data-division-number')
+  document.querySelector('.stop-count-total').innerHTML = popup.getAttribute('data-stop-count-total')
+  document.querySelector('.yes-contraband-count').innerHTML = popup.getAttribute('data-yes-contraband-count')
+  document.querySelector('.yes-contraband-prc-rate').innerHTML = popup.getAttribute('data-yes-contraband-prc-rate')
+  document.querySelector('.no-contraband-count').innerHTML = popup.getAttribute('data-no-contraband-count')
+  document.querySelector('.no-contraband-prc-rate').innerHTML = popup.getAttribute('data-no-contraband-prc-rate')
 
-
-// Rescaling function: (((oldValue - oldMin) * (newMax - newMin)) / (oldMax - oldMin)) + newMin
-//let rateScaled = (((stopRate - 0) * (275 - 0)) / (512.1 - 0)) + 5
-//let countScaled = (((popCount - 0) * (50 - 10)) / (1 - 0)) + 10
-})})})})
+})})})
 
 ```
 
-```
     
