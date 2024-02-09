@@ -103,10 +103,10 @@ colors_function <- function(colors, sizes, borders, shapes) {
 data_popup <- paste0("<div class='pointdensity'> <div class='leaflet-data' data-division-name='", div_wide_sf$div_name,
                "' data-division-number='", div_wide_sf$div_num,
                "' data-stop-count-total='", div_wide_sf$stop_count_total,
-               "' data-contraband-count='", div_wide_sf$contraband_count,
-               "' data-contraband-prc-rate='", round(div_wide_sf$contraband_prc_rate, digits = 1),
-               "' data-no-contraband-count-total='", div_wide_sf$no_contraband_count_total,
-               "' data-no-contrband-prc-rate-total='", round(div_wide_sf$no_contraband_prc_rate_total, digits = 1),
+               "' data-yes-contraband-count='", div_wide_sf$contraband_count,
+               "' data-yes-contraband-prc-rate='", round(div_wide_sf$contraband_prc_rate, digits = 1),
+               "' data-no-contraband-count='", div_wide_sf$no_contraband_count_total,
+               "' data-no-contrband-prc-rate='", round(div_wide_sf$no_contraband_prc_rate_total, digits = 1),
                "' ></div></div>")
 
 # rate_popup <- paste0("<div class='leaflet-popup-scrolled' style='max-width:800px;max-height:200px'>",
@@ -125,7 +125,7 @@ data_popup <- paste0("<div class='pointdensity'> <div class='leaflet-data' data-
 
 ## Create full content (data and text) in an html string for the custom popup
 # Important to note our "class" names (e.g., leaflet-popup-scrolled, division-header, stop-count-total, etc.) 
-# <div> "class" names will help us with CSS styling
+# <div> "class" names are used as references with CSS styling (end of script, before JS)
 # <span> "class" names help us insert the data we have stored in data_popup
 # Note: the <span> "class" names are using the SAME naming as in the data_popup (only difference is no "data-" prefix) - this is a convenience for the JS (end of script)
 
@@ -192,4 +192,78 @@ map <- leaflet(width = "100%", height = "600px") %>%
   map
 ```
 <div align="left" style="line-height: 1em;"><span style="font-size: 10px;">Searches are randomly placed within each division and do not indicate the exact location of the search.</span> <span style=' font-size: 10px;'>Catalyst California's calculations based on City of San Diego's Police Stop Data (2022); <u>[Catalyst California](https://www.catalystcalifornia.org)</u>, 2023. Analysis for all officer-initiated stops that resulted in a field interview card completed and a search.</span> </div>
+
+<style type="text/css">
+
+.division-header {
+   margin-bottom: 8px; 
+   font-weight: 600; 
+   color: #000000;
+}
+
+.yes-contraband-color {
+  color: #F25922;
+  font-weight: 600;
+}
+
+.no-contraband-color {
+  color: #3A207D;
+  font-weight: 600;
+  
+}
+
+.leaflet-popup-scrolled {
+  max-height: 580px;
+  opacity: 1;
+  border-bottom: 0;
+  border-top: 0;
+}
+
+.info {
+  background: white;
+  opacity: 1;
+  border-radius: 0;
+}
+
+.leaflet-left {
+  width: 33%;
+}
+
+.leaflet-left .leaflet-control {
+  font-size: 12px;
+  margin-left: 0;
+  border-left: 1px solid #ddd;
+  border-top: 1px solid #ddd;
+  border-bottom: 1px solid #ddd;
+}
+
+.leaflet-right .leaflet-control {
+  margin-right: 0;
+}
+
+.leaflet-top .leaflet-control {
+  margin-top: 0;
+}
+
+.leaflet-control-container {
+  color: #000000;
+}
+
+.hidden {
+  display: none;
+}
+
+.popup-instruction {
+  font-style: italic;
+  font-weight: 400; 
+  font-size: 1em; 
+  line-height: 1.2em;
+  color: #000000;
+  border-bottom: 1px solid #000000;
+  padding-top: 1.2em;
+  padding-bottom: 1.2em;
+  margin-bottom: 1.2em;
+}
+
+</style
     
