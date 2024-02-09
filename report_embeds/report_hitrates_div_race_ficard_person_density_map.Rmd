@@ -133,14 +133,20 @@ merged_rate_popup <- "<div class='leaflet-popup-scrolled point-density-sidebar' 
 
 <div class ='division-header' style='font-size: 14px; font-weight: bold;'><span class='division-name'></span> Division (Division <span class='division-number'></span>)</div></div>
 
-<br><br>
-
-Out of <span class='stop-count-total' style='font-size: 14px; font-weight: bold;'></span> people searched during stops where a field interview card was completed, SDPD found contraband/evidence on <span class='contraband-count' style='font-size: 14px; font-weight: bold;'></span> people, a hit rate of <span class='contraband-prc-rate' style='font-size: 14px; font-weight: bold;'></span>%.
-
 <br>
 
-SDPD found no contraband or evidence on <span class='no-contraband-count-total' style='font-size: 14px; font-weight: bold;'></span> people, meaning SDPD  subjected <span class='no-contrband-prc-rate-total' style='font-size: 14px; font-weight: bold;'></span>% of people to unnecessary searches.
-</div>"
+Out of <span class='stop-count-total' style='font-size: 14px; font-weight: bold;'></span> people searched during stops where a field interview card was completed:
+
+<br><br>
+
+SDPD found contraband/evidence on <span class='yes-contraband-count' style='font-size: 14px; font-weight: bold;'></span> people, a hit rate of <span class='yes-contraband-prc-rate' style='font-size: 14px; font-weight: bold;'></span>%.
+
+<br><br>
+
+SDPD found no contraband or evidence on <span class='no-contraband-count' style='font-size: 14px; font-weight: bold;'></span> people, meaning SDPD  subjected <span class='no-contraband-prc-rate' style='font-size: 14px; font-weight: bold;'></span>% of people to unnecessary searches.
+</div>
+
+<br><br>"
 
 ```
   
