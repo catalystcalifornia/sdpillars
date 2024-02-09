@@ -96,7 +96,7 @@ colors_function <- function(colors, sizes, borders, shapes) {
     paste0(colors, "; width:", sizes, "px; height:", sizes, "px; border:1px solid ", borders, "; border-radius:", shapes)}
 
 ## Create content for popup
-# This stores the values we plan to insert into the final popup (i.e., not the full content of the final popup like rate_popup)
+# This stores the values we plan to insert into the custom popup (i.e., not the full content of the custom popup like in rate_popup)
 # Take note of the naming structure in the html tags: [data-][variable-name]
 # It's important to only use hyphens (no underscores or other symbols to denote space between words)
 # We'll use the names in the html tags when formatting popup behavior in JS (end of script)
@@ -128,7 +128,7 @@ data_popup <- paste0("<div class='pointdensity'> <div class='leaflet-data' data-
 ```{r, include=FALSE}
 ### Build map
 map <- leaflet(width = "100%", height = "600px") %>%
-    
+  
   ## add no contraband stop markers
   addCircleMarkers(data = no_contraband_dots, group = "No Contraband Found",
                    label = NULL, weight = 3,  opacity = 0, fillOpacity = 1, 
@@ -155,6 +155,10 @@ map <- leaflet(width = "100%", height = "600px") %>%
             labels= c("No Contraband Found",  "Yes Contraband Found"),
             opacity = 0.7, labFormat = labelFormat(digits = 0)) %>% 
   
+  ## add custom popup with full content
+  addControl(html=rate_popup, position = "topleft") %>%
+
+  ## Set tiles, view
   addProviderTiles("CartoDB.Positron") %>%
   setView(-117.13395, 32.79923, zoom = 10)
   
