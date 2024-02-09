@@ -9,7 +9,8 @@ output:
     
     
 ```{r, include=FALSE}
-#### Map: Data Prep ###
+knitr::opts_chunk$set(echo=FALSE, message=FALSE, warning=FALSE)
+
 #### Load libraries ####
 library(usethis)
 library(tidyverse)
@@ -26,7 +27,10 @@ source("W:\\RDA Team\\R\\credentials_source.R")
 source("chart_functions.R")
   
 pillars_conn <- connect_to_db("rjs_pillars")
-  
+```
+
+```{r}
+#### Map: Data Prep ###
 ## load in race metadata
 metadata_race_labels <-  dbGetQuery(pillars_conn, "SELECT * FROM metadata_race_labels") %>% 
   select(race_base, race_label_short, race_label_long)
@@ -63,10 +67,7 @@ div_wide_sf <- div %>%
 # the dot density needs the data to be long
 div_long_sf <- div %>% 
   left_join(df_long)
-```
-  
 
-```{r, include=FALSE}
 ### Calculate dot density count ###
 no_contraband_dots = as_dot_density(div_long_sf,
                                     value = "no_contraband_count",
@@ -78,10 +79,7 @@ contraband_dots = as_dot_density(div_long_sf,
                                  values_per_dot = 5, ## each dot represents
                                  group = "race")
 
-```
-  
-  
-```{r, include=FALSE}
+
 ### Map components prep
 
 ## Set CC Brand Colors for contraband layers
@@ -117,10 +115,7 @@ data_popup <- paste0("<div class='pointdensity'> <div class='leaflet-data' data-
 rate_popup <- "<div class='leaflet-popup-scrolled point-density-sidebar'><div class='popup-instruction'>Please click on a police division to see stop data below.</div><div class ='division-header'><span class='division-name'></span> Division (Division <span class='division-number'></span>)</div></div><br>Out of <span class='stop-count-total data-emphasis'></span> people searched during stops where a field interview card was completed:<br><br>SDPD found contraband/evidence on <span class='yes-contraband-count data-emphasis'></span> people, a hit rate of <span class='yes-contraband-prc-rate data-emphasis'></span>%.<br><br>SDPD found no contraband or evidence on <span class='no-contraband-count data-emphasis'></span> people, meaning SDPD  subjected <span class='no-contraband-prc-rate data-emphasis'></span>% of people to unnecessary searches.
 <br><br><div class='legend'><div class='legend-note'>1 dot = 5 field interview card stops and a search</div><br><span class='no-contraband-dot'></span> No Contraband Found <br><span class='yes-contraband-dot'></span> Yes Contraband Found</div></div><br>"
 
-```
-  
-  
-```{r, include=FALSE}
+
 ### Build map
 map <- leaflet(width = "100%", height = "600px",
                options = leafletOptions(zoomControl = FALSE, minZoom=10, maxZoom=10)) %>%
@@ -158,8 +153,8 @@ map <- leaflet(width = "100%", height = "600px",
 <h4 class="leaflet-map-subtitle">People searched during field interviews by division and search result</h4>
     
     
-```{r, echo=FALSE}
-  map
+```{r}
+map
 ```
 <div align="left" style="line-height: 1em;"><span style="font-size: 10px;">Searches are randomly placed within each division and do not indicate the exact location of the search.</span> <span style=' font-size: 10px;'>Catalyst California's calculations based on City of San Diego's Police Stop Data (2022); <u>[Catalyst California](https://www.catalystcalifornia.org)</u>, 2023. Analysis for all officer-initiated stops that resulted in a field interview card completed and a search.</span> </div>
 
@@ -275,13 +270,9 @@ map <- leaflet(width = "100%", height = "600px",
   font-weight: 700;
 }
 
-
-</style
+</style>
 
 ```{js}
-<!-- This function is used to format SDPD RIPA data in the point density map "popup"/sidebar feature -->
-
-<!-- Captures  -->
 var mapsPlaceholder = [];
 L.Map.addInitHook(function () {
   mapsPlaceholder.push(this);
@@ -305,8 +296,6 @@ L.Map.addInitHook(function () {
   document.querySelector('.no-contraband-count').innerHTML = popup.getAttribute('data-no-contraband-count')
   document.querySelector('.no-contraband-prc-rate').innerHTML = popup.getAttribute('data-no-contraband-prc-rate')
 
-})})})
+})})});
 
 ```
-
-    
