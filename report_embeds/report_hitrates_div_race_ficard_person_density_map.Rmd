@@ -77,17 +77,25 @@ contraband_dots = as_dot_density(div_long_sf,
                                  value = "contraband_count",
                                  values_per_dot = 5, ## each dot represents
                                  group = "race")
+
+```
   
+  
+```{r, include=FALSE}
+### Map components prep
+
+## Set CC Brand Colors for contraband layers
+# Base Color 00
+meteorite <- c('#3A207D') # no contraband
+peridot <- c('#F25922') # contraband
+
 ## function to change the legend shape and color
 colors_function <- function(colors, sizes, borders, shapes) {
     shapes <- gsub("circle", "100%", shapes)
     shapes <- gsub("square", "100%", shapes)
     paste0(colors, "; width:", sizes, "px; height:", sizes, "px; border:1px solid ", borders, "; border-radius:", shapes)}
 
-```
-  
-  
-```{r, include=FALSE}
+## Create content for popup
 rate_popup <- paste0("<div class='leaflet-popup-scrolled' style='max-width:800px;max-height:200px'>",
                      "In the <span style='font-size: 14px; font-weight: bold;'>",
                      div_wide_sf$div_name, " Division",  " (Division ", div_wide_sf$div_num,")",
@@ -105,30 +113,26 @@ rate_popup <- paste0("<div class='leaflet-popup-scrolled' style='max-width:800px
   
   
 ```{r, include=FALSE}
-# CC Brand Colors, Base Color 00
-meteorite <- c('#3A207D') # no contraband
-peridot <- c('#F25922') # contraband
-
-### intiate leaflet map
+### Build map
 map <- leaflet(width = "100%", height = "600px") %>%
     
-  ## add no contraband stops
+  ## add no contraband stop markers
   addCircleMarkers(data = no_contraband_dots, group = "No Contraband Found",
                    label = NULL, weight = 3,  opacity = 0, fillOpacity = 1, 
                    radius = 2, color="white",  fillColor= meteorite, stroke = TRUE) %>% 
     
-  ## add contraband stops
+  ## add contraband stop markers
   addCircleMarkers(data = contraband_dots, group = "Yes Contraband Found",
                    label = NULL, weight = 3, opacity = 0, fillOpacity = 1,
                    radius = 2, color="white",  fillColor=  peridot,  stroke = TRUE) %>% 
     
-  ## add Division 
+  ## add Division polygons
   addPolygons(data = div_wide_sf, label=~htmlEscape(paste0(div_name, " Division ")),
               color = "black", fillColor = "white", opacity = 1,  popup = ~paste0(rate_popup),
               weight = 2, smoothFactor = 0.5, highlight = highlightOptions(color = "white", 
                                                                            weight = 3, bringToFront = TRUE, sendToBack = FALSE)) %>%
 
-  ## Add layers for contraband/no contraband selections
+  ## Add selection control for contraband/no contraband layers
   addLayersControl(overlayGroups = c("No Contraband Found", "Yes Contraband Found"),
                    options = layersControlOptions(collapsed = FALSE)) %>%
     
