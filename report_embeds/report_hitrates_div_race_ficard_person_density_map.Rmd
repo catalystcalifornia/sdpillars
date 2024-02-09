@@ -96,19 +96,32 @@ colors_function <- function(colors, sizes, borders, shapes) {
     paste0(colors, "; width:", sizes, "px; height:", sizes, "px; border:1px solid ", borders, "; border-radius:", shapes)}
 
 ## Create content for popup
-rate_popup <- paste0("<div class='leaflet-popup-scrolled' style='max-width:800px;max-height:200px'>",
-                     "In the <span style='font-size: 14px; font-weight: bold;'>",
-                     div_wide_sf$div_name, " Division",  " (Division ", div_wide_sf$div_num,")",
-                     "</span>", "<br> <br> Out of ", "<span style='font-size: 14px; font-weight: bold;'>", div_wide_sf$stop_count_total,
-                     "</span> people searched during stops where a field interview card was completed, SDPD found contraband/evidence on ",
-                     "<span style='font-size: 14px; font-weight: bold;'>", div_wide_sf$contraband_count, 
-                     "</span>", " people, a hit rate of ", "<span style='font-size: 14px; font-weight: bold;'>",
-                     round(div_wide_sf$contraband_prc_rate, digits = 1), "</span>",  "%.", 
-                     " SDPD found no contraband or evidence on ", "<span style='font-size: 14px; font-weight: bold;'>",
-                     div_wide_sf$no_contraband_count_total, "</span>", " people, meaning SDPD  subjected ", 
-                     "<span style='font-size: 14px; font-weight: bold;'>", round(div_wide_sf$no_contraband_prc_rate_total, digits = 1),
-                     "% of people to unnecessary searches.")
-  
+# This stores the values we plan to insert into the final popup (i.e., not the full content of the final popup like rate_popup)
+# Take note of the naming structure in the html tags: [data-][variable-name]
+# It's important to only use hyphens (no underscores or other symbols to denote space between words)
+# We'll use the names in the html tags when formatting popup behavior in JS (end of script)
+data_popup <- paste0("<div class='pointdensity'> <div class='leaflet-data' data-division-name='", div_wide_sf$div_name,
+               "' data-division-number='", div_wide_sf$div_num,
+               "' data-stop-count-total='", div_wide_sf$stop_count_total,
+               "' data-contraband-count='", div_wide_sf$contraband_count,
+               "' data-contraband-prc-rate='", round(div_wide_sf$contraband_prc_rate, digits = 1),
+               "' data-no-contraband-count-total='", div_wide_sf$no_contraband_count_total,
+               "' data-no-contrband-prc-rate-total='", round(div_wide_sf$no_contraband_prc_rate_total, digits = 1),
+               "' ></div></div>")
+
+# rate_popup <- paste0("<div class='leaflet-popup-scrolled' style='max-width:800px;max-height:200px'>",
+#                      "In the <span style='font-size: 14px; font-weight: bold;'>",
+#                      div_wide_sf$div_name, " Division",  " (Division ", div_wide_sf$div_num,")",
+#                      "</span>", "<br> <br> Out of ", "<span style='font-size: 14px; font-weight: bold;'>", div_wide_sf$stop_count_total,
+#                      "</span> people searched during stops where a field interview card was completed, SDPD found contraband/evidence on ",
+#                      "<span style='font-size: 14px; font-weight: bold;'>", div_wide_sf$contraband_count, 
+#                      "</span>", " people, a hit rate of ", "<span style='font-size: 14px; font-weight: bold;'>",
+#                      round(div_wide_sf$contraband_prc_rate, digits = 1), "</span>",  "%.", 
+#                      " SDPD found no contraband or evidence on ", "<span style='font-size: 14px; font-weight: bold;'>",
+#                      div_wide_sf$no_contraband_count_total, "</span>", " people, meaning SDPD  subjected ", 
+#                      "<span style='font-size: 14px; font-weight: bold;'>", round(div_wide_sf$no_contraband_prc_rate_total, digits = 1),
+#                      "% of people to unnecessary searches.")
+#   
 ```
   
   
