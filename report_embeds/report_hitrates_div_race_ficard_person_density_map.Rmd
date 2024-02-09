@@ -106,7 +106,7 @@ data_popup <- paste0("<div class='pointdensity'> <div class='leaflet-data' data-
                "' data-yes-contraband-count='", div_wide_sf$contraband_count,
                "' data-yes-contraband-prc-rate='", round(div_wide_sf$contraband_prc_rate, digits = 1),
                "' data-no-contraband-count='", div_wide_sf$no_contraband_count_total,
-               "' data-no-contrband-prc-rate='", round(div_wide_sf$no_contraband_prc_rate_total, digits = 1),
+               "' data-no-contraband-prc-rate='", round(div_wide_sf$no_contraband_prc_rate_total, digits = 1),
                "' ></div></div>")
 
 # rate_popup <- paste0("<div class='leaflet-popup-scrolled' style='max-width:800px;max-height:200px'>",
@@ -266,4 +266,42 @@ map <- leaflet(width = "100%", height = "600px") %>%
 }
 
 </style
+
+```{js}
+```{js}
+<!-- This function is used to format SDPD RIPA data in the point density map "popup"/sidebar feature -->
+
+<!-- Captures  -->
+var mapsPlaceholder = [];
+L.Map.addInitHook(function () {
+  mapsPlaceholder.push(this);
+  mapsPlaceholder.forEach(map => {
+    map.on('popupopen', (e) => {
+    
+    let popups = document.querySelectorAll('.leaflet-data');
+    console.log(popups);
+
+document.querySelectorAll('.pointdensity').forEach(pointdensity => {
+pointdensity.parentElement.parentElement.parentElement.classList.add('hidden')
+})
+  
+popups.forEach((popup) => {
+division = popup.getAttribute('data-division-name')
+document.querySelectorAll('.division-name').forEach(node => node.innerHTML = division)
+document.querySelector('.division-number').innerHTML = popup.getAttribute('data-division-number')
+document.querySelector('.stop-count-total').innerHTML = popup.getAttribute('data-stop-count-total')
+document.querySelector('.yes-contraband-count').innerHTML = popup.getAttribute('data-yes-contraband-count')
+document.querySelector('.yes-contraband-prc-rate').innerHTML = popup.getAttribute('data-yes-contraband-prc-rate')
+document.querySelector('.no-contraband-count').innerHTML = popup.getAttribute('data-no-contraband-count')
+document.querySelector('.no-contraband-prc-rate').innerHTML = popup.getAttribute('data-no-contraband-prc-rate')
+
+
+// Rescaling function: (((oldValue - oldMin) * (newMax - newMin)) / (oldMax - oldMin)) + newMin
+//let rateScaled = (((stopRate - 0) * (275 - 0)) / (512.1 - 0)) + 5
+//let countScaled = (((popCount - 0) * (50 - 10)) / (1 - 0)) + 10
+})})})})
+
+```
+
+```
     
