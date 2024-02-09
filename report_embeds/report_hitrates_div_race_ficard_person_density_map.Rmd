@@ -95,7 +95,7 @@ colors_function <- function(colors, sizes, borders, shapes) {
     shapes <- gsub("square", "100%", shapes)
     paste0(colors, "; width:", sizes, "px; height:", sizes, "px; border:1px solid ", borders, "; border-radius:", shapes)}
 
-## Create content for popup
+## Create data content for popup
 # This stores the values we plan to insert into the custom popup (i.e., not the full content of the custom popup like in rate_popup)
 # Take note of the naming structure in the html tags: [data-][variable-name]
 # It's important to only use hyphens (no underscores or other symbols to denote space between words)
@@ -122,6 +122,25 @@ data_popup <- paste0("<div class='pointdensity'> <div class='leaflet-data' data-
 #                      "<span style='font-size: 14px; font-weight: bold;'>", round(div_wide_sf$no_contraband_prc_rate_total, digits = 1),
 #                      "% of people to unnecessary searches.")
 #   
+
+## Create full content (data and text) in an html string for the custom popup
+# Important to note our "class" names (e.g., leaflet-popup-scrolled, division-header, stop-count-total, etc.) 
+# <div> "class" names will help us with CSS styling
+# <span> "class" names help us insert the data we have stored in data_popup
+# Note: the <span> "class" names are using the SAME naming as in the data_popup (only difference is no "data-" prefix) - this is a convenience for the JS (end of script)
+
+merged_rate_popup <- "<div class='leaflet-popup-scrolled point-density-sidebar' style='max-width:800px;max-height:200px'><div class='popup-instruction'><b>Please click on a police division to see stop data below.</b></div>
+
+<div class ='division-header' style='font-size: 14px; font-weight: bold;'><span class='division-name'></span> Division (Division <span class='division-number'></span></div></div>
+
+<br><br>
+
+Out of <span class='stop-count-total' style='font-size: 14px; font-weight: bold;'></span> people searched during stops where a field interview card was completed, SDPD found contraband/evidence on <span class='contraband-count' style='font-size: 14px; font-weight: bold;'></span> people, a hit rate of <span class='contraband-prc-rate' style='font-size: 14px; font-weight: bold;'></span>%.
+
+<br>
+
+SDPD found no contraband or evidence on <span class='no-contraband-count-total' style='font-size: 14px; font-weight: bold;'></span> people, meaning SDPD  subjected <span class='no-contrband-prc-rate-total' style='font-size: 14px; font-weight: bold;'></span>% of people to unnecessary searches."
+
 ```
   
   
@@ -156,7 +175,7 @@ map <- leaflet(width = "100%", height = "600px") %>%
             opacity = 0.7, labFormat = labelFormat(digits = 0)) %>% 
   
   ## add custom popup with full content
-  addControl(html=rate_popup, position = "topleft") %>%
+  addControl(html=merged_rate_popup, position = "topleft") %>%
 
   ## Set tiles, view
   addProviderTiles("CartoDB.Positron") %>%
