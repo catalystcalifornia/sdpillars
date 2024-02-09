@@ -109,27 +109,12 @@ data_popup <- paste0("<div class='pointdensity'> <div class='leaflet-data' data-
                "' data-no-contraband-prc-rate='", round(div_wide_sf$no_contraband_prc_rate_total, digits = 1),
                "' ></div></div>")
 
-# rate_popup <- paste0("<div class='leaflet-popup-scrolled' style='max-width:800px;max-height:200px'>",
-#                      "In the <span style='font-size: 14px; font-weight: bold;'>",
-#                      div_wide_sf$div_name, " Division",  " (Division ", div_wide_sf$div_num,")",
-#                      "</span>", "<br> <br> Out of ", "<span style='font-size: 14px; font-weight: bold;'>", div_wide_sf$stop_count_total,
-#                      "</span> people searched during stops where a field interview card was completed, SDPD found contraband/evidence on ",
-#                      "<span style='font-size: 14px; font-weight: bold;'>", div_wide_sf$contraband_count, 
-#                      "</span>", " people, a hit rate of ", "<span style='font-size: 14px; font-weight: bold;'>",
-#                      round(div_wide_sf$contraband_prc_rate, digits = 1), "</span>",  "%.", 
-#                      " SDPD found no contraband or evidence on ", "<span style='font-size: 14px; font-weight: bold;'>",
-#                      div_wide_sf$no_contraband_count_total, "</span>", " people, meaning SDPD  subjected ", 
-#                      "<span style='font-size: 14px; font-weight: bold;'>", round(div_wide_sf$no_contraband_prc_rate_total, digits = 1),
-#                      "% of people to unnecessary searches.")
-#   
-
 ## Create full content (data and text) in an html string for the custom popup
 # Important to note our "class" names (e.g., leaflet-popup-scrolled, division-header, stop-count-total, etc.) 
 # <div> "class" names are used as references with CSS styling (end of script, before JS)
 # <span> "class" names help us insert the data we have stored in data_popup
 # Note: the <span> "class" names are using the SAME naming as in the data_popup (only difference is no "data-" prefix) - this is a convenience for the JS (end of script)
-
-merged_rate_popup <- "<div class='leaflet-popup-scrolled point-density-sidebar' style='max-width:800px;max-height:200px'><div class='popup-instruction'><b>Please click on a police division to see stop data below.</b></div>
+rate_popup <- "<div class='leaflet-popup-scrolled point-density-sidebar' style='max-width:800px;max-height:200px'><div class='popup-instruction'><b>Please click on a police division to see stop data below.</b></div>
 
 <div class ='division-header' style='font-size: 14px; font-weight: bold;'><span class='division-name'></span> Division (Division <span class='division-number'></span>)</div></div>
 
@@ -182,7 +167,7 @@ map <- leaflet(width = "100%", height = "600px") %>%
             opacity = 0.7, labFormat = labelFormat(digits = 0)) %>% 
   
   ## add custom popup with full content
-  addControl(html=merged_rate_popup, position = "topleft") %>%
+  addControl(html=rate_popup, position = "topleft") %>%
 
   ## Set tiles, view
   addProviderTiles("CartoDB.Positron") %>%
@@ -290,6 +275,7 @@ L.Map.addInitHook(function () {
     document.querySelectorAll('.pointdensity').forEach(pointdensity => {
     pointdensity.parentElement.parentElement.parentElement.classList.add('hidden')
   })
+  
   //console.log('click')
   let popup = popups[popups.length-1]
   document.querySelector('.division-name').innerHTML = popup.getAttribute('data-division-name')
