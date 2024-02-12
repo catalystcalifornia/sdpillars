@@ -146,14 +146,14 @@ Officers stopped <span class='count-nh-white'></span> people perceived as <span 
 
 ## Set CC Brand colors for race/ethnic layers
 # Base Color 00
-lime_green <- c('#0AB013')
-persian_indigo <- c('#211447')
-halloween_orange <- c('#DF4007')
-bitter_lemon <- c('#BCD313')
-blue <- c('#0860BC')
-dark_tangerine <- c('#EB8D00')
-american_yellow <- c('#EABB00')
-halaya_ube <- c('#601D42')
+dark_tangerine <- c('#EB8D00') # AIAN
+halaya_ube <- c('#601D42') # NHPI
+american_yellow <- c('#EABB00') # SWANA/sa
+halloween_orange <- c('#DF4007') # Asian
+blue <- c('#0860BC') # Black
+lime_green <- c('#0AB013') # Latinx
+persian_indigo <- c('#211447') # Two or more races/Multiracial
+bitter_lemon <- c('#BCD313') # White
   
 # Create list of colors for race/ethnic layers
 map_colors <- c(dark_tangerine, halaya_ube, american_yellow, halloween_orange,
@@ -247,5 +247,185 @@ map <-  leaflet(width = "100%", height = "600px") %>%
 ```
   <div align="left" style="line-height: 1em;"><span style=' font-size: 10px;'>Race/ethnicity: AIAN=American Indian or Alaska Native, NHPI=Native Hawaiian or Pacific Islander, SWANA/SA=Southwest Asian (Middle Eastern) or North African, or South Asian.</span> <span style="font-size: 10px;">Stops are randomly placed within each division and do not indicate the exact location of the stop.</span> <span style=' font-size: 10px;'>Catalyst California's calculations based on City of San Diego's Police Stop Data (2022); <u>[Catalyst California](https://www.catalystcalifornia.org)</u>, 2023. Analysis for all officer-initiated stops that resulted in a field interview card completed.</div>
     
-    
+<style type="text/css">
+
+.division-header {
+   margin-bottom: 8px; 
+   font-weight: 700; 
+   color: #000000;
+   font-size: 14px; 
+}
+
+.leaflet-popup-scrolled {
+  max-height: 580px;
+  opacity: 1;
+  border-bottom: 0;
+  border-top: 0;
+}
+
+.leaflet-popup-scrolled .point-density-sidebar{
+  max-width: 800px;
+  max-height: 200px;
+} 
+
+.info {
+  background: white;
+  opacity: 1;
+  border-radius: 0;
+}
+
+.leaflet-left {
+  width: 33%;
+}
+
+.leaflet-left .leaflet-control {
+  font-size: 12px;
+  margin-left: 0;
+  border-left: 1px solid #ddd;
+  border-top: 1px solid #ddd;
+  border-bottom: 1px solid #ddd;
+}
+
+.leaflet-right .leaflet-control {
+  margin-right: 0;
+}
+
+.leaflet-top .leaflet-control {
+  margin-top: 0;
+}
+
+.leaflet-control-container {
+  color: #000000;
+}
+
+.hidden {
+  display: none;
+}
+
+.popup-instruction {
+  font-style: italic;
+  font-weight: 600; 
+  font-size: 1em; 
+  line-height: 1.2em;
+  color: #000000;
+  border-bottom: 1px solid #000000;
+  padding-top: 1.2em;
+  padding-bottom: 1.2em;
+  margin-bottom: 1.2em;
+}
+
+.legend {
+  color: #000000;
+  border-top: 1px solid #000000;
+  padding-top: 1.2em;
+}
+
+.legend-note {
+  font-size: 1em;
+  font-weight: 700;
+}
+
+.nh-black-dot {
+  height: 1em;
+  width: 1em;
+  background-color: #0860BC;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.nh-black-color {
+  color: #0860BC;
+}
+
+.latinx-dot {
+  height: 1em;
+  width: 1em;
+  background-color: #0AB013;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.latinx-color {
+  color: #0AB013;
+}
+
+.nh-asian-dot {
+  height: 1em;
+  width: 1em;
+  background-color: #DF4007;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.nh-asian-color {
+  color: #DF4007;
+}
+
+.nh-aian-dot {
+  height: 1em;
+  width: 1em;
+  background-color: #EB8D00;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.nh-aian-color {
+  color: #EB8D00;
+}
+
+.nh-nhpi-dot {
+  height: 1em;
+  width: 1em;
+  background-color: #601D42;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.nh-nhpi-color {
+  color: #601D42;
+}
+
+.sswana-dot {
+  height: 1em;
+  width: 1em;
+  background-color: #EABB00;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.sswana-color {
+  color: #EABB00;
+}
+
+.nh-twoormor-dot {
+  height: 1em;
+  width: 1em;
+  background-color: #211447;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.nh-twoormor-color {
+  color: #211447;
+}
+
+.nh-white-dot {
+  height: 1em;
+  width: 1em;
+  background-color: #BCD313;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.nh-white-color {
+  color: #BCD313;
+}
+
+.data-emphasis {
+  font-size: 14px; 
+  font-weight: 700;
+}
+
+</style>
+  
   
