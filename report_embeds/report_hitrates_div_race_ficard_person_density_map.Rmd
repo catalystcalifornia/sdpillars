@@ -294,17 +294,19 @@ var mapsPlaceholder = [];
 L.Map.addInitHook(function () {
   mapsPlaceholder.push(this);
   mapsPlaceholder.forEach(map => {
+    // pre-populate map pop-up (when map loads/before user clicks anywhere)
     map.on('load', (e) => {
     setTimeout(() => {
-    document.querySelector('.division-name').innerHTML = 'Northern'
-    document.querySelector('.division-number').innerHTML = '1'
-    document.querySelector('.stop-count-total').innerHTML = '312'
-    document.querySelector('.yes-contraband-count').innerHTML = '66'
-    document.querySelector('.yes-contraband-prc-rate').innerHTML = '21.2'
-    document.querySelector('.no-contraband-count').innerHTML = '246'
-    document.querySelector('.no-contraband-prc-rate').innerHTML = '78.8'
+    document.querySelector('.division-name').innerHTML = 'Southeastern'
+    document.querySelector('.division-number').innerHTML = '4'
+    document.querySelector('.stop-count-total').innerHTML = '984'
+    document.querySelector('.yes-contraband-count').innerHTML = '221'
+    document.querySelector('.yes-contraband-prc-rate').innerHTML = '22.5'
+    document.querySelector('.no-contraband-count').innerHTML = '763'
+    document.querySelector('.no-contraband-prc-rate').innerHTML = '75.5'
     }, 250)
   })
+    // hide default leaflet popup
     map.on('popupopen', (e) => {
     let popups = document.querySelectorAll('.leaflet-data');
     // console.log(popups);
@@ -313,6 +315,7 @@ L.Map.addInitHook(function () {
     pointdensity.parentElement.parentElement.parentElement.classList.add('hidden')
   })
   
+  // populate custom pop-up when user clicks map
   //console.log('click')
   let popup = popups[popups.length-1]
   document.querySelector('.division-name').innerHTML = popup.getAttribute('data-division-name')
