@@ -114,7 +114,6 @@ rate_popup <- "<div class='leaflet-popup-scrolled point-density-sidebar'><div cl
 ```
 
 ```{r}
-
 ### Build map
 map <- leaflet(width = "100%", height = "600px",
                options = leafletOptions(zoomControl = FALSE, minZoom=10, maxZoom=10)) %>%

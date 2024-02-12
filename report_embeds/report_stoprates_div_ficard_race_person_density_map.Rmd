@@ -9,6 +9,7 @@ output:
     
     
 ```{r, include = FALSE}
+knitr::opts_chunk$set(echo=FALSE, message=FALSE, warning=FALSE)
 
 #### Load libraries ####
 library(usethis)
@@ -27,6 +28,9 @@ source("chart_functions.R")
   
 pillars_conn <- connect_to_db("rjs_pillars")
 
+```
+
+```{r}
 #### Map Data Prep ####
 ## load in race metadata
 metadata_race_labels <-  dbGetQuery(pillars_conn, "SELECT * FROM metadata_race_labels") %>%
@@ -64,8 +68,7 @@ ficard_dots = as_dot_density(div_long_sf,
                              group = "race")
 
 # Filter for race groups
-df_long %>% 
-  as.data.frame() %>% 
+df_long <- df_long %>% 
   group_by(race) %>% 
   summarize(count = n())
 
@@ -78,10 +81,11 @@ nh_asian_dots <- ficard_dots %>% filter(race == "nh_asian")
 nh_twoormor_dots <- ficard_dots %>% filter(race == "nh_twoormor")
 nh_nhpi_dots <- ficard_dots %>% filter(race == "nh_nhpi")
 
-dbDisconnect(pillars_conn)
+invisible(dbDisconnect(pillars_conn))
+
 ```
 
-```{r, include=FALSE}
+```{r}
 ### Map components prep
 
 ## function to change the legend shape and color
@@ -165,7 +169,7 @@ map_race_labels <- c("AIAN",  "NHPI", "SWANA/SA", "Asian",  "Black", "Latinx",
 
 ```
   
-```{r, include=FALSE}
+```{r}
 ### Build map
 map <-  leaflet(width = "100%", height = "600px") %>%
   
@@ -242,7 +246,7 @@ map <-  leaflet(width = "100%", height = "600px") %>%
 <h3 class="leaflet-map-title">SDPD disproportionately conducts field interviews for people of color in the Southeastern and Central Division</h3>
 <h4 class="leaflet-map-subtitle">People officers field interviewed by race and division</h4>
     
-```{r, echo=FALSE}
+```{r}
   map
 ```
   <div align="left" style="line-height: 1em;"><span style=' font-size: 10px;'>Race/ethnicity: AIAN=American Indian or Alaska Native, NHPI=Native Hawaiian or Pacific Islander, SWANA/SA=Southwest Asian (Middle Eastern) or North African, or South Asian.</span> <span style="font-size: 10px;">Stops are randomly placed within each division and do not indicate the exact location of the stop.</span> <span style=' font-size: 10px;'>Catalyst California's calculations based on City of San Diego's Police Stop Data (2022); <u>[Catalyst California](https://www.catalystcalifornia.org)</u>, 2023. Analysis for all officer-initiated stops that resulted in a field interview card completed.</div>
