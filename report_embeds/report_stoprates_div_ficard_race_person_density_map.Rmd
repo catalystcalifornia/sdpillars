@@ -130,15 +130,23 @@ data_popup <- paste0("<div class='pointdensity'> <div class='leaflet-data' data-
 # to style with CSS AND insert the data stored in data_popup
 # Note: the <span> "class" names are using the SAME naming as in the data_popup (only difference is no "data-" prefix) - this makes things clear and convenient for JS coding (end of script)
 
-rate_popup <- "<div class='leaflet-popup-scrolled point-density-sidebar'><div class='popup-instruction'>Please click on a police division to see stop data below.</div><div class ='division-header'><span class='division-name'></span> Division (Division <span class='division-number'></span>)</div></div><br> SDPD Officers stopped:<br><br>
-<span class='count-nh-black'></span> people perceived as <span class='data-emphasis'>Black</span> for stops that resulted in a field interview card completed, or<span class='rate-nh-black'></span>% of Black people stopped.<br><br> 
-<span class='count-latinx'></span> people perceived as <span class='data-emphasis'>Latinx</span> for stops that resulted in a field interview card completed, or<span class='rate-latinx'></span>% of Latinx people stopped.<br><br> 
-<span class='count-nh-asian'></span> people perceived as <span class='data-emphasis'>Asian</span> for stops that resulted in a field interview card completed, or<span class='rate-nh-asian'></span>% of Asian people stopped.<br><br> 
-<span class='count-nh-aian'></span> people perceived as <span class='data-emphasis'>AIAN</span> for stops that resulted in a field interview card completed, or<span class='rate-nh-aian'></span>% of AIAN people stopped.<br><br> 
-<span class='count-nh-nhpi'></span> people perceived as <span class='data-emphasis'>NHPI</span> for stops that resulted in a field interview card completed, or<span class='rate-nh-nhpi'></span>% of NHPI people stopped.<br><br> 
-<span class='count-sswana'></span> people perceived as <span class='data-emphasis'>SWANA/SA</span> for stops that resulted in a field interview card completed, or<span class='rate-sswana'></span>% of SWANA/SA people stopped.<br><br> 
-<span class='count-nh-twoormor'></span> people perceived as <span class='data-emphasis'>Multiracial</span> for stops that resulted in a field interview card completed, or<span class='rate-nh-twoormor'></span>% of Multiracial people stopped.<br><br> 
-<span class='count-nh-white'></span> people perceived as <span class='data-emphasis'>White</span> for stops that resulted in a field interview card completed, or<span class='rate-nh-white'></span>% of White people stopped.<br><br> "
+rate_popup <- "<div class='leaflet-popup-scrolled point-density-sidebar'><div class='popup-instruction'>Please click on a police division to see stop data below.</div><div class ='division-header'><span class='division-name'></span> Division (Division <span class='division-number'></span>)</div></div><br> SDPD Officers stopped and conducted field interviews on:<br><br>
+
+<span class='nh-black-dot'></span> <span class='data-emphasis nh-black-color'><span class='count-nh-black nh-black-color'></span> people</span> perceived as <span class='data-emphasis nh-black-color'>Black</span>, or <span class='data-emphasis nh-black-color'><span class='rate-nh-black nh-black-color'></span>% of Black people stopped.</span><br><br> 
+
+<span class='latinx-dot'></span> <span class='data-emphasis latinx-color'><span class='count-latinx latinx-color'></span> people</span> perceived as <span class='data-emphasis latinx-color'>Latinx</span>, or <span class='data-emphasis latinx-color'><span class='rate-latinx latinx-color'></span>% of Latinx people stopped.</span><br><br> 
+
+<span class='nh-asian-dot'></span> <span class='nh-asian-color'><span class='count-nh-asian nh-asian-color'></span> people</span> perceived as <span class='data-emphasis nh-asian-color'>Asian</span>, or <span class='data-emphasis nh-asian-color'><span class='rate-nh-asian nh-asian-color'></span>% of Asian people stopped.</span><br><br> 
+
+<span class='nh-aian-dot'></span> <span class='nh-aian-color'><span class='count-nh-aian nh-aian-color'></span> people</span> perceived as <span class='data-emphasis nh-aian-color'>AIAN</span>, or <span class='data-emphasis nh-aian-color'><span class='rate-nh-aian nh-aian-color'></span>% of AIAN people stopped.</span><br><br> 
+
+<span class='nh-nhpi-dot'></span> <span class='nh-nhpi-color'><span class='count-nh-nhpi nh-nhpi-color'></span> people</span> perceived as <span class='nh-nhpi-color'>NHPI</span>, or <span class='nh-nhpi-color'><span class='rate-nh-nhpi'></span>% of NHPI people stopped.</span><br><br> 
+
+<span class='sswana-dot'></span> <span class='sswana-color'><span class='count-sswana sswana-color'></span> people</span> perceived as <span class='sswana-color'>SWANA/SA</span>, or <span class='sswana-color'><span class='rate-sswana sswana-color'></span>% of SWANA/SA people stopped.</span><br><br> 
+
+<span class='nh-twoormor-dot'></span> <span class='nh-twoormor-color'><span class='data-emphasis count-nh-twoormor nh-twoormor-color'></span> people perceived as <span class='data-emphasis'>Multiracial</span>, or <span class='rate-nh-twoormor data-emphasis nh-twoormor-color'></span>% of Multiracial people stopped.</span><br><br> 
+
+<span class='nh-white-dot'></span> <span class='nh-white-color'><span class='data-emphasis count-nh-white nh-white-color'></span> people perceived as <span class='data-emphasis nh-white-color'>White</span>, or <span class='rate-nh-white data-emphasis nh-white-color'></span>% of White people stopped.</span><br><br> "
 
 ## Set CC Brand colors for race/ethnic layers
 # Base Color 00
@@ -355,8 +363,8 @@ map <-  leaflet(width = "100%", height = "600px",
 }
 
 .nh-black-dot {
-  height: 1em;
-  width: 1em;
+  height: 6px;
+  width: 6px;
   background-color: #0860BC;
   border-radius: 50%;
   display: inline-block;
@@ -367,8 +375,8 @@ map <-  leaflet(width = "100%", height = "600px",
 }
 
 .latinx-dot {
-  height: 1em;
-  width: 1em;
+  height: 6px;
+  width: 6px;
   background-color: #0AB013;
   border-radius: 50%;
   display: inline-block;
@@ -379,8 +387,8 @@ map <-  leaflet(width = "100%", height = "600px",
 }
 
 .nh-asian-dot {
-  height: 1em;
-  width: 1em;
+  height: 6px;
+  width: 6px;
   background-color: #DF4007;
   border-radius: 50%;
   display: inline-block;
@@ -391,8 +399,8 @@ map <-  leaflet(width = "100%", height = "600px",
 }
 
 .nh-aian-dot {
-  height: 1em;
-  width: 1em;
+  height: 6px;
+  width: 6px;
   background-color: #EB8D00;
   border-radius: 50%;
   display: inline-block;
@@ -403,8 +411,8 @@ map <-  leaflet(width = "100%", height = "600px",
 }
 
 .nh-nhpi-dot {
-  height: 1em;
-  width: 1em;
+  height: 6px;
+  width: 6px;
   background-color: #601D42;
   border-radius: 50%;
   display: inline-block;
@@ -415,8 +423,8 @@ map <-  leaflet(width = "100%", height = "600px",
 }
 
 .sswana-dot {
-  height: 1em;
-  width: 1em;
+  height: 6px;
+  width: 6px;
   background-color: #EABB00;
   border-radius: 50%;
   display: inline-block;
@@ -427,8 +435,8 @@ map <-  leaflet(width = "100%", height = "600px",
 }
 
 .nh-twoormor-dot {
-  height: 1em;
-  width: 1em;
+  height: 6px;
+  width: 6px;
   background-color: #211447;
   border-radius: 50%;
   display: inline-block;
@@ -439,8 +447,8 @@ map <-  leaflet(width = "100%", height = "600px",
 }
 
 .nh-white-dot {
-  height: 1em;
-  width: 1em;
+  height: 6px;
+  width: 6px;
   background-color: #BCD313;
   border-radius: 50%;
   display: inline-block;
@@ -452,7 +460,7 @@ map <-  leaflet(width = "100%", height = "600px",
 
 .data-emphasis {
   font-size: 14px; 
-  font-weight: 700;
+  font-weight: 600;
 }
 
 </style>
@@ -467,20 +475,22 @@ L.Map.addInitHook(function () {
     setTimeout(() => {
     document.querySelector('.division-name').innerHTML = 'Southeastern'
     document.querySelector('.division-number').innerHTML = '4'
-    document.querySelector('.count-nh-black').innerHTML = ''
-    document.querySelector('.rate-nh-black').innerHTML = ''
-    document.querySelector('.count-latinx').innerHTML = ''
-    document.querySelector('.rate-latinx').innerHTML = ''
-    document.querySelector('.count-nh-asian').innerHTML = ''
-    document.querySelector('.rate-nh-asian').innerHTML = ''
-    document.querySelector('.count-nh-nhpi').innerHTML = ''
-    document.querySelector('.rate-nh-nhpi').innerHTML = ''
-    document.querySelector('.count-sswana').innerHTML = ''
-    document.querySelector('.rate-sswana').innerHTML = ''
-    document.querySelector('.count-nh-twoormor').innerHTML = ''
-    document.querySelector('.rate-nh-twoormor').innerHTML = ''
-    document.querySelector('.count-nh-white').innerHTML = ''
-    document.querySelector('.rate-nh-white').innerHTML = ''
+    document.querySelector('.count-nh-black').innerHTML = '549'
+    document.querySelector('.rate-nh-black').innerHTML = '19.4'
+    document.querySelector('.count-latinx').innerHTML = '405'
+    document.querySelector('.rate-latinx').innerHTML = '11.0'
+    document.querySelector('.count-nh-asian').innerHTML = '42'
+    document.querySelector('.rate-nh-asian').innerHTML = '10.2'
+    document.querySelector('.count-nh-aian').innerHTML = '4'
+    document.querySelector('.rate-nh-aian').innerHTML = '25'
+    document.querySelector('.count-nh-nhpi').innerHTML = '7'
+    document.querySelector('.rate-nh-nhpi').innerHTML = '13.2'
+    document.querySelector('.count-sswana').innerHTML = '3'
+    document.querySelector('.rate-sswana').innerHTML = '3.0'
+    document.querySelector('.count-nh-twoormor').innerHTML = '8'
+    document.querySelector('.rate-nh-twoormor').innerHTML = '21.6'
+    document.querySelector('.count-nh-white').innerHTML = '82'
+    document.querySelector('.rate-nh-white').innerHTML = '9.6'
     }, 250)
   })
     // hide default leaflet popup
@@ -503,13 +513,15 @@ L.Map.addInitHook(function () {
   document.querySelector('.rate-latinx').innerHTML = popup.getAttribute('data-rate-latinx')
   document.querySelector('.count-nh-asian').innerHTML = popup.getAttribute('data-count-nh-asian')
   document.querySelector('.rate-nh-asian').innerHTML = popup.getAttribute('data-rate-nh-asian')
+  document.querySelector('.count-nh-aian').innerHTML = popup.getAttribute('data-count-nh-aian')
+  document.querySelector('.rate-nh-aian').innerHTML = popup.getAttribute('data-rate-nh-aian')
   document.querySelector('.count-nh-nhpi').innerHTML = popup.getAttribute('data-count-nh-nhpi')
   document.querySelector('.rate-nh-nhpi').innerHTML = popup.getAttribute('data-rate-nh-nhpi')
   document.querySelector('.count-sswana').innerHTML = popup.getAttribute('data-count-sswana')
   document.querySelector('.rate-sswana').innerHTML = popup.getAttribute('data-rate-sswana')
   document.querySelector('.count-nh-twoormor').innerHTML = popup.getAttribute('data-count-nh-twoormor')
   document.querySelector('.rate-nh-twoormor').innerHTML = popup.getAttribute('data-rate-nh-twoormor')
-  document.querySelector('.count-nh-white').innerHTML = popup.getAttribute('data-cout-nh-white')
+  document.querySelector('.count-nh-white').innerHTML = popup.getAttribute('data-count-nh-white')
   document.querySelector('.rate-nh-white').innerHTML = popup.getAttribute('data-rate-nh-white')
 })})});
 
