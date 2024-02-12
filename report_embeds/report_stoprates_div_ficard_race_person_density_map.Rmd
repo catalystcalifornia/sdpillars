@@ -174,45 +174,85 @@ map_race_labels <- c("AIAN",  "NHPI", "SWANA/SA", "Asian",  "Black", "Latinx",
 map <-  leaflet(width = "100%", height = "600px",
                 options = leafletOptions(zoomControl = FALSE, minZoom=10, maxZoom=10)) %>%
   
+  ## add provider tiles
+  addProviderTiles("CartoDB.Positron") %>%
+  
+  ## add Division polygons
+  # add polygon layer below (zIndex) markers - if the white fillColor is on top of the marker colors they will get washed out (dull)
+  addPolygons(data = div_wide_sf, label=~htmlEscape(paste0(div_name, " Division ")),
+              # polygon fill arguments
+              fillColor="white", 
+              #polygon line arguments
+              color="black", weight=2, opacity = 1, smoothFactor = 0.5,
+              # want to connect this to the data_popup (i.e. where we pull data values in)
+              popup = ~paste0(data_popup),
+              highlight = highlightOptions(color="darkgrey", weight = 2, opacity = 1,
+                                           # Use these settings otherwise highlight will overlap/dull marker colors
+                                           bringToFront=TRUE, sendToBack = TRUE)) %>%
+  
   ### add NH White Stops
   addCircleMarkers(data = nh_white_dots, group = "White", label = NULL, 
                    weight = 2, opacity = 0.2, fillOpacity = 1, radius = 2, 
-                   color="white",  fillColor=  bitter_lemon,  stroke = TRUE) %>%
+                   color="white",  fillColor=  bitter_lemon,  stroke = TRUE,
+                   # keep this so that markers are layered on top of polygons 
+                   # but do not impact our ability to click on the polygon
+                   options = pathOptions(clickable = FALSE)) %>% 
   
   ### add nh two or more stops
   addCircleMarkers(data = nh_twoormor_dots, group = "Two or More Races", label = NULL, 
                    weight = 2, opacity = 0.2, fillOpacity = 1, radius = 2, 
-                   color="white",  fillColor= persian_indigo, stroke = TRUE) %>% 
+                   color="white",  fillColor= persian_indigo, stroke = TRUE,
+                   # keep this so that markers are layered on top of polygons 
+                   # but do not impact our ability to click on the polygon
+                   options = pathOptions(clickable = FALSE)) %>% 
   
   ### add latinx stops
   addCircleMarkers(data = latinx_dots, group = "Latinx", label = NULL, 
                    weight = 2, opacity = 0.2, fillOpacity = 1, radius = 2, 
-                   color="white",  fillColor= lime_green,  stroke = TRUE) %>%
+                   color="white",  fillColor= lime_green,  stroke = TRUE,
+                   # keep this so that markers are layered on top of polygons 
+                   # but do not impact our ability to click on the polygon
+                   options = pathOptions(clickable = FALSE)) %>% 
   
   ### add NH Black Stops
   addCircleMarkers(data = nh_black_dots, group = "Black", label = NULL, 
                    weight = 2, opacity = 0.2, fillOpacity = 1, radius = 2, 
-                   color="white",  fillColor=blue, stroke = TRUE) %>% 
+                   color="white",  fillColor=blue, stroke = TRUE,
+                   # keep this so that markers are layered on top of polygons 
+                   # but do not impact our ability to click on the polygon
+                   options = pathOptions(clickable = FALSE)) %>% 
   
   ### add nh asian stops
   addCircleMarkers(data = nh_asian_dots, group = "Asian", label = NULL, 
                    weight = 2, opacity = 0.2, fillOpacity = 1, radius = 2, 
-                   color="white",  fillColor=  halloween_orange, stroke = TRUE) %>% 
+                   color="white",  fillColor=  halloween_orange, stroke = TRUE,
+                   # keep this so that markers are layered on top of polygons 
+                   # but do not impact our ability to click on the polygon
+                   options = pathOptions(clickable = FALSE)) %>% 
     
   ### add sswana stops
   addCircleMarkers(data = sswana_dots, group = "SWANA/SA", label = NULL, 
                    weight = 2, opacity = 0.2, fillOpacity = 1, radius = 2, 
-                   color="white",  fillColor= american_yellow, stroke = TRUE) %>% 
+                   color="white",  fillColor= american_yellow, stroke = TRUE,
+                   # keep this so that markers are layered on top of polygons 
+                   # but do not impact our ability to click on the polygon
+                   options = pathOptions(clickable = FALSE)) %>%  
     
   ### add nh_nhpi stops
   addCircleMarkers(data = nh_nhpi_dots, group = "NHPI", label = NULL, 
                    weight = 2, opacity = 0.2, fillOpacity = 1, radius = 2, 
-                   color="white",  fillColor= halaya_ube, stroke = TRUE) %>% 
+                   color="white",  fillColor= halaya_ube, stroke = TRUE,
+                   # keep this so that markers are layered on top of polygons 
+                   # but do not impact our ability to click on the polygon
+                   options = pathOptions(clickable = FALSE)) %>% 
     
   ### add NH AIAN stops
   addCircleMarkers(data = nh_aian_dots,  group = "AIAN", label = NULL, 
                    weight = 2, opacity = 0.2, fillOpacity = 1, radius = 2, 
-                   color="white",  fillColor= dark_tangerine, stroke = TRUE) %>%
+                   color="white",  fillColor= dark_tangerine, stroke = TRUE,
+                   # keep this so that markers are layered on top of polygons 
+                   # but do not impact our ability to click on the polygon
+                   options = pathOptions(clickable = FALSE)) %>% 
     
   ### add Division polygons
   addPolygons(data = div_wide_sf, label=~htmlEscape(paste0(div_name, " Division ")),
