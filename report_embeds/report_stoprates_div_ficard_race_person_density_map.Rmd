@@ -96,37 +96,90 @@ colors_function <- function(colors, sizes, borders, shapes) {
 ```
   
 ```{r, include = FALSE}
-rate_popup <- paste0(label = paste0(
-      "<div class='leaflet-popup-scrolled' style='max-width:800px;max-height:200px'>", 
-      
-      "In the", "<span style='font-size: 14px; font-weight: bold;'>", div_wide_sf$div_name, " Division",  " (Division ", div_wide_sf$div_num, "),", "</span>", 
-      
-      "<br>",  "Officers stopped ", "<span style='font-size: 14px; font-weight: bold;'>", div_wide_sf$count_nh_black,  "</span>", " people perceived as ", "<span style='font-size: 14px; font-weight: bold;'>", "Black",  "</span>", " for stops that resulted in a field interview card completed, or ", "<span style='font-size: 14px; font-weight: bold;'>", round(div_wide_sf$rate_nh_black, digits = 1),  "</span>", "% of Black people stopped. ", "</br>",
-      
-      
-      "<br>",  "Officers stopped ", "<span style='font-size: 14px; font-weight: bold;'>", div_wide_sf$count_latinx,  "</span>", " people perceived as ", "<span style='font-size: 14px; font-weight: bold;'>", "Latinx",  "</span>", " for stops that resulted in a field interview card completed, or ", "<span style='font-size: 14px; font-weight: bold;'>", round(div_wide_sf$rate_latinx, digits = 1),  "</span>", "% of Latinx people stopped. ", "</br>",
-      
-      
-      "<br>",  "Officers stopped ", "<span style='font-size: 14px; font-weight: bold;'>", div_wide_sf$count_nh_asian,  "</span>", " people perceived as ", "<span style='font-size: 14px; font-weight: bold;'>", "Asian",  "</span>", " for stops that resulted in a field interview card completed, or ", "<span style='font-size: 14px; font-weight: bold;'>", round(div_wide_sf$rate_nh_asian, digits = 1),  "</span>", "% of Asian people stopped. ", "</br>",
-      
-      
-      "<br>",  "Officers stopped ", "<span style='font-size: 14px; font-weight: bold;'>", div_wide_sf$count_nh_aian,  "</span>", " people perceived as ", "<span style='font-size: 14px; font-weight: bold;'>", "AIAN",  "</span>", " for stops that resulted in a field interview card completed, or ", "<span style='font-size: 14px; font-weight: bold;'>", round(div_wide_sf$rate_nh_aian, digits = 1),  "</span>", "% of AIAN people stopped. ", "</br>",
-      
-      "<br>",  "Officers stopped ", "<span style='font-size: 14px; font-weight: bold;'>", div_wide_sf$count_nh_nhpi,  "</span>", " people perceived as ", "<span style='font-size: 14px; font-weight: bold;'>", "NHPI",  "</span>", " for stops that resulted in a field interview card completed, or ", "<span style='font-size: 14px; font-weight: bold;'>", round(div_wide_sf$rate_nh_nhpi, digits = 1),  "</span>", "% of NHPI people stopped. ", "</br>",
-      
-      
-      "<br>",  "Officers stopped ", "<span style='font-size: 14px; font-weight: bold;'>", div_wide_sf$count_sswana,  "</span>", " people perceived as ", "<span style='font-size: 14px; font-weight: bold;'>", "SWANA/SA",  "</span>", " for stops that resulted in a field interview card completed, or ", "<span style='font-size: 14px; font-weight: bold;'>", round(div_wide_sf$rate_sswana, digits = 1),  "</span>", "% of SWANA/SA people stopped. ", "</br>",
-      
-      
-      "<br>",  "Officers stopped ", "<span style='font-size: 14px; font-weight: bold;'>", div_wide_sf$count_nh_twoormor,  "</span>", " people perceived as ", "<span style='font-size: 14px; font-weight: bold;'>", "Multiracial",  "</span>", " for stops that resulted in a field interview card completed, or ", "<span style='font-size: 14px; font-weight: bold;'>", round(div_wide_sf$rate_nh_twoormor, digits = 1),  "</span>", "% of Multiracial people stopped. ", "</br>",
-      
-      
-      
-      "<br>",  "Officers stopped ", "<span style='font-size: 14px; font-weight: bold;'>", div_wide_sf$count_nh_white,  "</span>", " people perceived as ", "<span style='font-size: 14px; font-weight: bold;'>", "White",  "</span>", " for stops that resulted in a field interview card completed, or ", "<span style='font-size: 14px; font-weight: bold;'>", round(div_wide_sf$rate_nh_white, digits = 1),  "</span>", "% of White people stopped. "
-      
-      
-    )
-  )
+rate_popup <- paste0("<div class='leaflet-popup-scrolled' style='max-width:800px;max-height:200px'>", 
+                     "In the <span style='font-size: 14px; font-weight: bold;'>", 
+                     div_wide_sf$div_name, " Division",  " (Division ", div_wide_sf$div_num, "),",
+                     "</span><br><br>",  
+                     
+                     ## Black outcomes
+                     "Officers stopped ", 
+                     "<span style='font-size: 14px; font-weight: bold;'>", 
+                     div_wide_sf$count_nh_black,  "</span> people perceived as ", 
+                     "<span style='font-size: 14px; font-weight: bold;'>", "Black",  
+                     "</span>", " for stops that resulted in a field interview card completed, or ", 
+                     "<span style='font-size: 14px; font-weight: bold;'>",
+                     round(div_wide_sf$rate_nh_black, digits = 1), "</span>", 
+                     "% of Black people stopped. ", "<br><br>",  
+                     
+                     ## Latinx outcomes
+                     "Officers stopped ", 
+                     "<span style='font-size: 14px; font-weight: bold;'>",
+                     div_wide_sf$count_latinx,  "</span>", " people perceived as ", 
+                     "<span style='font-size: 14px; font-weight: bold;'>", "Latinx",  
+                     "</span>", " for stops that resulted in a field interview card completed, or ",
+                     "<span style='font-size: 14px; font-weight: bold;'>", 
+                     round(div_wide_sf$rate_latinx, digits = 1),  "</span>", 
+                     "% of Latinx people stopped. ", "<br><br>",
+                     
+                     ## Asian outcomes
+                     "Officers stopped ", 
+                     "<span style='font-size: 14px; font-weight: bold;'>", 
+                     div_wide_sf$count_nh_asian,  "</span>", " people perceived as ", 
+                     "<span style='font-size: 14px; font-weight: bold;'>", "Asian",  
+                     "</span>", " for stops that resulted in a field interview card completed, or ",
+                     "<span style='font-size: 14px; font-weight: bold;'>",
+                     round(div_wide_sf$rate_nh_asian, digits = 1),  "</span>", 
+                     "% of Asian people stopped. ", "<br><br>",
+                     
+                     ## AIAN outcomes
+                     "Officers stopped ", 
+                     "<span style='font-size: 14px; font-weight: bold;'>", 
+                     div_wide_sf$count_nh_aian,  "</span>", " people perceived as ", 
+                     "<span style='font-size: 14px; font-weight: bold;'>", "AIAN",  
+                     "</span>", " for stops that resulted in a field interview card completed, or ",
+                     "<span style='font-size: 14px; font-weight: bold;'>", 
+                     round(div_wide_sf$rate_nh_aian, digits = 1),  "</span>", 
+                     "% of AIAN people stopped. ", "<br><br>",
+                     
+                     ## NHPI outcomes
+                     "Officers stopped ", 
+                     "<span style='font-size: 14px; font-weight: bold;'>", 
+                     div_wide_sf$count_nh_nhpi,  "</span>", " people perceived as ", 
+                     "<span style='font-size: 14px; font-weight: bold;'>", "NHPI",  
+                     "</span>", " for stops that resulted in a field interview card completed, or ",
+                     "<span style='font-size: 14px; font-weight: bold;'>", 
+                     round(div_wide_sf$rate_nh_nhpi, digits = 1),  "</span>", 
+                     "% of NHPI people stopped. ", "<br><br>",
+                     
+                     ## SWANA/SA outcomes
+                     "Officers stopped ", 
+                     "<span style='font-size: 14px; font-weight: bold;'>", 
+                     div_wide_sf$count_sswana,  "</span>", " people perceived as ", 
+                     "<span style='font-size: 14px; font-weight: bold;'>", "SWANA/SA",  
+                     "</span>", " for stops that resulted in a field interview card completed, or ",
+                     "<span style='font-size: 14px; font-weight: bold;'>", 
+                     round(div_wide_sf$rate_sswana, digits = 1),  "</span>", 
+                     "% of SWANA/SA people stopped. ", "<br><br>",
+                     
+                     ## Multiracial outcomes
+                     "Officers stopped ", 
+                     "<span style='font-size: 14px; font-weight: bold;'>", 
+                     div_wide_sf$count_nh_twoormor,  "</span>", " people perceived as ", 
+                     "<span style='font-size: 14px; font-weight: bold;'>", "Multiracial",  
+                     "</span>", " for stops that resulted in a field interview card completed, or ",
+                     "<span style='font-size: 14px; font-weight: bold;'>",
+                     round(div_wide_sf$rate_nh_twoormor, digits = 1),  "</span>", 
+                     "% of Multiracial people stopped. ", "<br><br>",
+                     
+                     ## White outcomes
+                     "Officers stopped ", 
+                     "<span style='font-size: 14px; font-weight: bold;'>", 
+                     div_wide_sf$count_nh_white,  "</span>", " people perceived as ", 
+                     "<span style='font-size: 14px; font-weight: bold;'>", "White",  
+                     "</span>", " for stops that resulted in a field interview card completed, or ",
+                     "<span style='font-size: 14px; font-weight: bold;'>",
+                     round(div_wide_sf$rate_nh_white, digits = 1),  "</span>", 
+                     "% of White people stopped. ")
   
 ```
   
