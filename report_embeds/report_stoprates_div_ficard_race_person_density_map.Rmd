@@ -132,9 +132,7 @@ rate_popup <- paste0(label = paste0(
   
   
 ```{r, include=FALSE}
-# colors according to our brand guide: https://catalystcalifornia.sharepoint.com/sites/Portal/AP%20Projects/Forms/AllItems.aspx?FolderCTID=0x012000EF0283621C7FE048A8E68512F119353B&id=%2Fsites%2FPortal%2FAP%20Projects%2FCommunications%2FCatalyst%20California%2FBranding%20Materials%20%2B%20Templates%2FVisual%20Brand%20Guide%2FCatalyst%20California%20Brand%20Guide%5FSeptember%202022%2Epdf&viewid=1aaeb4a9%2D2232%2D41c7%2Da71c%2D727af9e1f5d7&parent=%2Fsites%2FPortal%2FAP%20Projects%2FCommunications%2FCatalyst%20California%2FBranding%20Materials%20%2B%20Templates%2FVisual%20Brand%20Guide
-  
-# Base Color 00
+# CC Brand Guide Colors, Base Color 00
 lime_green <- c('#0AB013')
 persian_indigo <- c('#211447')
 halloween_orange <- c('#DF4007')
@@ -144,7 +142,11 @@ dark_tangerine <- c('#EB8D00')
 american_yellow <- c('#EABB00')
 halaya_ube <- c('#601D42')
   
-#dark_silver <- c('#6F6F6F') ## remove these
+map_colors <- c(dark_tangerine, halaya_ube, american_yellow, halloween_orange,
+                blue, lime_green, persian_indigo,  bitter_lemon)
+
+map_race_labels <- c("AIAN",  "NHPI", "SWANA/SA", "Asian",  "Black", "Latinx", 
+                     "Two or More Races", "White")
   
   
 ### change size of legend
@@ -198,13 +200,14 @@ map <-  leaflet(width = "100%", height = "600px") %>%
                                            bringToFront = TRUE, 
                                            sendToBack = FALSE)) %>%
   ### Layer control checkbox
-  addLayersControl(overlayGroups = c("AIAN",  "NHPI", "SWANA/SA", "Asian",  "Black", "Latinx", "Two or More Races", "White"), options = layersControlOptions(collapsed = FALSE)) %>%
+  addLayersControl(overlayGroups = map_race_labels, 
+                   options = layersControlOptions(collapsed = FALSE)) %>%
     
   ### add Legend
   addLegend("bottomleft", title= paste0("1 dot = 5 field interview card stops"), 
-            colors = colors_function(colors = c(dark_tangerine, halaya_ube, american_yellow, halloween_orange, blue,lime_green, persian_indigo, bitter_lemon), sizes = "10", shapes = "circle", borders = NULL),
-            labels= c("AIAN",  "NHPI", "SWANA/SA", "Asian",  "Black", "Latinx", "Two or More Races", "White"),
-            opacity = 0.7, labFormat = labelFormat(digits = 0)) %>% 
+            colors = colors_function(colors = map_colors, sizes = "10", 
+                                     shapes = "circle", borders = NULL),
+            labels= map_race_labels, opacity = 0.7, labFormat = labelFormat(digits = 0)) %>% 
   
   ### set tiles and view
   addProviderTiles("CartoDB.Positron") %>%
