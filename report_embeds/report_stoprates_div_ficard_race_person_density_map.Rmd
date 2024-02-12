@@ -427,5 +427,61 @@ map <-  leaflet(width = "100%", height = "600px") %>%
 }
 
 </style>
+
+```{js}
+var mapsPlaceholder = [];
+L.Map.addInitHook(function () {
+  mapsPlaceholder.push(this);
+  mapsPlaceholder.forEach(map => {
+    // pre-populate map pop-up (when map loads/before user clicks anywhere)
+    map.on('load', (e) => {
+    setTimeout(() => {
+    document.querySelector('.division-name').innerHTML = 'Southeastern'
+    document.querySelector('.division-number').innerHTML = '4'
+    document.querySelector('.count-nh-black').innerHTML = ''
+    document.querySelector('.rate-nh-black').innerHTML = ''
+    document.querySelector('.count-latinx').innerHTML = ''
+    document.querySelector('.rate-latinx').innerHTML = ''
+    document.querySelector('.count-nh-asian').innerHTML = ''
+    document.querySelector('.rate-nh-asian').innerHTML = ''
+    document.querySelector('.count-nh-nhpi').innerHTML = ''
+    document.querySelector('.rate-nh-nhpi').innerHTML = ''
+    document.querySelector('.count-sswana').innerHTML = ''
+    document.querySelector('.rate-sswana').innerHTML = ''
+    document.querySelector('.count-nh-twoormor').innerHTML = ''
+    document.querySelector('.rate-nh-twoormor').innerHTML = ''
+    document.querySelector('.count-nh-white').innerHTML = ''
+    document.querySelector('.rate-nh-white').innerHTML = ''
+    }, 250)
+  })
+    // hide default leaflet popup
+    map.on('popupopen', (e) => {
+    let popups = document.querySelectorAll('.leaflet-data');
+    // console.log(popups);
+
+    document.querySelectorAll('.pointdensity').forEach(pointdensity => {
+    pointdensity.parentElement.parentElement.parentElement.classList.add('hidden')
+  })
   
-  
+  // populate custom pop-up when user clicks map
+  //console.log('click')
+  let popup = popups[popups.length-1]
+  document.querySelector('.division-name').innerHTML = popup.getAttribute('data-division-name')
+  document.querySelector('.division-number').innerHTML = popup.getAttribute('data-division-number')
+  document.querySelector('.count-nh-black').innerHTML = popup.getAttribute('data-count-nh-black')
+  document.querySelector('.rate-nh-black').innerHTML = popup.getAttribute('data-rate-nh-black')
+  document.querySelector('.count-latinx').innerHTML = popup.getAttribute('data-count-latinx')
+  document.querySelector('.rate-latinx').innerHTML = popup.getAttribute('data-rate-latinx')
+  document.querySelector('.count-nh-asian').innerHTML = popup.getAttribute('data-count-nh-asian')
+  document.querySelector('.rate-nh-asian').innerHTML = popup.getAttribute('data-rate-nh-asian')
+  document.querySelector('.count-nh-nhpi').innerHTML = popup.getAttribute('data-count-nh-nhpi')
+  document.querySelector('.rate-nh-nhpi').innerHTML = popup.getAttribute('data-rate-nh-nhpi')
+  document.querySelector('.count-sswana').innerHTML = popup.getAttribute('data-count-sswana')
+  document.querySelector('.rate-sswana').innerHTML = popup.getAttribute('data-rate-sswana')
+  document.querySelector('.count-nh-twoormor').innerHTML = popup.getAttribute('data-count-nh-twoormor')
+  document.querySelector('.rate-nh-twoormor').innerHTML = popup.getAttribute('data-rate-nh-twoormor')
+  document.querySelector('.count-nh-white').innerHTML = popup.getAttribute('data-cout-nh-white')
+  document.querySelector('.rate-nh-white').innerHTML = popup.getAttribute('data-rate-nh-white')
+})})});
+
+```  

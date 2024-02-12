@@ -283,8 +283,6 @@ map
 </style>
 
 ```{js}
-
- 
 var mapsPlaceholder = [];
 L.Map.addInitHook(function () {
   mapsPlaceholder.push(this);
