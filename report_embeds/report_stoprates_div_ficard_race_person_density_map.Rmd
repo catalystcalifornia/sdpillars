@@ -171,7 +171,8 @@ map_race_labels <- c("AIAN",  "NHPI", "SWANA/SA", "Asian",  "Black", "Latinx",
   
 ```{r}
 ### Build map
-map <-  leaflet(width = "100%", height = "600px") %>%
+map <-  leaflet(width = "100%", height = "600px",
+                options = leafletOptions(zoomControl = FALSE, minZoom=10, maxZoom=10)) %>%
   
   ### add NH White Stops
   addCircleMarkers(data = nh_white_dots, group = "White", label = NULL, 
