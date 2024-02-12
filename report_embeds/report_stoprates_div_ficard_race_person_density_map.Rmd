@@ -9,94 +9,94 @@ output:
     
     
 ```{r, include = FALSE}
-  #### Map ###
-  #### Load libraries ####
-  library(usethis)
-  library(tidyverse)
-  library(sf)
-  library(leaflet)
-  library(sp)
-  library(htmltools) # for html escape
-  library(magrittr)
-  library(RPostgreSQL)
-  library(htmlwidgets)
-  library(stringr)
+#### Map ###
+#### Load libraries ####
+library(usethis)
+library(tidyverse)
+library(sf)
+library(leaflet)
+library(sp)
+library(htmltools) # for html escape
+library(magrittr)
+library(RPostgreSQL)
+library(htmlwidgets)
+library(stringr)
   
-  source("W:\\RDA Team\\R\\credentials_source.R")
-  source("chart_functions.R")
+source("W:\\RDA Team\\R\\credentials_source.R")
+source("chart_functions.R")
   
-  pillars_conn <- connect_to_db("rjs_pillars")
-  ## load in race metadata
-  metadata_race_labels <-  dbGetQuery(pillars_conn, "SELECT * FROM metadata_race_labels") %>% select(race_base, race_label_short, race_label_long)
+pillars_conn <- connect_to_db("rjs_pillars")
+
+
+## load in race metadata
+metadata_race_labels <-  dbGetQuery(pillars_conn, "SELECT * FROM metadata_race_labels") %>%
+  select(race_base, race_label_short, race_label_long)
   
-  ## Load in RJS Pillars data ##
-  df_long <- dbGetQuery(pillars_conn, "SELECT * FROM data.report_stoprates_div_ficard_race_person")
-  div <- st_read(pillars_conn, query =  "SELECT * FROM data.sangis_sdpd_divisions_2023") 
+## Load in RJS Pillars data ##
+df_long <- dbGetQuery(pillars_conn, "SELECT * FROM data.report_stoprates_div_ficard_race_person")
+div <- st_read(pillars_conn, query =  "SELECT * FROM data.sangis_sdpd_divisions_2023") 
   
-  ## change division name to sentence case
-  df_long$div_name <- str_to_title(df_long$div_name)
-  div$div_name <- str_to_title(div$div_name)
+## change division name to sentence case
+df_long$div_name <- str_to_title(df_long$div_name)
+div$div_name <- str_to_title(div$div_name)
   
-  # transform for leaflet
+# transform for leaflet
+div <- st_transform(div,4326)
   
-  div <- st_transform(div,4326)
+# go from long to wide
+df_wide <- df_long %>% 
+  pivot_wider(names_from = race,
+              values_from = total:rate,
+              names_sep = "_")
   
-  # go from long to wide
-  
-  df_wide <- df_long %>% pivot_wider(
-    names_from = race,
-    values_from = total:rate,
-    names_sep = "_"
-    
-  )
-  
-  # merge division sf by df: this is only for the shapefile
-  div_wide_sf <- div %>% left_join(df_wide)
+# merge division sf by df: this is only for the shapefile
+div_wide_sf <- div %>% 
+  left_join(df_wide)
   
   
-  # the dot density needs the data to be long
-  div_long_sf <- div %>% left_join(df_long)
+# the dot density needs the data to be long
+div_long_sf <- div %>% 
+  left_join(df_long)
+
+invisible(dbDisconnect(pillars_conn))
 ```
   
   
 
 ```{r, include=FALSE}
-  ### Calculate dot density count ###
-  ficard_dots = as_dot_density(
-    div_long_sf,
-    value = "count",
-    values_per_dot = 5, ## each dot represents 5 values
-    group = "race"
-  )
-  # Filter for race groups
-  df_long %>% as.data.frame() %>% group_by(race) %>% summarize(count = n())
-  nh_black_dots <- ficard_dots %>% filter(race == "nh_black")
-  nh_white_dots <- ficard_dots %>% filter(race == "nh_white")
-  nh_aian_dots <- ficard_dots %>%  filter(race == "nh_aian")
-  latinx_dots <- ficard_dots %>% filter(race == "latinx")
-  sswana_dots <- ficard_dots %>% filter(race == "sswana")
-  nh_asian_dots <- ficard_dots %>% filter(race == "nh_asian")
-  nh_twoormor_dots <- ficard_dots %>% filter(race == "nh_twoormor")
-  nh_nhpi_dots <- ficard_dots %>% filter(race == "nh_nhpi")
+### Calculate dot density count ###
+ficard_dots = as_dot_density(div_long_sf,
+                             value = "count",
+                             values_per_dot = 5, ## each dot represents 5 values
+                             group = "race")
+
+# Filter for race groups
+df_long %>% 
+  as.data.frame() %>% 
+  group_by(race) %>% 
+  summarize(count = n())
+
+nh_black_dots <- ficard_dots %>% filter(race == "nh_black")
+nh_white_dots <- ficard_dots %>% filter(race == "nh_white")
+nh_aian_dots <- ficard_dots %>%  filter(race == "nh_aian")
+latinx_dots <- ficard_dots %>% filter(race == "latinx")
+sswana_dots <- ficard_dots %>% filter(race == "sswana")
+nh_asian_dots <- ficard_dots %>% filter(race == "nh_asian")
+nh_twoormor_dots <- ficard_dots %>% filter(race == "nh_twoormor")
+nh_nhpi_dots <- ficard_dots %>% filter(race == "nh_nhpi")
   
-  ## function to change the legend shape and color
-  colors_function <- function(colors, sizes, borders, shapes) {
+## function to change the legend shape and color
+colors_function <- function(colors, sizes, borders, shapes) {
     shapes <- gsub("circle", "100%", shapes)
     shapes <- gsub("square", "100%", shapes)
-    paste0(colors, "; width:", sizes, "px; height:", sizes, "px; border:1px solid ", borders, "; border-radius:", shapes)
-  }
-  
+    paste0(colors, "; width:", sizes, "px; height:", 
+           sizes, "px; border:1px solid ", borders, "; border-radius:", shapes)
+    }
   
 ```
   
-  
-  
-  
 ```{r, include = FALSE}
-  rate_popup <- paste0(
-    
-    
-    label = paste0(
+rate_popup <- paste0(label = paste0(
       "<div class='leaflet-popup-scrolled' style='max-width:800px;max-height:200px'>", 
       
       "In the", "<span style='font-size: 14px; font-weight: bold;'>", div_wide_sf$div_name, " Division",  " (Division ", div_wide_sf$div_num, "),", "</span>", 
@@ -132,80 +132,86 @@ output:
   
   
 ```{r, include=FALSE}
-  # colors according to our brand guide: https://catalystcalifornia.sharepoint.com/sites/Portal/AP%20Projects/Forms/AllItems.aspx?FolderCTID=0x012000EF0283621C7FE048A8E68512F119353B&id=%2Fsites%2FPortal%2FAP%20Projects%2FCommunications%2FCatalyst%20California%2FBranding%20Materials%20%2B%20Templates%2FVisual%20Brand%20Guide%2FCatalyst%20California%20Brand%20Guide%5FSeptember%202022%2Epdf&viewid=1aaeb4a9%2D2232%2D41c7%2Da71c%2D727af9e1f5d7&parent=%2Fsites%2FPortal%2FAP%20Projects%2FCommunications%2FCatalyst%20California%2FBranding%20Materials%20%2B%20Templates%2FVisual%20Brand%20Guide
+# colors according to our brand guide: https://catalystcalifornia.sharepoint.com/sites/Portal/AP%20Projects/Forms/AllItems.aspx?FolderCTID=0x012000EF0283621C7FE048A8E68512F119353B&id=%2Fsites%2FPortal%2FAP%20Projects%2FCommunications%2FCatalyst%20California%2FBranding%20Materials%20%2B%20Templates%2FVisual%20Brand%20Guide%2FCatalyst%20California%20Brand%20Guide%5FSeptember%202022%2Epdf&viewid=1aaeb4a9%2D2232%2D41c7%2Da71c%2D727af9e1f5d7&parent=%2Fsites%2FPortal%2FAP%20Projects%2FCommunications%2FCatalyst%20California%2FBranding%20Materials%20%2B%20Templates%2FVisual%20Brand%20Guide
   
-  # Base Color 00
-  lime_green <- c('#0AB013')
-  persian_indigo <- c('#211447')
-  halloween_orange <- c('#DF4007')
-  bitter_lemon <- c('#BCD313')
-  blue <- c('#0860BC')
-  dark_tangerine <- c('#EB8D00')
-  american_yellow <- c('#EABB00')
-  halaya_ube <- c('#601D42')
+# Base Color 00
+lime_green <- c('#0AB013')
+persian_indigo <- c('#211447')
+halloween_orange <- c('#DF4007')
+bitter_lemon <- c('#BCD313')
+blue <- c('#0860BC')
+dark_tangerine <- c('#EB8D00')
+american_yellow <- c('#EABB00')
+halaya_ube <- c('#601D42')
   
-  #dark_silver <- c('#6F6F6F') ## remove these
-  
-  
-  ### change size of legend
-  
-  map <-  leaflet(width = "100%", height = "600px") %>%
-    
-    ## add NH White Stops
-    
-    addCircleMarkers(data = nh_white_dots, group = "White", label = NULL, weight = 2, opacity = 0.2, fillOpacity = 1, radius = 2, color="white",  fillColor=  bitter_lemon,  stroke = TRUE) %>% 
-    
-    ### add nh two or more dots
-    
-    addCircleMarkers(data = nh_twoormor_dots, group = "Two or More Races", label = NULL, weight = 2, opacity = 0.2, fillOpacity = 1, radius = 2, color="white",  fillColor= persian_indigo, stroke = TRUE) %>% 
-    
-    ### add latinx dots
-    
-    addCircleMarkers(data = latinx_dots, group = "Latinx", label = NULL, weight = 2, opacity = 0.2, fillOpacity = 1, radius = 2, color="white",  fillColor= lime_green,  stroke = TRUE) %>% 
-    
-    ## add NH Black Stops
-    
-    addCircleMarkers(data = nh_black_dots, group = "Black", label = NULL, weight = 2, opacity = 0.2, fillOpacity = 1, radius = 2, color="white",  fillColor=blue, stroke = TRUE) %>% 
-    
-    ### add nh asian dots
-    
-    addCircleMarkers(data = nh_asian_dots, group = "Asian", label = NULL, weight = 2, opacity = 0.2, fillOpacity = 1, radius = 2, color="white",  fillColor=  halloween_orange, stroke = TRUE) %>% 
-    
-    ### add sswana dots
-    
-    addCircleMarkers(data = sswana_dots, group = "SWANA/SA", label = NULL, weight = 2, opacity = 0.2, fillOpacity = 1, radius = 2, color="white",  fillColor= american_yellow, stroke = TRUE) %>% 
-    
-    ### add nh_nhpi dots
-    
-    addCircleMarkers(data = nh_nhpi_dots, group = "NHPI", label = NULL, weight = 2, opacity = 0.2, fillOpacity = 1, radius = 2, color="white",  fillColor= halaya_ube, stroke = TRUE) %>% 
-    
-    ### add NH AIAN dots 
-    
-    addCircleMarkers(data = nh_aian_dots,  group = "AIAN", label = NULL, weight = 2, opacity = 0.2, fillOpacity = 1, radius = 2, color="white",  fillColor= dark_tangerine, stroke = TRUE) %>%
-    
-    # add Division 
-    addPolygons(data = div_wide_sf, label=~htmlEscape(paste0(div_name, " Division ")),
-                color = "black", fillColor = "white", opacity = 1,  popup = ~paste0(rate_popup), 
-                weight = 2, smoothFactor = 0.5,  highlight = highlightOptions(color = "white", weight = 3, bringToFront = TRUE, sendToBack = FALSE)) %>%
-    
-    addLayersControl(overlayGroups = c("AIAN",  "NHPI", "SWANA/SA", "Asian",  "Black", "Latinx", "Two or More Races", "White"),
-                     options = layersControlOptions(collapsed = FALSE)) %>%
-    
-    
-    ## add Legend
-    
-    
-    addLegend("bottomleft", title= paste0("1 dot = 5 field interview card stops"), colors = colors_function(colors = c(dark_tangerine, halaya_ube, american_yellow, halloween_orange, blue,lime_green, persian_indigo, bitter_lemon), sizes = "10", shapes = "circle", borders = NULL),
-              labels= c("AIAN",  "NHPI", "SWANA/SA", "Asian",  "Black", "Latinx", "Two or More Races", "White"),
-              opacity = 0.7, labFormat = labelFormat(digits = 0)) %>% 
-    
-    addProviderTiles("CartoDB.Positron") %>%
-    setView(-117.13395, 32.79923, zoom = 10) %>% #base and view 
-    
-    hideGroup(c("White"))   # hide white group
+#dark_silver <- c('#6F6F6F') ## remove these
   
   
-  invisible(dbDisconnect(pillars_conn))
+### change size of legend
+map <-  leaflet(width = "100%", height = "600px") %>%
+  
+  ### add NH White Stops
+  addCircleMarkers(data = nh_white_dots, group = "White", label = NULL, 
+                   weight = 2, opacity = 0.2, fillOpacity = 1, radius = 2, 
+                   color="white",  fillColor=  bitter_lemon,  stroke = TRUE) %>%
+  
+  ### add nh two or more dots
+  addCircleMarkers(data = nh_twoormor_dots, group = "Two or More Races", label = NULL, 
+                   weight = 2, opacity = 0.2, fillOpacity = 1, radius = 2, 
+                   color="white",  fillColor= persian_indigo, stroke = TRUE) %>% 
+  
+  ### add latinx dots
+  addCircleMarkers(data = latinx_dots, group = "Latinx", label = NULL, 
+                   weight = 2, opacity = 0.2, fillOpacity = 1, radius = 2, 
+                   color="white",  fillColor= lime_green,  stroke = TRUE) %>%
+  
+  ### add NH Black Stops
+  addCircleMarkers(data = nh_black_dots, group = "Black", label = NULL, 
+                   weight = 2, opacity = 0.2, fillOpacity = 1, radius = 2, 
+                   color="white",  fillColor=blue, stroke = TRUE) %>% 
+  
+  ### add nh asian dots
+  addCircleMarkers(data = nh_asian_dots, group = "Asian", label = NULL, 
+                   weight = 2, opacity = 0.2, fillOpacity = 1, radius = 2, 
+                   color="white",  fillColor=  halloween_orange, stroke = TRUE) %>% 
+    
+  ### add sswana dots
+  addCircleMarkers(data = sswana_dots, group = "SWANA/SA", label = NULL, 
+                   weight = 2, opacity = 0.2, fillOpacity = 1, radius = 2, 
+                   color="white",  fillColor= american_yellow, stroke = TRUE) %>% 
+    
+  ### add nh_nhpi dots
+  addCircleMarkers(data = nh_nhpi_dots, group = "NHPI", label = NULL, 
+                   weight = 2, opacity = 0.2, fillOpacity = 1, radius = 2, 
+                   color="white",  fillColor= halaya_ube, stroke = TRUE) %>% 
+    
+  ### add NH AIAN dots 
+  addCircleMarkers(data = nh_aian_dots,  group = "AIAN", label = NULL, 
+                   weight = 2, opacity = 0.2, fillOpacity = 1, radius = 2, 
+                   color="white",  fillColor= dark_tangerine, stroke = TRUE) %>%
+    
+  ### add Division 
+  addPolygons(data = div_wide_sf, label=~htmlEscape(paste0(div_name, " Division ")),
+              color = "black", fillColor = "white", opacity = 1, 
+              popup = ~paste0(rate_popup), weight = 2, smoothFactor = 0.5,  
+              highlight = highlightOptions(color = "white", weight = 3, 
+                                           bringToFront = TRUE, 
+                                           sendToBack = FALSE)) %>%
+  ### Layer control checkbox
+  addLayersControl(overlayGroups = c("AIAN",  "NHPI", "SWANA/SA", "Asian",  "Black", "Latinx", "Two or More Races", "White"), options = layersControlOptions(collapsed = FALSE)) %>%
+    
+  ### add Legend
+  addLegend("bottomleft", title= paste0("1 dot = 5 field interview card stops"), 
+            colors = colors_function(colors = c(dark_tangerine, halaya_ube, american_yellow, halloween_orange, blue,lime_green, persian_indigo, bitter_lemon), sizes = "10", shapes = "circle", borders = NULL),
+            labels= c("AIAN",  "NHPI", "SWANA/SA", "Asian",  "Black", "Latinx", "Two or More Races", "White"),
+            opacity = 0.7, labFormat = labelFormat(digits = 0)) %>% 
+  
+  ### set tiles and view
+  addProviderTiles("CartoDB.Positron") %>%
+  setView(-117.13395, 32.79923, zoom = 10) %>% #base and view 
+    
+  ### Deselect White from Layer Control checkbox
+  hideGroup(c("White"))   # hide white group
   
 ```
   
