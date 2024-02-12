@@ -105,20 +105,20 @@ data_popup <- paste0("<div class='pointdensity'> <div class='leaflet-data' data-
                "' data-division-number='", div_wide_sf$div_num,
                "' data-count-nh-black='", div_wide_sf$count_nh_black,
                "' data-rate-nh-black='", round(div_wide_sf$rate_nh_black, digits = 1),
-               "' data-count-latinx='", div_wide_sf$count_nh_black,
-               "' data-rate-latinx='", round(div_wide_sf$rate_nh_black, digits = 1),
-               "' data-count-nh-asian='", div_wide_sf$count_nh_black,
-               "' data-rate-nh-asian='", round(div_wide_sf$rate_nh_black, digits = 1),
-               "' data-count-nh-aian='", div_wide_sf$count_nh_black,
-               "' data-rate-nh-aian='", round(div_wide_sf$rate_nh_black, digits = 1),
-               "' data-count-nh-nhpi='", div_wide_sf$count_nh_black,
-               "' data-rate-nh-nhpi='", round(div_wide_sf$rate_nh_black, digits = 1),
-               "' data-count-sswana='", div_wide_sf$count_nh_black,
-               "' data-rate-sswana='", round(div_wide_sf$rate_nh_black, digits = 1),
-               "' data-count-nh-twoormor='", div_wide_sf$count_nh_black,
-               "' data-rate-nh-twoormor='", round(div_wide_sf$rate_nh_black, digits = 1),
-               "' data-count-nh-white='", div_wide_sf$count_nh_black,
-               "' data-rate-nh-white='", round(div_wide_sf$rate_nh_black, digits = 1),
+               "' data-count-latinx='", div_wide_sf$count_latinx,
+               "' data-rate-latinx='", round(div_wide_sf$rate_latinx, digits = 1),
+               "' data-count-nh-asian='", div_wide_sf$count_nh_asian,
+               "' data-rate-nh-asian='", round(div_wide_sf$rate_nh_asian, digits = 1),
+               "' data-count-nh-aian='", div_wide_sf$count_nh_aian,
+               "' data-rate-nh-aian='", round(div_wide_sf$rate_nh_aian, digits = 1),
+               "' data-count-nh-nhpi='", div_wide_sf$count_nh_nhpi,
+               "' data-rate-nh-nhpi='", round(div_wide_sf$rate_nh_nhpi, digits = 1),
+               "' data-count-sswana='", div_wide_sf$count_sswana,
+               "' data-rate-sswana='", round(div_wide_sf$rate_sswana, digits = 1),
+               "' data-count-nh-twoormor='", div_wide_sf$count_nh_twoormor,
+               "' data-rate-nh-twoormor='", round(div_wide_sf$rate_nh_twoormor, digits = 1),
+               "' data-count-nh-white='", div_wide_sf$count_nh_white,
+               "' data-rate-nh-white='", round(div_wide_sf$rate_nh_white, digits = 1),
                "'></div></div>")
 
 
@@ -130,23 +130,15 @@ data_popup <- paste0("<div class='pointdensity'> <div class='leaflet-data' data-
 # to style with CSS AND insert the data stored in data_popup
 # Note: the <span> "class" names are using the SAME naming as in the data_popup (only difference is no "data-" prefix) - this makes things clear and convenient for JS coding (end of script)
 
-rate_popup <- "<div class='leaflet-popup-scrolled point-density-sidebar'><div class='popup-instruction'>Please click on a police division to see stop data below.</div><div class ='division-header'><span class='division-name'></span> Division (Division <span class='division-number'></span>)</div></div><br><br>
-
-Officers stopped <span class='count-nh-black'></span> people perceived as <span class='data-emphasis'>Black</span> for stops that resulted in a field interview card completed, or<span class='rate-nh-black'></span>% of Black people stopped.<br><br> 
-
-Officers stopped <span class='count-latinx'></span> people perceived as <span class='data-emphasis'>Latinx</span> for stops that resulted in a field interview card completed, or<span class='rate-latinx'></span>% of Latinx people stopped.<br><br> 
-
-Officers stopped <span class='count-nh-asian'></span> people perceived as <span class='data-emphasis'>Asian</span> for stops that resulted in a field interview card completed, or<span class='rate-nh-asian'></span>% of Asian people stopped.<br><br> 
-
-Officers stopped <span class='count-nh-aian'></span> people perceived as <span class='data-emphasis'>AIAN</span> for stops that resulted in a field interview card completed, or<span class='rate-nh-aian'></span>% of AIAN people stopped.<br><br> 
-
-Officers stopped <span class='count-nh-nhpi'></span> people perceived as <span class='data-emphasis'>NHPI</span> for stops that resulted in a field interview card completed, or<span class='rate-nh-nhpi'></span>% of NHPI people stopped.<br><br> 
-
-Officers stopped <span class='count-sswana'></span> people perceived as <span class='data-emphasis'>SWANA/SA</span> for stops that resulted in a field interview card completed, or<span class='rate-sswana'></span>% of SWANA/SA people stopped.<br><br> 
-
-Officers stopped <span class='count-nh-twoormor'></span> people perceived as <span class='data-emphasis'>Multiracial</span> for stops that resulted in a field interview card completed, or<span class='rate-nh-twoormor'></span>% of Multiracial people stopped.<br><br> 
-
-Officers stopped <span class='count-nh-white'></span> people perceived as <span class='data-emphasis'>White</span> for stops that resulted in a field interview card completed, or<span class='rate-nh-white'></span>% of White people stopped.<br><br> "
+rate_popup <- "<div class='leaflet-popup-scrolled point-density-sidebar'><div class='popup-instruction'>Please click on a police division to see stop data below.</div><div class ='division-header'><span class='division-name'></span> Division (Division <span class='division-number'></span>)</div></div><br> SDPD Officers stopped:<br><br>
+<span class='count-nh-black'></span> people perceived as <span class='data-emphasis'>Black</span> for stops that resulted in a field interview card completed, or<span class='rate-nh-black'></span>% of Black people stopped.<br><br> 
+<span class='count-latinx'></span> people perceived as <span class='data-emphasis'>Latinx</span> for stops that resulted in a field interview card completed, or<span class='rate-latinx'></span>% of Latinx people stopped.<br><br> 
+<span class='count-nh-asian'></span> people perceived as <span class='data-emphasis'>Asian</span> for stops that resulted in a field interview card completed, or<span class='rate-nh-asian'></span>% of Asian people stopped.<br><br> 
+<span class='count-nh-aian'></span> people perceived as <span class='data-emphasis'>AIAN</span> for stops that resulted in a field interview card completed, or<span class='rate-nh-aian'></span>% of AIAN people stopped.<br><br> 
+<span class='count-nh-nhpi'></span> people perceived as <span class='data-emphasis'>NHPI</span> for stops that resulted in a field interview card completed, or<span class='rate-nh-nhpi'></span>% of NHPI people stopped.<br><br> 
+<span class='count-sswana'></span> people perceived as <span class='data-emphasis'>SWANA/SA</span> for stops that resulted in a field interview card completed, or<span class='rate-sswana'></span>% of SWANA/SA people stopped.<br><br> 
+<span class='count-nh-twoormor'></span> people perceived as <span class='data-emphasis'>Multiracial</span> for stops that resulted in a field interview card completed, or<span class='rate-nh-twoormor'></span>% of Multiracial people stopped.<br><br> 
+<span class='count-nh-white'></span> people perceived as <span class='data-emphasis'>White</span> for stops that resulted in a field interview card completed, or<span class='rate-nh-white'></span>% of White people stopped.<br><br> "
 
 ## Set CC Brand colors for race/ethnic layers
 # Base Color 00
