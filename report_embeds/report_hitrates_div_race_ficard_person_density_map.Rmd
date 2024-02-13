@@ -95,7 +95,7 @@ papaya <- c('#F25922') # contraband
 # in this case, added pd2 prefix to ALL division-name and division-number references (the other map will get a pd1 prefix, etc.)
 # It's important to only use hyphens (no underscores or other symbols to denote space between words)
 # We'll use the names in the html tags when formatting popup behavior in JS (end of script)
-data_popup <- paste0("<div class='pd2'> <div class='leaflet-data-pd2' data-pd2-division-name='", div_wide_sf$div_name,
+data_popup <- paste0("<div class='pd-2'> <div class='leaflet-data-pd2' data-pd2-division-name='", div_wide_sf$div_name,
                "' data-pd2-division-number='", div_wide_sf$div_num,
                "' data-stop-count-total='", div_wide_sf$stop_count_total,
                "' data-yes-contraband-count='", div_wide_sf$contraband_count,
@@ -305,20 +305,20 @@ L.Map.addInitHook(function () {
     let popupsPd2 = document.querySelectorAll('.leaflet-data-pd2');
     // console.log(popups);
 
-    document.querySelectorAll('.pd2').forEach(pointdensity => {
-    pointdensity.parentElement.parentElement.parentElement.classList.add('hidden')
+    document.querySelectorAll('.pd-2').forEach(pd2 => {
+    pd2.parentElement.parentElement.parentElement.classList.add('hidden')
   })
   
   // populate custom pop-up when user clicks map
   //console.log('click')
-  let popup = popupsPd2[popupsPd2.length-1]
-  document.querySelector('.pd2-division-name').innerHTML = popup.getAttribute('data-pd2-division-name')
-  document.querySelector('.pd2-division-number').innerHTML = popup.getAttribute('data-pd2-division-number')
-  document.querySelector('.stop-count-total').innerHTML = popup.getAttribute('data-stop-count-total')
-  document.querySelector('.yes-contraband-count').innerHTML = popup.getAttribute('data-yes-contraband-count')
-  document.querySelector('.yes-contraband-prc-rate').innerHTML = popup.getAttribute('data-yes-contraband-prc-rate')
-  document.querySelector('.no-contraband-count').innerHTML = popup.getAttribute('data-no-contraband-count')
-  document.querySelector('.no-contraband-prc-rate').innerHTML = popup.getAttribute('data-no-contraband-prc-rate')
+  let popupPd2 = popupsPd2[popupsPd2.length-1]
+  document.querySelector('.pd2-division-name').innerHTML = popupPd2.getAttribute('data-pd2-division-name')
+  document.querySelector('.pd2-division-number').innerHTML = popupPd2.getAttribute('data-pd2-division-number')
+  document.querySelector('.stop-count-total').innerHTML = popupPd2.getAttribute('data-stop-count-total')
+  document.querySelector('.yes-contraband-count').innerHTML = popupPd2.getAttribute('data-yes-contraband-count')
+  document.querySelector('.yes-contraband-prc-rate').innerHTML = popupPd2.getAttribute('data-yes-contraband-prc-rate')
+  document.querySelector('.no-contraband-count').innerHTML = popupPd2.getAttribute('data-no-contraband-count')
+  document.querySelector('.no-contraband-prc-rate').innerHTML = popupPd2.getAttribute('data-no-contraband-prc-rate')
 
 })})});
 

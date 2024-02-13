@@ -95,7 +95,7 @@ invisible(dbDisconnect(pillars_conn))
 # in this case, added pd1 prefix to ALL division-name and division-number references (the other map will get a pd2 prefix, etc.)
 # It's important to only use hyphens (no underscores or other symbols to denote space between words)
 # We'll use the names in the html tags when formatting popup behavior in JS (end of script)
-data_popup <- paste0("<div class='pd1'> <div class='leaflet-data-pd1' data-pd1-division-name='", div_wide_sf$div_name,
+data_popup <- paste0("<div class='pd-1'> <div class='leaflet-data-pd1' data-pd1-division-name='", div_wide_sf$div_name,
                "' data-pd1-division-number='", div_wide_sf$div_num,
                "' data-count-nh-black='", div_wide_sf$count_nh_black,
                "' data-rate-nh-black='", round(div_wide_sf$rate_nh_black, digits = 1),
@@ -424,31 +424,31 @@ L.Map.addInitHook(function () {
     let popupsPd1 = document.querySelectorAll('.leaflet-data-pd1');
     // console.log(popups);
 
-    document.querySelectorAll('.pd1').forEach(pointdensity => {
-    pointdensity.parentElement.parentElement.parentElement.classList.add('hidden')
+    document.querySelectorAll('.pd-1').forEach(pd1 => {
+    pd1.parentElement.parentElement.parentElement.classList.add('hidden')
   })
   
   // populate custom pop-up when user clicks map
   //console.log('click')
-  let popup = popupsPd1[popupsPd1.length-1]
-  document.querySelector('.pd1-division-name').innerHTML = popup.getAttribute('data-pd1-division-name')
-  document.querySelector('.pd1-division-number').innerHTML = popup.getAttribute('data-pd1-division-number')
-  document.querySelector('.count-nh-black').innerHTML = popup.getAttribute('data-count-nh-black')
-  document.querySelector('.rate-nh-black').innerHTML = popup.getAttribute('data-rate-nh-black')
-  document.querySelector('.count-latinx').innerHTML = popup.getAttribute('data-count-latinx')
-  document.querySelector('.rate-latinx').innerHTML = popup.getAttribute('data-rate-latinx')
-  document.querySelector('.count-nh-asian').innerHTML = popup.getAttribute('data-count-nh-asian')
-  document.querySelector('.rate-nh-asian').innerHTML = popup.getAttribute('data-rate-nh-asian')
-  document.querySelector('.count-nh-aian').innerHTML = popup.getAttribute('data-count-nh-aian')
-  document.querySelector('.rate-nh-aian').innerHTML = popup.getAttribute('data-rate-nh-aian')
-  document.querySelector('.count-nh-nhpi').innerHTML = popup.getAttribute('data-count-nh-nhpi')
-  document.querySelector('.rate-nh-nhpi').innerHTML = popup.getAttribute('data-rate-nh-nhpi')
-  document.querySelector('.count-sswana').innerHTML = popup.getAttribute('data-count-sswana')
-  document.querySelector('.rate-sswana').innerHTML = popup.getAttribute('data-rate-sswana')
-  document.querySelector('.count-nh-twoormor').innerHTML = popup.getAttribute('data-count-nh-twoormor')
-  document.querySelector('.rate-nh-twoormor').innerHTML = popup.getAttribute('data-rate-nh-twoormor')
-  document.querySelector('.count-nh-white').innerHTML = popup.getAttribute('data-count-nh-white')
-  document.querySelector('.rate-nh-white').innerHTML = popup.getAttribute('data-rate-nh-white')
+  let popupPd1 = popupsPd1[popupsPd1.length-1]
+  document.querySelector('.pd1-division-name').innerHTML = popupPd1.getAttribute('data-pd1-division-name')
+  document.querySelector('.pd1-division-number').innerHTML = popupPd1.getAttribute('data-pd1-division-number')
+  document.querySelector('.count-nh-black').innerHTML = popupPd1.getAttribute('data-count-nh-black')
+  document.querySelector('.rate-nh-black').innerHTML = popupPd1.getAttribute('data-rate-nh-black')
+  document.querySelector('.count-latinx').innerHTML = popupPd1.getAttribute('data-count-latinx')
+  document.querySelector('.rate-latinx').innerHTML = popupPd1.getAttribute('data-rate-latinx')
+  document.querySelector('.count-nh-asian').innerHTML = popupPd1.getAttribute('data-count-nh-asian')
+  document.querySelector('.rate-nh-asian').innerHTML = popupPd1.getAttribute('data-rate-nh-asian')
+  document.querySelector('.count-nh-aian').innerHTML = popupPd1.getAttribute('data-count-nh-aian')
+  document.querySelector('.rate-nh-aian').innerHTML = popupPd1.getAttribute('data-rate-nh-aian')
+  document.querySelector('.count-nh-nhpi').innerHTML = popupPd1.getAttribute('data-count-nh-nhpi')
+  document.querySelector('.rate-nh-nhpi').innerHTML = popupPd1.getAttribute('data-rate-nh-nhpi')
+  document.querySelector('.count-sswana').innerHTML = popupPd1.getAttribute('data-count-sswana')
+  document.querySelector('.rate-sswana').innerHTML = popupPd1.getAttribute('data-rate-sswana')
+  document.querySelector('.count-nh-twoormor').innerHTML = popupPd1.getAttribute('data-count-nh-twoormor')
+  document.querySelector('.rate-nh-twoormor').innerHTML = popupPd1.getAttribute('data-rate-nh-twoormor')
+  document.querySelector('.count-nh-white').innerHTML = popupPd1.getAttribute('data-count-nh-white')
+  document.querySelector('.rate-nh-white').innerHTML = popupPd1.getAttribute('data-rate-nh-white')
 })})});
 
 ```  
