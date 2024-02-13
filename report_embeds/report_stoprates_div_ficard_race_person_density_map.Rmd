@@ -88,14 +88,6 @@ invisible(dbDisconnect(pillars_conn))
 ```{r}
 ### Map components prep
 
-## function to change the legend shape and color
-colors_function <- function(colors, sizes, borders, shapes) {
-    shapes <- gsub("circle", "100%", shapes)
-    shapes <- gsub("square", "100%", shapes)
-    paste0(colors, "; width:", sizes, "px; height:", 
-           sizes, "px; border:1px solid ", borders, "; border-radius:", shapes)
-}
-
 ## Create data_popup
 # Stores ONLY data we plan to insert into the custom popup (i.e., not the full content like in rate_popup)
 # Take note of the naming structure in the html tags: [data-][variable-name]
