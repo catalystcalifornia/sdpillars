@@ -130,23 +130,15 @@ data_popup <- paste0("<div class='pointdensity'> <div class='leaflet-data' data-
 # to style with CSS AND insert the data stored in data_popup
 # Note: the <span> "class" names are using the SAME naming as in the data_popup (only difference is no "data-" prefix) - this makes things clear and convenient for JS coding (end of script)
 
-rate_popup <- "<div class='leaflet-popup-scrolled point-density-sidebar'><div class='popup-instruction'>Please click on a police division to see stop data below.</div><div class ='division-header'><span class='division-name'></span> Division (Division <span class='division-number'></span>)</div></div><br> SDPD Officers stopped and conducted field interviews on:<br><br>
-
-<span class='nh-black-dot'></span> <span class='data-emphasis nh-black-color'><span class='count-nh-black nh-black-color'></span> people</span> perceived as <span class='data-emphasis nh-black-color'>Black</span>, or <span class='data-emphasis nh-black-color'><span class='rate-nh-black nh-black-color'></span>% of Black people stopped.</span><br><br> 
-
-<span class='latinx-dot'></span> <span class='data-emphasis latinx-color'><span class='count-latinx latinx-color'></span> people</span> perceived as <span class='data-emphasis latinx-color'>Latinx</span>, or <span class='data-emphasis latinx-color'><span class='rate-latinx latinx-color'></span>% of Latinx people stopped.</span><br><br> 
-
-<span class='nh-asian-dot'></span> <span class='nh-asian-color'><span class='count-nh-asian nh-asian-color'></span> people</span> perceived as <span class='data-emphasis nh-asian-color'>Asian</span>, or <span class='data-emphasis nh-asian-color'><span class='rate-nh-asian nh-asian-color'></span>% of Asian people stopped.</span><br><br> 
-
-<span class='nh-aian-dot'></span> <span class='nh-aian-color'><span class='count-nh-aian nh-aian-color'></span> people</span> perceived as <span class='data-emphasis nh-aian-color'>AIAN</span>, or <span class='data-emphasis nh-aian-color'><span class='rate-nh-aian nh-aian-color'></span>% of AIAN people stopped.</span><br><br> 
-
-<span class='nh-nhpi-dot'></span> <span class='nh-nhpi-color'><span class='count-nh-nhpi nh-nhpi-color'></span> people</span> perceived as <span class='nh-nhpi-color'>NHPI</span>, or <span class='nh-nhpi-color'><span class='rate-nh-nhpi'></span>% of NHPI people stopped.</span><br><br> 
-
-<span class='sswana-dot'></span> <span class='sswana-color'><span class='count-sswana sswana-color'></span> people</span> perceived as <span class='sswana-color'>SWANA/SA</span>, or <span class='sswana-color'><span class='rate-sswana sswana-color'></span>% of SWANA/SA people stopped.</span><br><br> 
-
-<span class='nh-twoormor-dot'></span> <span class='nh-twoormor-color'><span class='data-emphasis count-nh-twoormor nh-twoormor-color'></span> people perceived as <span class='data-emphasis'>Multiracial</span>, or <span class='rate-nh-twoormor data-emphasis nh-twoormor-color'></span>% of Multiracial people stopped.</span><br><br> 
-
-<span class='nh-white-dot'></span> <span class='nh-white-color'><span class='data-emphasis count-nh-white nh-white-color'></span> people perceived as <span class='data-emphasis nh-white-color'>White</span>, or <span class='rate-nh-white data-emphasis nh-white-color'></span>% of White people stopped.</span><br><br> "
+rate_popup <- "<div class='leaflet-popup-scrolled point-density-sidebar'><div class='popup-instruction'>Please click on a San Diego police division to see stop data below.</div><div class ='division-header'><span class='division-name'></span> Division (Division <span class='division-number'></span>)</div></div><br> SDPD Officers stopped and conducted field interviews on:<br><br><ul class='popup-list'>
+<li class='popup-list-item'><span class='data-emphasis nh-black-color'><span class='count-nh-black nh-black-color'></span> people</span> perceived as <span class='data-emphasis nh-black-color'>Black</span>, or <span class='nh-black-color'><span class='rate-nh-black nh-black-color'></span>% of Black people stopped.</span></li>
+<li class='popup-list-item'><span class='data-emphasis latinx-color'><span class='count-latinx latinx-color'></span> people</span> perceived as <span class='data-emphasis latinx-color'>Latinx</span>, or <span class='latinx-color'><span class='rate-latinx latinx-color'></span>% of Latinx people stopped.</span></li>
+<li class='popup-list-item'><span class='nh-asian-color'><span class='count-nh-asian nh-asian-color'></span> people</span> perceived as <span class='data-emphasis nh-asian-color'>Asian</span>, or <span class='data-emphasis nh-asian-color'><span class='rate-nh-asian nh-asian-color'></span>% of Asian people stopped.</span></li>
+<li class='popup-list-item'><span class='nh-aian-color'><span class='count-nh-aian nh-aian-color'></span> people</span> perceived as <span class='data-emphasis nh-aian-color'>AIAN</span>, or <span class='data-emphasis nh-aian-color'><span class='rate-nh-aian nh-aian-color'></span>% of AIAN people stopped.</span></li>
+<li class='popup-list-item'><span class='nh-nhpi-color'><span class='count-nh-nhpi nh-nhpi-color'></span> people</span> perceived as <span class='nh-nhpi-color'>NHPI</span>, or <span class='nh-nhpi-color'><span class='rate-nh-nhpi'></span>% of NHPI people stopped.</span></li>
+<li class='popup-list-item'><span class='sswana-color'><span class='count-sswana sswana-color'></span> people</span> perceived as <span class='sswana-color'>SWANA/SA</span>, or <span class='sswana-color'><span class='rate-sswana sswana-color'></span>% of SWANA/SA people stopped.</span></li>
+<li class='popup-list-item'><span class='nh-twoormor-color'><span class='data-emphasis count-nh-twoormor nh-twoormor-color'></span> people perceived as <span class='data-emphasis'>Multiracial</span>, or <span class='rate-nh-twoormor data-emphasis nh-twoormor-color'></span>% of Multiracial people stopped.</span></li> 
+<li class='popup-list-item'><span class='nh-white-color'><span class='data-emphasis count-nh-white nh-white-color'></span> people perceived as <span class='data-emphasis nh-white-color'>White</span>, or <span class='rate-nh-white data-emphasis nh-white-color'></span>% of White people stopped.</span></li></ul> "
 
 ## Set CC Brand colors for race/ethnic layers
 # Base Color 00
@@ -362,96 +354,32 @@ map <-  leaflet(width = "100%", height = "600px",
   font-weight: 700;
 }
 
-.nh-black-dot {
-  height: 6px;
-  width: 6px;
-  background-color: #0860BC;
-  border-radius: 50%;
-  display: inline-block;
-}
-
 .nh-black-color {
   color: #0860BC;
-}
-
-.latinx-dot {
-  height: 6px;
-  width: 6px;
-  background-color: #0AB013;
-  border-radius: 50%;
-  display: inline-block;
 }
 
 .latinx-color {
   color: #0AB013;
 }
 
-.nh-asian-dot {
-  height: 6px;
-  width: 6px;
-  background-color: #DF4007;
-  border-radius: 50%;
-  display: inline-block;
-}
-
 .nh-asian-color {
   color: #DF4007;
-}
-
-.nh-aian-dot {
-  height: 6px;
-  width: 6px;
-  background-color: #EB8D00;
-  border-radius: 50%;
-  display: inline-block;
 }
 
 .nh-aian-color {
   color: #EB8D00;
 }
 
-.nh-nhpi-dot {
-  height: 6px;
-  width: 6px;
-  background-color: #601D42;
-  border-radius: 50%;
-  display: inline-block;
-}
-
 .nh-nhpi-color {
   color: #601D42;
-}
-
-.sswana-dot {
-  height: 6px;
-  width: 6px;
-  background-color: #EABB00;
-  border-radius: 50%;
-  display: inline-block;
 }
 
 .sswana-color {
   color: #EABB00;
 }
 
-.nh-twoormor-dot {
-  height: 6px;
-  width: 6px;
-  background-color: #211447;
-  border-radius: 50%;
-  display: inline-block;
-}
-
 .nh-twoormor-color {
   color: #211447;
-}
-
-.nh-white-dot {
-  height: 6px;
-  width: 6px;
-  background-color: #BCD313;
-  border-radius: 50%;
-  display: inline-block;
 }
 
 .nh-white-color {
@@ -461,6 +389,19 @@ map <-  leaflet(width = "100%", height = "600px",
 .data-emphasis {
   font-size: 14px; 
   font-weight: 600;
+}
+
+.popup-list {
+  padding-left: 1.3em;
+  line-height: 1.2em;
+}
+
+.popup-list-item {
+  padding-bottom: 1.2em;
+  font-weight: 400; 
+  font-size: 1em; 
+  line-height: 1.2em;
+  color: #000000;
 }
 
 </style>
