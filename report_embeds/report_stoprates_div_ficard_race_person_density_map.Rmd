@@ -99,10 +99,12 @@ colors_function <- function(colors, sizes, borders, shapes) {
 ## Create data_popup
 # Stores ONLY data we plan to insert into the custom popup (i.e., not the full content like in rate_popup)
 # Take note of the naming structure in the html tags: [data-][variable-name]
+# Another note: multiple point density maps will be on the report page, will need to use a unique prefix for common data values so they behave correctly
+# in this case, added pd1 prefix to ALL division-name and division-number references (the other map will get a pd2 prefix, etc.)
 # It's important to only use hyphens (no underscores or other symbols to denote space between words)
 # We'll use the names in the html tags when formatting popup behavior in JS (end of script)
-data_popup <- paste0("<div class='pointdensity'> <div class='leaflet-data' data-division-name='", div_wide_sf$div_name,
-               "' data-division-number='", div_wide_sf$div_num,
+data_popup <- paste0("<div class='pd1'> <div class='leaflet-data-pd1' data-pd1-division-name='", div_wide_sf$div_name,
+               "' data-pd1-division-number='", div_wide_sf$div_num,
                "' data-count-nh-black='", div_wide_sf$count_nh_black,
                "' data-rate-nh-black='", round(div_wide_sf$rate_nh_black, digits = 1),
                "' data-count-latinx='", div_wide_sf$count_latinx,
@@ -130,7 +132,7 @@ data_popup <- paste0("<div class='pointdensity'> <div class='leaflet-data' data-
 # to style with CSS AND insert the data stored in data_popup
 # Note: the <span> "class" names are using the SAME naming as in the data_popup (only difference is no "data-" prefix) - this makes things clear and convenient for JS coding (end of script)
 
-rate_popup <- "<div class='leaflet-popup-scrolled'><div class='popup-instruction'>Please click on a San Diego police division to see stop data below.<br></div><div class ='division-header'><span class='division-name'></span> Division (Division <span class='division-number'></span>)</div><div class='division-subheader'>SDPD Officers conducted field interviews on:</div>
+rate_popup <- "<div class='leaflet-popup-scrolled'><div class='popup-instruction'>Please click on a San Diego police division to see stop data below.<br></div><div class ='division-header'><span class='pd1-division-name'></span> Division (Division <span class='pd1-division-number'></span>)</div><div class='division-subheader'>SDPD Officers conducted field interviews on:</div>
 <ul class='popup-list'>
 <li class='popup-list-item'><span class='data-emphasis nh-black-color'><span class='count-nh-black nh-black-color'></span> people</span> they perceived as <span class='data-emphasis nh-black-color'>Black</span>, or <span class='nh-black-color data-emphasis'><span class='rate-nh-black nh-black-color data-emphasis'></span>%</span> of Black people they stopped.</li>
 <li class='popup-list-item'><span class='data-emphasis latinx-color'><span class='count-latinx latinx-color'></span> people</span> they perceived as <span class='data-emphasis latinx-color'>Latinx</span>, or <span class='latinx-color data-emphasis'><span class='rate-latinx latinx-color data-empasis'></span>%</span> of Latinx people they stopped.</li>
@@ -405,8 +407,8 @@ L.Map.addInitHook(function () {
     // pre-populate map pop-up (when map loads/before user clicks anywhere)
     map.on('load', (e) => {
     setTimeout(() => {
-    document.querySelector('.division-name').innerHTML = 'Southeastern'
-    document.querySelector('.division-number').innerHTML = '4'
+    document.querySelector('.pd1-division-name').innerHTML = 'Southeastern'
+    document.querySelector('.pd1-division-number').innerHTML = '4'
     document.querySelector('.count-nh-black').innerHTML = '549'
     document.querySelector('.rate-nh-black').innerHTML = '19.4'
     document.querySelector('.count-latinx').innerHTML = '405'
@@ -427,18 +429,18 @@ L.Map.addInitHook(function () {
   })
     // hide default leaflet popup
     map.on('popupopen', (e) => {
-    let popups = document.querySelectorAll('.leaflet-data');
+    let popups = document.querySelectorAll('.leaflet-data-pd1');
     // console.log(popups);
 
-    document.querySelectorAll('.pointdensity').forEach(pointdensity => {
+    document.querySelectorAll('.pd1').forEach(pointdensity => {
     pointdensity.parentElement.parentElement.parentElement.classList.add('hidden')
   })
   
   // populate custom pop-up when user clicks map
   //console.log('click')
   let popup = popups[popups.length-1]
-  document.querySelector('.division-name').innerHTML = popup.getAttribute('data-division-name')
-  document.querySelector('.division-number').innerHTML = popup.getAttribute('data-division-number')
+  document.querySelector('.pd1-division-name').innerHTML = popup.getAttribute('data-pd1-division-name')
+  document.querySelector('.pd1-division-number').innerHTML = popup.getAttribute('data-pd1-division-number')
   document.querySelector('.count-nh-black').innerHTML = popup.getAttribute('data-count-nh-black')
   document.querySelector('.rate-nh-black').innerHTML = popup.getAttribute('data-rate-nh-black')
   document.querySelector('.count-latinx').innerHTML = popup.getAttribute('data-count-latinx')
