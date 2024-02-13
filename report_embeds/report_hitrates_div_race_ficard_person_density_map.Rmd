@@ -108,7 +108,7 @@ data_popup <- paste0("<div class='pointdensity'> <div class='leaflet-data' data-
 # We are using <span> "class" names (e.g. data-emphasis, division-name) 
 # to style with CSS AND insert the data stored in data_popup
 # Note: the <span> "class" names are using the SAME naming as in the data_popup (only difference is no "data-" prefix) - this makes things clear and convenient for JS coding (end of script)
-rate_popup <- "<div class='leaflet-popup-scrolled point-density-sidebar'><div class='popup-instruction'>Please click on a police division to see stop data below.</div><div class ='division-header'><span class='division-name'></span> Division (Division <span class='division-number'></span>)</div></div><br>Out of <span class='data-emphasis'><span class='stop-count-total'></span> people</span> searched during stops where a field interview card was completed:<br><br>SDPD found no contraband or evidence on <span class='data-emphasis no-contraband-color'><span class='no-contraband-count no-contraband-color'></span> people</span>, meaning SDPD  subjected <span class='data-emphasis no-contraband-color'><span class='no-contraband-prc-rate no-contraband-color'></span>%</span> of people to unnecessary searches.<br><br>SDPD found contraband/evidence on <span class='data-emphasis yes-contraband-color'><span class='yes-contraband-count yes-contraband-color'></span> people</span>, a hit rate of <span class='data-emphasis yes-contraband-color'><span class='yes-contraband-prc-rate yes-contraband-color'></span>%</span>.
+rate_popup <- "<div class='leaflet-popup-scrolled point-density-sidebar'><div class='popup-instruction'>Please click on a San Diego police division to see stop data below.</div><div class ='division-header'><span class='division-name'></span> Division (Division <span class='division-number'></span>)</div></div><br>Out of <span class='data-emphasis'><span class='stop-count-total'></span> people</span> searched during stops where a field interview card was completed:<br><br>SDPD found no contraband or evidence on <span class='data-emphasis no-contraband-color'><span class='no-contraband-count no-contraband-color'></span> people</span>, meaning SDPD  subjected <span class='data-emphasis no-contraband-color'><span class='no-contraband-prc-rate no-contraband-color'></span>%</span> of people to unnecessary searches.<br><br>SDPD found contraband/evidence on <span class='data-emphasis yes-contraband-color'><span class='yes-contraband-count yes-contraband-color'></span> people</span>, a hit rate of <span class='data-emphasis yes-contraband-color'><span class='yes-contraband-prc-rate yes-contraband-color'></span>%</span>.
 <br><br><div class='legend'><div class='legend-note'>1 dot = 5 field interview card stops and a search</div><br><span class='no-contraband-dot'></span> No Contraband Found <br><span class='yes-contraband-dot'></span> Yes Contraband Found</div></div><br>"
 
 ```
@@ -275,8 +275,8 @@ map
 }
 
 .data-emphasis {
-  font-size: 14px; 
-  font-weight: 700;
+  font-size: 12px; 
+  font-weight: 600;
 }
 
 </style>
