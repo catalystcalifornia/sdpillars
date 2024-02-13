@@ -421,7 +421,7 @@ L.Map.addInitHook(function () {
   })
     // hide default leaflet popup
     map.on('popupopen', (e) => {
-    let popups = document.querySelectorAll('.leaflet-data-pd1');
+    let popupsPd1 = document.querySelectorAll('.leaflet-data-pd1');
     // console.log(popups);
 
     document.querySelectorAll('.pd1').forEach(pointdensity => {
@@ -430,7 +430,7 @@ L.Map.addInitHook(function () {
   
   // populate custom pop-up when user clicks map
   //console.log('click')
-  let popup = popups[popups.length-1]
+  let popup = popupsPd1[popupsPd1.length-1]
   document.querySelector('.pd1-division-name').innerHTML = popup.getAttribute('data-pd1-division-name')
   document.querySelector('.pd1-division-number').innerHTML = popup.getAttribute('data-pd1-division-number')
   document.querySelector('.count-nh-black').innerHTML = popup.getAttribute('data-count-nh-black')
