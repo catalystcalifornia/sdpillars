@@ -168,7 +168,7 @@ map <- leaflet(width = "100%", height = "600px",
 ```{r}
 map
 ```
-<div align="left" style="line-height: 1em;"><span style="font-size: 10px;">Searches are randomly placed within each division and do not indicate the exact location of the search.</span> <span style=' font-size: 10px;'>Catalyst California's calculations based on City of San Diego's Police Stop Data (2022); <u>[Catalyst California](https://www.catalystcalifornia.org)</u>, 2023. Analysis for all officer-initiated stops that resulted in a field interview card completed and a search.</span> </div>
+<div align="left" style="line-height: 12px;"><span style="font-size: 10px;">Searches are randomly placed within each division and do not indicate the exact location of the search.</span> <span style=' font-size: 10px;'>Catalyst California's calculations based on City of San Diego's Police Stop Data (2022); <u>[Catalyst California](https://www.catalystcalifornia.org)</u>, 2023. Analysis for all officer-initiated stops that resulted in a field interview card completed and a search.</span> </div>
 
 
 <style type="text/css">
@@ -232,13 +232,12 @@ map
 .popup-instruction {
   font-style: italic;
   font-weight: 600; 
-  font-size: 1em; 
-  line-height: 1.2em;
+  font-size: 12px; 
+  line-height: 16px;
   color: #000000;
   border-bottom: 1px solid #000000;
-  padding-top: 1.2em;
-  padding-bottom: 1.2em;
-  margin-bottom: 1.2em;
+  padding-bottom: 16px;
+  margin-bottom: 16px;
 }
 
 .legend {
@@ -248,21 +247,21 @@ map
 }
 
 .legend-note {
-  font-size: 1em;
+  font-size: 12px;
   font-weight: 700;
 }
 
 .no-contraband-dot {
-  height: 1em;
-  width: 1em;
+  height: 12px;
+  width: 12px;
   background-color: #3A207D;
   border-radius: 50%;
   display: inline-block;
 }
 
 .yes-contraband-dot {
-  height: 1em;
-  width: 1em;
+  height: 12px;
+  width: 12px;
   background-color: #F25922;
   border-radius: 50%;
   display: inline-block;
