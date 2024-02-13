@@ -249,12 +249,7 @@ map <-  leaflet(width = "100%", height = "600px",
   ### Layer control checkbox for race/ethnic groups
   addLayersControl(overlayGroups = map_race_labels, 
                    options = layersControlOptions(collapsed = FALSE)) %>%
-    
-  ### add Legend
-  addLegend("bottomright", title= paste0("1 dot = 5 field interview card stops"), 
-            colors = colors_function(colors = map_colors, sizes = "10", 
-                                     shapes = "circle", borders = NULL),
-            labels= map_race_labels, opacity = 0.7, labFormat = labelFormat(digits = 0)) %>% 
+
   
   ## add custom popup with full content
   addControl(html=rate_popup, position = "topleft") %>%
@@ -264,7 +259,12 @@ map <-  leaflet(width = "100%", height = "600px",
   setView(-117.13395, 32.79923, zoom = 10) %>% #base and view 
     
   ### Deselect White from Layer Control checkbox
-  hideGroup(c("White"))   # hide white group
+  hideGroup(c("White")) %>%  # hide white group
+  
+  htmlwidgets::onRender("function() {
+            $('.leaflet-control-layers-overlays').append('<label style=\"font-style:italic; font-size:10px;\">*Each dot represents<br>5 people stopped by SDPD.</label>');
+        }")
+
   
 ```
   
