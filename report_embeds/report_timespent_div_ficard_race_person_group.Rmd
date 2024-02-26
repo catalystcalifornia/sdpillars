@@ -42,7 +42,7 @@ df1<-df1%>%
 methodnote <- "Analysis for all officer-initiated stops resulting in a field interview card only in each SDPD division. Officers spent a total of 118,970.3 hours on officer-initiated stops that resulted in a field interview card only in 2022."
 
 # create caption
-caption_text <- paste("<br><br>", sourcenote, methodnote)
+caption_text <- paste("<br>", sourcenote, methodnote)
 
 # add title and subtitle
 top_finding<-"Across all SDPD divisions, SDPD disproportionately spends time on field interview cards for Black people relative to their population"

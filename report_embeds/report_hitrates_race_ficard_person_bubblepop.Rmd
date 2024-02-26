@@ -22,7 +22,7 @@ metadata_race_labels <-  dbGetQuery(pillars_conn, "SELECT * FROM metadata_race_l
 methodnote <- "Analysis for all officer-initiated stops that resulted in a search and field interview card completed."
 
 ## create caption
-caption_text <- paste("<br><br>", racenote, sourcenote, methodnote)
+caption_text <- paste("<br>", racenote, sourcenote, methodnote)
 
 ## Load in RJS Pillars data: Bubble Pop test ##
 df <- dbGetQuery(pillars_conn, "SELECT * FROM data.report_hitrates_race_ficard_person")  %>% 
