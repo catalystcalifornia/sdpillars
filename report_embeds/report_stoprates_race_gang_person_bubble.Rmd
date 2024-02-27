@@ -27,7 +27,7 @@ df <- dbGetQuery(pillars_conn, "SELECT * FROM report_stoprates_race_gang_person"
 methodnote <- "All officer-initiated stops made by officers assigned to gang enforcement."
 
 ## create caption
-caption_text <- paste("<br><br>", racenote, sourcenote, methodnote)
+caption_text <- paste("<br>", racenote, sourcenote, methodnote)
 
 chart <- fx_bubblepopchart(
   df=df, 

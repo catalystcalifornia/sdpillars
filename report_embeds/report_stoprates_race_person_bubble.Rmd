@@ -25,7 +25,7 @@ df <- dbGetQuery(pillars_conn, "SELECT * FROM report_stoprates_race_person") %>%
 methodnote <- "Analysis for all officer-initiated stops."
 
 ## create caption
-caption_text <- paste("<br><br>", racenote, sourcenote, methodnote)
+caption_text <- paste("<br>", racenote, sourcenote, methodnote)
 
 ## Load in race metadata
 chart <- fx_bubblepopchart(

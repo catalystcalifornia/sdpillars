@@ -42,7 +42,7 @@ df <- within(df, result_simple <- factor(result_simple, levels=c("Warning (verba
 methodnote <- "Analysis for all officer-initiated stops."
 
 # create caption
-caption_text <- paste("<br><br>", racenote, sourcenote, methodnote)
+caption_text <- paste("<br>", racenote, sourcenote, methodnote)
 
 ## graph
 
