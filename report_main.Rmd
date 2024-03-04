@@ -54,30 +54,33 @@ orange <- "#F25922"
 
 ```
 
-*The San Diego Police Department criminalizes communities of color, especially Black people, in Southeast San Diego by routinely labeling them as gang members. This practice inflicts devastating racially biased harms, undermines community safety, and wastes tremendous public dollars.*  
-
-
-# ACKNOWLEDGEMENTS
-
-Thank you to the people of Southeast San Diego for sharing their stories. Their stories bring to light the inhumane interactions the Southeast community experiences daily with the police. We are incredibly grateful for their courage and honesty. We urge the City to respond to their stories by putting an end to racially biased policing in San Diego.
-
-This project was completed with support from the Microsoft Justice Reform Initiative. 
+**The San Diego Police Department criminalizes communities of color, especially Black and Latinx people, in Southeast San Diego through gang profiling. This practice inflicts devastating racially biased harms, undermines community safety, and wastes tremendous public dollars.** 
 
 ```{r}
 embed_url("https://youtu.be/cWlR-a1bm5w")
 
 ```
 
-# CONTEXT
+# SUMMARY
 
-**The San Diego Police Department ("SDPD")**, and law enforcement agencies throughout California have a long history of unjustly criminalizing people of color through gang profiling. This occurs through officers documenting community members–especially those who are Black and/or Latinx as a member or affiliate of a gang and placing their identities in electronic gang databases.  In 1987, for instance, the Los Angeles Sheriff’s Department (“LASD”) and the Law Enforcement Communication Network (NALECOM) – a rapid interstate law enforcement communications system^[https://www.ojp.gov/ncjrs/virtual-library/abstracts/national-law-enforcement-communication-network-nalecom-users] – jointly developed a database used to collect, retain, and analyze information about alleged gang members.^[See Tracked & Trapped at 2.] Over the next decade, law enforcement agencies throughout California refined and expanded gang databases.^[Id. at 3.]
+This report combines data analysis of San Diego Police Department’s (“SDPD”) patrol activities, video interviews with community members in Southeast San Diego, and public policy research to show how SDPD criminalizes community members in Southeast San Diego through gang profiling. Gang profiling is a practice through which SDPD–and law enforcement agencies throughout California–document people of color as gang members and place their identities in gang databases. This report unpacks how gang profiling in Southeast San Diego inflicts devastating racially biased harms, undermines community safety, and wastes tremendous public dollars. To address these issues, a comprehensive set of recommendations for the City of San Diego (the “City”) are provided. 
 
-In 1997, a company called CSRA International, Inc. (“CSRA”) used funding from the California Department of Justice to develop the most prominent system – “CalGang” (also known as “GangNet”). CalGang allows law enforcement throughout California to collect, store, and share personal information about people suspected – but not convicted – of being involved in criminal activity.^[State Auditor at 2.] People added to CalGang are documented as either a gang member or gang affiliated.^[Id. at 11.] In addition to in-state law enforcement agencies, CalGang is used by federal law enforcement, other states, and Canada.^[Id. at 9.] Reports indicate that in 2022, at least 106 law enforcement agencies used CalGang, including the San Diego Police Department (SDPD). Amongst those agencies, SDPD had the third highest number of records added to the system (only the LASD  and San Bernardino County Sheriff’s Department had more).      
+
+# ACKNOWLEDGEMENTS
+
+This report was jointly produced through a partnership between Catalyst California and Pillars of the Community–an organization that advocates and organizes for people harmed by the criminal legal system in Southeast San Diego. Thank you to Southeast San Diego community members for courageously sharing your stories and perspectives on how SDPD patrol activities undermine community safety. This project was completed with support from the Microsoft Justice Reform Initiative. 
+
+
+# BACKGROUND
+
+The SDPD has a long history of criminalizing people of color in Southeast San Diego through a devastating practice known as “gang profiling.” Used by California law enforcement agencies for decades, gang profiling occurs through officers documenting community members–especially those who are Black and/or Latinx–as a member or affiliate of a gang and placing their identities in electronic gang databases. For example, in 1987, the Los Angeles Sheriff’s Department (“LASD”) and the Law Enforcement Communication Network (“NALECOM”)–a rapid interstate law enforcement communications system^[https://www.ojp.gov/ncjrs/virtual-library/abstracts/national-law-enforcement-communication-network-nalecom-users]–jointly developed and began using a database to collect, retain, and analyze information about alleged gang members.^[See Tracked & Trapped at 2.] Over the next decade, gang databases were refined and expanded.^[Id. at 3.]
+
+In 1997, the most prominent gang database–CalGang (also known as “GangNet”)–was developed through funding from the California Department of Justice. CalGang allows law enforcement throughout California to collect, store, and share personal information about people suspected, but not convicted, of being involved in criminal activity.^[State Auditor at 2.] People added to CalGang by law enforcement are documented as either a gang member or gang affiliated.^[Id. at 11.] In addition to in-state law enforcement agencies, CalGang is used by federal law enforcement, other states, and Canada.^[Id. at 9.] Reports indicate that in 2022, at least 106 law enforcement agencies used CalGang, including SDPD. Amongst those agencies, SDPD had the third highest number of records in CalGang (only LASD and the San Bernardino County Sheriff’s Department had more). Latinx and Black people respectively accounted for 46% and 43% of people added to CalGang by SDPD.    
 
 ```{r calgang-table, child= 'report_embeds/report_calgangstats_table.Rmd', echo=FALSE}
 ```
 
-**The process through which people of color are gang profiled is notoriously problematic.**   Many people have been added to gang databases without prior knowledge and without being arrested for a crime.  For example, officers often conduct pretextual stops of Black and Latinx people by detaining them for relatively minor issues–such as a broken taillight or jaywalking–and interrogating them in aim of discovering evidence or a more serious crime.  During these encounters, officers document personal information about the community member on a Field Interview (FI) card.  The information collected may include, but not be limited to, the person’s name, date of birth, race, gender, nicknames, their family members and friends, their place of residence, the community where they live, photos, tattoos, clothing color, vehicles, and suspected gang affiliation.^[Tracked & Trapped at 4-5. State Auditor at 11.] These interactions and resulting implications impose devastating, long-lasting harms on the community members involved.
+The process through which people of color are gang profiled is notoriously problematic. Many are added to gang databases without prior knowledge and without being arrested for a crime. For example, officers often conduct pretextual stops of Black and Latinx people by detaining them for relatively minor issues—such as a broken taillight or jaywalking—and interrogating them in aim of discovering evidence of a more serious crime. Through the interrogation, which typically functions as a form of intimidation and harassment, officers document personal information about the community member on a Field Interview card. The information collected may include, but not be limited to, the person’s name, date of birth, race, gender, nicknames, names of family members and friends, their place of residence, the community where they live, photos, images and descriptions of their tattoos, clothing colors at the time of a stop, vehicles registered to or driven by the person stopped, and suspected gang affiliation identified by the officer.^[Tracked & Trapped at 4-5. State Auditor at 11; See also https://gould.usc.edu/students/journals/rlsj/issues/assets/docs/issue_18/Yoshino_(MACRO2).pdf] Being documented as gang members imposes devastating, long-lasting harms on Southeast San Diego community members.
 
 ```{r}
 embed_url("https://www.youtube.com/watch?v=FTqt90YJ_V4")
@@ -85,182 +88,228 @@ embed_url("https://www.youtube.com/watch?v=FTqt90YJ_V4")
 ```
 
 <div style="background-color:#F25922">
-## The devastating impact of criminalizing people
-Criminalization occurs when people are turned into criminals by making their alleged activities illegal, even if the activities are ordinary or not harmful to others.^[https://www.oed.com/search/dictionary/?scope=Entries&q=criminalization+ ; https://www.merriam-webster.com/dictionary/criminalize] SDPD criminalizes community members from Southeast San Diego by documenting them as gang members. This inflicts devastating harms, direct and indirect, on Southeast community members and their families–including physical, mental, and emotional trauma.  
+## The Devastating Impact of Criminalizing People through Gang Profiling
+Criminalization occurs when people are turned into criminals by making their alleged activities illegal–including actions that are ordinary in a community, not harmful to others, or byproducts of systemic racism.^[https://www.oed.com/search/dictionary/?scope=Entries&q=criminalization+ ; https://www.merriam-webster.com/dictionary/criminalize] SDPD criminalizes Southeast San Diego community members by documenting them as gang members. This inflicts devastating harms–including physical, mental, and emotional trauma. 
 
-In addition, being documented as a gang member can have devastating impacts on a person being charged with an alleged crime because of sentencing enhancements for gang membership (or “gang enhancements”). Specifically, under the STEP Act, the application of a gang enhancement adds an additional two years to life imprisonment to a person’s sentence.  The added time runs consecutive (rather than concurrent) to the punishment for an underlying felony.^[Yoshino at 119.] The potential for such added harm often has devastating impacts on people facing relatively low charges because the threat of far more lengthy imprisonment impacts plea bargaining, charging decisions, juror perspectives, among other things.   
+In addition, being documented as a gang member has devastating ripple effects, especially for people of color. For example, a person charged with an alleged crime can be subject to longer periods of incarceration if a sentence enhancement for gang membership (i.e., a “gang enhancement”) is applied. Specifically, the application of a gang enhancement can add an additional two years to life imprisonment to a person’s sentence. The added time runs consecutive (rather than concurrent) to the punishment for the underlying felony.^[Cal. P.C. s. 186.22(b); Yoshino at 119.] These factors have devastating impacts on people facing relatively low charges because the threat of far more lengthy imprisonment impacts plea bargaining, charging decisions, juror perspectives, and other factors in criminal cases.^[Yoshino at 138.] For immigrant communities, this often includes potential deportation.^[https://link.springer.com/article/10.1007/s10612-022-09614-3 ] As context for the racially inequitable impact of gang profiling, statewide data show that “Black and Latinx people comprise 92% of the people sentenced under California’s gang enhancement statute”^[http://www.clrc.ca.gov/CRPC/Pub/Reports/CRPC_AR2020.pdf at 45.] while collectively accounting for approximately 45% of the state population.^[https://www.ppic.org/publication/californias-population/#:~:text=No%20race%20or%20ethnic%20group,the%202022%20American%20Community%20Survey.]   
 </div>
 
 
 # BRIEF METHODOLOGY
 
-This report evaluates SDPD gang profiling in the City of San Diego by analyzing data collected by SDPD pursuant to the Racial and Identity Profiling Act (“RIPA”) of 2015.  For each stop made by law enforcement, RIPA data includes key information that can be assessed for evidence of racial or identify profiling—including characteristics about the person stopped (e.g., race, gender, and age), the stop location, the length of the stop, the reason for the stop, and the result of the stop. 
-
-Using RIPA data, this report examines gang profiling by using the officer assignment field (under “gang enforcement”) which we find underrepresents total gang enforcement activity being done by SDPD, and stop result filed (under “field interview card”). 
+This report evaluates SDPD gang profiling by analyzing 2022 data collected and reported by SDPD pursuant to the Racial and Identity Profiling Act (“RIPA”) of 2015. For each stop made by law enforcement, RIPA data includes information that can be analyzed for evidence of profiling—including characteristics about the person stopped (e.g., race, gender, and age), the stop location, the length of the stop, the reason for the stop, and the result of the stop. This report uses RIPA data to evaluate SDPD’s gang profiling activities. Key RIPA indicators include the officer assignment field (under “gang enforcement”), and the stop result field (under “field interview card”). 
 
 
-# FINDINGS
+# KEY FINDINGS
 
-In sum, the data for SDPD clearly show racial bias towards people who officers perceive as Black and/or Latinx, and that these groups are disproportionately impacted by gang enforcement activity. Regions with higher concentrations of  Black and Latinx residents, such as Southeast San Diego, have higher stop rates and are subject to greater gang enforcement activity. Furthermore, comparing stop rates to the San Diego population shows that SDPD stops people perceived as Black at rates much higher than their proportion of the population. In addition to racial bias, the data show that SDPD gang profiling activities often undermine safety by inflicting tremendous harm upon Southeast San Diego community members while rarely resulting in the discovery of criminal evidence or an arrest. . Community member stories add more poignancy to the impact of SDPD’s racially biased activities by showing how Black and Latinx people have personally been harmed repeatedly by officers.
+In sum, stop data, video stories from community members, and policy research show that SDPD is committed to a practice of criminalizing communities of color–especially Black and Latinx people–in Southeast San Diego through gang profiling. This causes severe physical, mental and emotional harm, and operates as a form of dehumanization. Below are key findings.
 
-## 1. SDPD targets communities of color, particularly Black and young people in Southeast San Diego, with gang profiling
+1. SDPD patrol activities target Black and Latinx people (and in some instances other people of color) in Southeast San Diego and subject them to gang profiling.     
 
-In Southeast San Diego, SDPD’s practice of racial profiling people for gang activity is far too common and affects the daily lives of community members. Lived experiences reveal the long-lasting harm, trauma, and distrust caused by these practices.
+2. SDPD’s gang profiling undermines community safety by inflicting tremendous harm on Southeast San Diego community members while being an ineffective crime prevention method.     
+
+3. SDPD’s racially biased gang profiling in Southeast San Diego wastes tremendous time and public dollars. Those resources could be better invested in non-law enforcement safety programs that are rooted in care and equity.     
+
+The data and stories below unpack these findings in greater detail.
+
+
+## 1. SDPD targets communities of color, particularly Black and Latinx people in Southeast San Diego, with gang profiling.
+
+Data below show that stops made by SDPD are racially biased, and officers assigned to gang enforcement disproportionately profile Black and Latinx people. Beyond officers assigned to gang enforcement, an analysis of field interview cards reveals racially biased gang profiling. And, community member stories translate the data into lived experiences that reveal unsettling harm and trauma caused by SDPD.
 
 ```{r}
 embed_url("https://www.youtube.com/watch?v=arZekGIgIrw")
 
 ```
 
-### A. Data show that stops made by the SDPD are racially biased
+### A. Stops made by SDPD are racially biased.
 
-An analysis of all officer-initiated stops–as opposed to stops based on service calls–shows that officers disproportionately stop people of color, particularly people officers perceive as Black or Native Hawaiian or Pacific Islander (NHPI). More specifically, in 2022, for every one-thousand Black people in San Diego, officers stopped nearly 216 people they perceived as Black. In comparison, the average stop rate in San Diego in 2022 was 64 people for every one-thousand people in the city. This means that SDPD was more than three times as likely to stop a Black person than city residents at large. And, while Black people comprise 5.7 percent of the total population, they accounted for 19.2 percent of officer-initiated stops.
+An analysis of all officer-initiated stops^[As opposed to stops based on calls for service from community members.] shows that officers disproportionately stop Black, Native Hawaiian or Pacific Islander (NHPI), and Latinx people. More specifically, in 2022, for every 1000 Black people in San Diego, officers stopped nearly 216 people they perceived as Black. To compare, the citywide average stop rate was 64 people stopped for every 1000 people. This means that **SDPD was more than three times more likely to stop a Black person than residents at large.** In terms of percentages, Black people comprised 5.7 percent of the total population, but accounted for 19.2 percent of officer-initiated stops.
 
 ```{r bubble-chart, child= 'report_embeds/report_stoprates_race_person_bubble.Rmd', echo=FALSE}
 ```
 
-A common assumption is that officer-initiated stops advance safety. However, data show that officer-initiated stops are often driven by racial bias rather than safety risks. Stops that result in no enforcement action or a relatively minor result (such as a warning) indicate relatively low safety risks. When people of color are disproportionately subjected to stops that pose little to no safety risks, it indicates racial bias. These stops, known as pretextual stops, are often based on a racially biased and incorrect “hunch” that a person of color was connected to illegal activity. All too often, pretextual stops are used to expose people of color to unnecessary contact with armed law enforcement.
+In addition, data  show that officer-initiated stops are often driven by racial bias, not safety risks. Specifically, stops that result in “no action” or a relatively minor result (such as a warning) indicate relatively low safety risk. When people of color are disproportionately subjected to stops that pose little-to-no safety risk, it indicates racial bias. These stops, known as “pretextual,” are often based on a racially biased and incorrect “hunch” that a person of color is connected to illegal activity. All too often, pretextual stops expose people of color to unnecessary contact with the criminal legal system. They are a primary method of racial profiling. 
 
-In San Diego, Black and Latinx people are disproportionately subjected to officer-initiated stops that result in no action or a warning. Specifically, in 2022, nearly 1 in 4 stops (25.3%) of people officers perceived as Black resulted in a warning and over 1 in 10 (12.7%) resulted in no action. Combined these stops affected an estimated 6,416 Black people in San Diego. People officers perceived as Latinx have the second highest rate of stops resulting in no action (11.5%) or a warning (26.8%). These racially biased stops affected an estimated total of 11,563 Latinx people.
+With this context, data show that SDPD disproportionately subjects Black and Latinx people to officer-initiated stops that result in no action or a warning. In 2022, nearly one in four stops (25.3%) of people officers perceived as Black resulted in a warning, and over one in ten (12.7%) resulted in no action. Combined these stops affected an estimated 6,416 Black people. For people that officers perceived as Latinx, 11.5% of officer-initiated stops resulted in no action and 26.8% resulted in a warning (26.8%). Those stops directly affected approximately 11,563 Latinx people that year.
 
 ```{r bubble-chart, child= 'report_embeds/report_stoprates_result_race_person_stacked.Rmd', echo=FALSE}
 ```
 
-### B. Data show that SDPD officers assigned to gang enforcement profile Black and Latinx people   
+### B. SDPD gang enforcement officers target Black and Latinx people for profiling.   
 
-Stories from community members reveal that SDPD’s gang enforcement officers target and harass Black and Latinx people and the Southeast community and label them as gang members. And many times officers target young people engaged in everyday activities with no indication of safety risks.
+Stories from community members reveal that SDPD targets and harasses Black and Latinx people, especially in Southeast San Diego, by labeling them as gang members. In addition, officers often target youth of color who pose no threat to safety.
 
 ```{r}
 embed_url("https://www.youtube.com/watch?v=Dd-e07UT6-Y")
 
 ```
 
-Data  show that officers assigned to gang enforcement at the time of the stop target Latinx and Black people. Specifically, amongst all people stopped by officers assigned to gang enforcement, 40.1% were perceived as Latinx and 32.4% were perceived as Black. Compared to their share of the San Diego population, Black and Latinx people were respectively 5.7 and 1.3 times overrepresented in people stopped by officers assigned to gang enforcement. 
+Data show that officers assigned to gang enforcement under RIPA data target Latinx and Black people. Specifically, amongst all people stopped by officers assigned to gang enforcement, 40.1% were perceived as Latinx and 32.4% were perceived as Black. Compared to their proportions of the San Diego population, **Black and Latinx people were respectively 5.7 and 1.3 times overrepresented among people stopped by officers assigned to gang enforcement.** 
 
-Black people of every age group in San Diego are disproportionately impacted by these stops. For instance, while Black people ages 45-54 comprise just 5.2% of the San Diego population in that age group, they made up 41.5% of people stopped by officers assigned to gang enforcement. This translates into Black people ages 45-54 being nearly 8 times overrepresented in people stopped by officers assigned to gang enforcement. Latinx people between the ages of 18-44 are over 1.3 times overrepresented in people stopped by officers assigned to gang enforcement compared to their share of the San Diego people. These trends indicate the alarming rate of racial profiling used by the Gang Suppression Unit. However, the counts included in this data are likely underinclusive of the actual number of stops done by the Gang Suppression Unit.
+In addition, Black people in every age group were disproportionately impacted. For instance, while Black people comprised 5.2% of the 45 to 54 years old population, they accounted for 41.5% of people in that age group who were stopped by officers assigned to gang enforcement. Stated differently, Black people ages 45 to 54 were nearly eight times overrepresented among people stopped by officers assigned to gang enforcement. Latinx people between the ages of 18 and 44 were more than 1.3 times overrepresented among people stopped by officers assigned to gang enforcement compared to their proportion of the population. Notably however, as explained below, such figures likely undercount the number of stops conducted by gang enforcement.
 
 ```{r bubble-chart, child= 'report_embeds/report_stoprates_race_gang_person_bubble.Rmd'}
 ```
 
 
 <div style="background-color:#F25922">
-### SDPD data are underinclusive and mask the extent of racially biased, gang profiling in San Diego
+### SDPD data are underinclusive and mask the extent of racially biased gang profiling in San Diego.
 
-Our research suggests that publicly available SDPD data on gang documentation are underinclusive and, in turn, mask the scope of racial biases in SDPD gang enforcement. This is in part due to a lack of clarity (and inconsistencies) between the officer assignment categories used under RIPA regulations, SDPD’s list of units, and the functional tasks SDPD’s officers are responsible for irrespective of their assignments. 
+Research suggests that publicly available SDPD data on gang documentation are underinclusive and, in turn, mask the scope of racial biases in SDPD gang enforcement. This is in part due to a lack of clarity (and inconsistencies) between the officer assignment categories used under RIPA regulations, SDPD’s list of units, and the functional tasks SDPD’s officers are responsible for irrespective of their assignments. 
 
-More specifically, RIPA regulations require that the “type of assignment of officer” be reported for each stop.^[11 Cal. Code Regs. § 999.226(a)(20)] There are eleven assignment types, including “gang enforcement.” Catalyst California’s research indicates that SDPD has approximately 39 departmental units to which officers are assigned.  This includes a “gang unit” for personnel that, among other things, identify and investigate gang members and gang activity, maintain SDPD gang information files and liaise with agencies across the nation, and assist patrol with gang information.^[https://www.sandiego.gov/sites/default/files/legacy/police/pdf/unitlist.pdf] This latter function–assisting patrol with gang information–indicates that the gang unit collaborates with other parts of SDPD that conduct patrol activities (such as traffic-related units) on matters related to alleged gang activity that may not qualify as “gang enforcement” under RIPA’s regulation on officer assignment.
+Specifically, RIPA regulations require that the “type of assignment of officer” be reported for each stop.^[11 Cal. Code Regs. § 999.226(a)(20)] There are 11 assignment types, including “gang enforcement.” Catalyst California’s research indicates that SDPD has approximately 39 departmental units to which officers are assigned. This includes a “gang unit” for personnel that, among other tasks, identify and investigate gang members and gang activity, maintain SDPD gang information files and liaise with agencies across the nation, and assist patrol with gang information.^[https://www.sandiego.gov/sites/default/files/legacy/police/pdf/unitlist.pdf] This latter function—assisting patrol with gang information—indicates that the gang unit collaborates with other parts of SDPD that conduct patrol activities (such as traffic-related units) on matters related to alleged gang activity that may not qualify as “gang enforcement” under RIPA’s regulation on officer assignment.
 
-To account for this, Catalyst California submitted a public records request to SDPD to determine whether there were additional stops related to gang enforcement that may not have been reported under RIPA’s gang enforcement assignment due to the lack of clarity between RIPA and SDPD definitions and personnel functions. Both requests were denied.
-^[insert brief description of SPDP’s responses] SDPD’s lack of transparency  with RIPA data masks the extent of racial biases in SDPD’s gang profiling and, in turn, attendant harms that are disproportionately experienced by Black and Latinx community members in Southeast San Diego.   
+To account for this, Catalyst California submitted a public records request to SDPD to determine whether there were additional stops related to gang enforcement that may not have been reported under RIPA’s gang enforcement assignment due to the lack of clarity between RIPA data and SDPD functions. The request and an appeal were denied.^[insert brief description of SPDP’s responses] SDPD’s lack of transparency masks the extent of racial biases in SDPD’s gang profiling and, in turn, attendant harms that are disproportionately experienced by Black and Latinx community members in Southeast San Diego. 
 
-Because SDPD refused to provide data specific to its Gang Suppression Unit, the data was analyzed based on stops that result in a field interview card as a proxy for identifying  gang suppression activity by SDPD. This data, combined with stories from impacted community members, further reveal the extent of extremely harmful SDPD’s gang profiling practices
+Because SDPD refused to provide data specific to its gang unit, available data on stops that result in a field interview card were analyzed as a proxy for identifying gang profiling activities. This data, combined with stories from impacted community members, further reveal the extent of SDPD’s extremely harmful gang profiling.
+
 </div>
 
-```{r}
-embed_url("https://www.youtube.com/watch?v=sD5libtgXfI")
 
-```
+### C. Beyond officers assigned to gang enforcement, an analysis of stops that result in field interview cards shows that SDPD targets Black people for gang profiling, especially in Southeast San Diego. 
 
-### C. Beyond officers assigned to gang enforcement, an analysis of stops that result in field interview cards shows that SDPD targets Black and Latinx people and labels them as gang members 
-
-Community members’ experiences show how SDPD’s gang profiling activity subjects them to traumatic encounters that go far beyond what SDPD reports. These encounters often include field interview cards that are used to enter community members into CalGang. 
+Community member experiences vividly reveal how SDPD’s gang profiling subjects people to trauma and harassment that goes far beyond what data show. These experiences include intrusive interrogations used to complete field interview cards (a key indicator of gang profiling) so that SDPD can document people in Southeast San Diego as gang members and add them to CalGang. 
 
 ```{r}
 embed_url("https://www.youtube.com/watch?v=oOmzLOEOFGM")
 
 ```
 
-Data shows that SDPD stops people they perceive as Black for field interview cards at the highest rate compared to all other racial groups. While Black people account for 5.6% of San Diego’s total population, White people make up 42% of the population. The rate at which SDPD stops people they perceive as Black for field interview cards is 5 times more than the rate at which they stop people perceived as White. 
-
-Communities most impacted by SDPD gang profiling report that the department targets youth of color. The data confirms this trend, and shows alarming racial disparities across other age groups. Young adults ages 18-24 and minors 17 years old and younger are more likely to be stopped and have a field interview card completed than all other age groups. And, across age ranges, SDPD stops and completes field interview cards for people they perceive as Black or Latinx at higher rates compared to other racial groups.
+Compared to all racial groups, data show that SDPD subjects people they perceive as Black to field interviews at the highest rate. Black people were subjected to stops that resulted in a field interview card at a rate five times greater than White people.
 
 ```{r bubble-chart, child= 'report_embeds/report_stoprates_ficard_race_person_bubble.Rmd'}
 ```
 
-SDPD’s racial targeting for stops that result in a field interview card primarily takes place in regions nearSouth and Southeast San Diego, where more people of color live. Analyzing the data by police division shows these geographic disparities., SDPD makes the most amount of stops that result in a field interview card in the Central, Southeastern, and Mid-City police divisions.  In 2022, SDPD made 1,100 total stops with a field interview card in the Southeastern division (e.g., Lincoln Park, Skyline, etc.) compared to only 171 total stops resulting in a field interview card in the Northwestern division. San Diego’s Whiter and more affluent communities (e.g., Carmel Valley, and Del Mar Heights) are in the Northwestern division . Black people make up less than 1% of the population in the Northwestern division are Black, but 14.9% of the population in Southeast San Diego.
+Analyzing data by SDPD’s patrol divisions shows that the department’s practice of disproportionately subjecting people of color to gang profiling primarily takes place in South and Southeast San Diego–areas where more people of color live. Specifically, SDPD stops the highest percentage of people for field interviews in the Central and Southeastern Divisions. **In 2022, SDPD subjected 1,100 people to stops resulting in field interviews in the Southeastern Division (e.g., Lincoln Park, Skyline, etc.) compared to only 171 people in the Northwestern Division.^[In the Southeastern Division this equated to 13.8% of people stopped compared to just 5% of people stopped in the Northwestern division.] More White and affluent people reside in the Northwestern Division**, which encompasses areas like Carmel Valley, Del Mar Heights, and parts of Torrey Pines. **Black people comprise less than 1% of the population in the Northwestern division, but account for 14.9% of the population in Southeast San Diego.**
 
-Analysis by race shows that the people SDPD disproportionately stops for field interview cards are people of color, especially people perceived as Black and Latinx. In the Southeastern division, 1 in 5 people (19.4%) SDPD stopped and perceived as Black have field interview cards completed, compared to less than 1 in 10 people perceived as White.
+Analysis by race shows that SDPD disproportionately subjects people of color to field interviews (which often amount to interrogation and harassment) during stops. For example, **in the Southeastern Division, one in five people (19.4%) that officers stopped and perceived as Black had field interview cards completed, compared to less than one in 10 (9.6%) people perceived as White.**^[Similarly, in the Central Division, 34% of people officers stopped and perceived as Multiracial had field interview cards completed compared to 21.4% of White people.]
 
 ```{r dot-density, child= 'report_embeds/report_stoprates_div_ficard_race_person_density_map.Rmd'}
 ```
 
-In addition, the data indicate that SDPD’s practice of disproportionately stopping people of color and subjecting them to field interviews (which often amount to interrogation and harassment) is rooted in racial profiling. Specifically, nearly 1 in 4 stops that resulted in a field interview card originated based on alleged traffic violations. Analyzing those stops by race shows that SDPD used traffic violations to stop people they perceived as people of color for field interview cards at more than twice the rate of people perceived as White. To add, while these stops were allegedly made in response to traffic safety risks, they concluded in results that indicate otherwise because no citations were issued. Rather, the officer only completed field interview cards. This indicates pretext and the use of racial profiling to harass people of color for gang activity.
+In addition, the data indicate that SDPD’s practice of disproportionately stopping people of color and subjecting them to field interviews is rooted in racial profiling. Specifically, nearly one in four stops that resulted in a field interview card originated based on alleged traffic violations. Analyzing those stops by race shows that SDPD used traffic violations to stop people they perceived as people of color for field interview cards at more than twice the rate of people perceived as White. To add, while these stops were allegedly made in response to traffic safety risks, they concluded in results that indicate otherwise because field interview cards, rather than citations or arrests, were issued. This indicates the use of pretextual stops for racially biased gang profiling. 
 
 ```{r stacked-chart, child= 'report_embeds/report_stoprates_ficard_reason_race_bubble.Rmd'}
 ```
 
-## 2. Such racially biased stops harm the Southeast community and undermine community safety  
+## 2. SDPD’s racially biased gang profiling undermines safety and harms the Southeast San Diego community.  
 
-SDPD’s gang profiling activity unnecessarily subjects community members to harmful contact with armed officers and undermines community safety. Stories from community members show that they are often harassed, interrogated, physically searched, and subjected to other degrading and dehumanizing treatment by officers. This results in community members feeling unsafe from the institution that is supposed to protect them from harm. 
+SDPD’s gang profiling unnecessarily subjects people of color to harmful criminal legal system contact and undermines community safety. Specifically, stories from Southeast San Diego community members show that they are often harassed, interrogated, searched, and subjected to other degrading and dehumanizing treatment by SDPD. This results in community members feeling unsafe from SDPD. 
 
 ```{r}
 embed_url("https://www.youtube.com/watch?v=e1KxqPIKjeo")
 
 ```
 
-### A. Searches conducted during gang profiling are largely ineffective and racially biased 
-During stops, officers often search people who they think may possess evidence of a crime. Data on police stops repeatedly show that officer searches are highly ineffective in rooting out crime and are racially biased. Specifically, amongst all people searched in 2022, officers failed to find evidence of a crime 70 percent of the time. In other words, over 18,000 people were subjected to a police search by SDPD in 2022 that was proven unnecessary.
+In addition to being extremely harmful, data show that SDPD’s gang profiling is extremely ineffective. This is shown by SDPD’s discovery (or “hit) rate–which measures how often evidence of a crime is found when a person is searched by an officer
+
+### A. SDPD searches conducted during gang profiling are highly ineffective and racially biased. 
+
+During routine stops, officers often search people who they think may possess evidence of a crime. Stop data show that amongst all people searched by SDPD in 2022, officers failed to find evidence of a crime over 70% of the time. Outside the context of law enforcement (e.g., education, public health, or housing), a 70% failure rate in government services that purportedly aim to improve communities would, at minimum, place the practice at issue in question. For SDPD, allowing this practice amounted to over 18,000 people being subjected to unnecessary, and often intrusive and traumatizing, searches in one year.
 
 ```{r donut-chart, child= 'report_embeds/report_hitrates_race_person_donut.Rmd'} 
 ```
 
-To add, searches conducted during stops that result in a field interview card were even less effective. Officers failed to find evidence of a crime in approximately 72 percent of stops that resulted in a field interview. Considering race and ethnicity in stops involving a search and resulting in a field interview, no contraband was found in 84 percent of stops of people perceived as NHPI. This rate drops to 65 percent during field interview card stops of people perceived as White, showing that searches for contraband were less effective when applied to people of color. These racially biased and unnecessary searches and contact with officers affected the highest numbers of Latinx and Black people the most. In 2022, officers subjected 1,705 people perceived as Latinx and 1,366 people perceived as Black to these searches.
+To add, searches conducted during stops that resulted in the completion of a field interview card–a proxy for gang profiling–were even less effective. Officers failed to find evidence of a crime in approximately 72.1% of those stops. To add, **people of color were less likely to possess evidence of a crime than White people. Specifically, the discovery rate for searches of White people was 34.9%, while the discovery rates for searches of NHPI, Black, Asian, Latinx, SWANA/SA, and AIAN people ranged between 15.8% and 30.4%.** NHPI people had the lowest discovery rates. However, these racially biased and unnecessary searches affected Latinx and Black people the most. Officers subjected 1,705 people perceived as Latinx and 1,366 people perceived as Black to these searches in 2022.
 
 ```{r stacked-chart, child= 'report_embeds/report_hitrates_race_ficard_person_bubblepop.Rmd'}
 ```
 
-### B. Southeast community members have had their wellbeing and safety harmed by gang enforcement stops and searches
+### B. Southeast San Diego community members’ wellbeing and safety are harmed by searches that occur during gang profiling.
 
-While these SDPD practices occur throughout San Diego, data and stories from the Southeast community show the prevalence of these searches in Southeast San Diego. Community members describe how physical interactions with police creates emotional trauma and physical harm. 
+Combined, stories from Southeast community members and data reveal the severity and prevalence of unnecessary SDPD searches in Southeast San Diego.  
 
 ```{r}
 embed_url("https://www.youtube.com/watch?v=KzE0t3U4Sk0")
 
 ```
 
-Division-level analysis of searches done during field interview card stops further demonstrates the extent of this harmful practice and how it targets people of color in Southeast San Diego. In all of San Diego, there were 2,936 people who were searched, field interviewed, and found to have no contraband. Of these people, around 66 percent were in the Southeastern, Central, and Mid-City divisions of San Diego, areas that have a higher concentration of people of color compared to the Northern regions.  
+Division-level analysis of searches conducted during stops that result in field interview cards shows that people of color in Southeast San Diego are being targeted. Specifically, citywide, 2,936 people were searched, field interviewed, and found to have no contraband in 2022. Approximately 66.3% of those people were in SDPD’s Southeastern, Central, and Mid-City Divisions–areas that have higher concentrations of people of color compared to northern regions. 
 
-The Southeast Division has the highest number of people searched during field interview card stops and the highest number of people found with no contraband. SDPD officers found no contraband in 77 percent of searches done during stops where a field interview card was completed in the Southeastern Division. Black and Latinx people in the Southeast were disproportionately targeted by these searches. People perceived as Black and Latinx accounted for over 89 percent of these unsuccessful searches while only making up 65 percent of the population in this division. These disparities existed in other divisions as well. While Black people represented only seven percent of the population in the Central division, they comprised 35 percent of people searched with no contraband or evidence. And while they represented the second highest searched group in the Central Division, only second to Latinx individuals, officers failed to find contraband or evidence on nearly 81 percent of people they perceived as Black who they searched and field interviewed.
+Among stops resulting in field interview cards, people in the Southeastern Division were subjected to the most searches and had the highest number of community members found with no contraband. **SDPD officers found no contraband in 77.5% of searches done during stops where a field interview card was completed in the Southeastern Division. Combined, people perceived as Black and Latinx accounted for 89.8% of those unsuccessful searches, while only making up 65.8% of the population in the Division.** Similar disparities were also present in other divisions.^[For example, while Black people represented only 7.4% of the population in SDPD’s Central Division, they comprised 35.1% of people subjected to a search where no evidence of a crime was found. And while they represented the second highest searched group in SDPD’s Central Division, only second to Latinx people, officers failed to find evidence on nearly 81.1% of people they perceived as Black and searched and field interviewed.] 
 
 ```{r dot-map, child= 'report_embeds/report_hitrates_div_race_ficard_person_density_map.Rmd'}
 ```
 
-## 3. These racially biased activities waste public resources
+## 3. SDPD’s racially biased gang profiling in Southeast San Diego wastes tremendous time and public dollars.
 
-Like most police departments in California, a significant portion of public dollars goes to SDPD. The narrative pushed by police departments is that a huge amount of funding is needed to keep communities safe. However, data shows that police spend their time on activities that are not preventing crime or keeping the public safe. SDPD is no exception to this.
+In addition to harming Southeast community members and undermining community safety, SDPD annually wastes time and millions of public dollars on gang profiling. Those resources should be invested in non-law enforcement equity-centered programs that advance true safety.
 
+```{r}
+embed_url("https://www.youtube.com/watch?v=sD5libtgXfI")
+
+```
+
+### A. SDPD wastes a significant amount of time profiling people of color for gang activity in Southeast San Diego.
+
+More than half (56.1%) of SPDP hours spent on stops that result in field interviews are spent stopping people perceived as Latinx or Black, even though Latinx and Black people only make up 35.7% of the population. In addition, across all SDPD Divisions, the Department spends more time subjecting Black people to field interviews compared to their share of the population. This is problematic because, as explained above, field interviews often entail intrusive questioning that operates as a form of severe intimidation and harassment. **In SDPD’s Southeastern Division, officers spent three times more hours on field interview cards of Black people compared to their share of the population.**
+
+```{r item-chart, child= 'report_embeds/report_timespent_div_ficard_race_person_group.Rmd'}
+```
+
+In addition, an analysis of hours spent by SDPD officers assigned to gang enforcement shows that nearly 40 out of every 100 (39.7%) hours was spent on stops with results indicative of little-to-no safety risk (i.e., resulting in a field interview card, a warning, or no action). To add, stops only resulting in a citation for an infraction (as opposed to a misdemeanor or felony) accounted for 8 out of 100 (7.7%) patrol hours. Collectively, this amounted to officers assigned to gang enforcement wasting nearly half (47.4%) of their time on minor conduct.
+
+```{r item-chart, child= 'report_embeds/report_timespent_ficard_gang_stop_item.Rmd'}
+```
+
+### B. SDPD annually wastes over $43 million on gang profiling in Southeast San Diego.
+
+In the adopted budget for fiscal year 2022, the city’s general fund expenditures on SDPD were the largest for any department, totaling $593.3 million. That amount was far more than the combined expenditures on other agencies that help build long-term community safety–$358.4 million. For example, the budget for Park & Recreation was $133.9 million, Transportation was $82.5 million, Libraries was $60.7 million, Environmental Services was $58.8 million, and Economic Development was $22.5 million.^[(See page 97 of https://www.sandiego.gov/sites/default/files/fy22ab_v1generalfundexpenditures.pdf)] 
+
+[insert bar graph of SD budget]
+
+While the City’s budget is not publicly disaggregated by SDPD divisions for fiscal year 2022, in 2021 the City’s Independent Budget Analyst produced an in-depth analysis which showed that the SDPD’s total fiscal year 2021 budget was $568.2 million. Amongst that, SDPD’s patrol operations—the part of the SDPD typically responsible for conducting stops—accounted for $238.6 million in general fund expenditures.^[(Pg. 6 of 2021 In-depth analysis - https://www.sandiego.gov/sites/default/files/iba-report-20-21.pdf)] Within that, the Southeastern Division of SDPD patrol operations–which conducts the vast majority of stops in its area–cost $26.2 million.^[(Id. at A-7).] In addition to the Southeastern Division, SDPD has  three special units for gang profiling, including the Street Gang Unit, Gang Intervention Unit, and Special Operations Unit.^[https://www.sandiego.gov/sites/default/files/iba-report-20-21.pdf] The units cost  $16.8 million.^[(Id. at A-64-66).]
+
+[Insert table with above figures like we had for the statewide report]
+
+In light of the above figures, **the estimated cost of operating the parts of SDPD primarily responsible for gang profiling in Southeast San Diego–that is, the Southeastern Division of Patrol Operations, and the Street Gang, Gang Intervention, and Special Operations Units—amounted to approximately $43.1 million in fiscal year 2021.** This does not include the cost of operating SDPD’s most expensive division—the Central Division of Patrol Operations ($32.4 million)—which has a patrol area that includes neighborhoods often considered part of Southeast San Diego (e.g., Barrio Logan and Logan Heights) that have relatively higher Latinx populations. It also excludes millions spent on support operations, human resources, and other administrative functions.
+
+Thus, a conservative estimate shows that the City’s spending on gang profiling in Southeast San Diego in 2021 ($43.1 million) far exceeded its investment in the Economic Development Department ($23.3 million), which implements citywide business and community development programs.^[https://www.sandiego.gov/sites/default/files/fy21ab_v2econdev.pdf. ] More apt comparisons are the City’s investments in the Storm Water Department ($47.5 million)—which is responsible for preventing flooding like that which displaced over 1,200 San Diegans from their homes in January 2024^[https://www.nbcsandiego.com/news/local/more-than-1200-plus-san-diegans-still-homeless-after-the-great-flood-of-2024/3429816/#:~:text=1%2C200%2Dplus%20San%20Diegans%20lost,22%20%E2%80%93%20NBC%207%20San%20Diego] ^[https://www.sandiego.gov/sites/default/files/fy21ab_v2stormwater.pdf]–, and homelessness prevention ($49.1 million).^[https://www.sandiego.gov/sites/default/files/fy21ab_v1generalfundexpenditures.pdf] The City should stop wasting public dollars on SDPD’s gang profiling because it inflicts devastating racially biased harms and undermines community safety. To build true community safety, those dollars should be reinvested in equity- and care-centered programs discussed in the recommendations below.
 
 ```{r}
 embed_url("https://www.youtube.com/watch?v=W_j4T1uOQhY")
 
 ```
 
-### A. Based on available data, SDPD spends a disproportionate amount of time on profiling people of color for gang activity
-
-When analyzing how much time SDPD spends on stops resulting in a field interview card, nearly six percent of all hours spent on officer-initiated stops are spent on stops that result in a field interview card.  
-
-Within stops that result in a field interview card, SDPD disproportionately spends their time stopping people perceived as Latinx and Black. More than half of the hours spent on stops that result in a field interview card are spent stopping people perceived as Latinx or Black, even though Latinx and Black people make up only 35.7 percent of the total population in San Diego.
-
-Black community members throughout San Diego are overwhelmingly impacted by this racially biased use of public resources. SDPD spends more time conducting field interview cards for Black people relative to their population in every police division. In Southeast San Diego, officers spent three times more hours on field interview cards of Black people compared to their relative share of the population in Southeast San Diego.  
-
-```{r item-chart, child= 'report_embeds/report_timespent_div_ficard_race_person_group.Rmd'}
-```
-
-Analysis of hours spent by SDPD officers assigned to gang enforcement also show that most of their time is not being spent on activities that prevent crime. Offices assigned to gang enforcement spent nearly 4 in 10 hours on stops resulting only in a field interview card, a warning, or no action. Stops only resulting in a citation for an infraction took up an additional 8 out of 100 patrol hours. Comparatively, arrests with warrants only comprised 9 in 100 patrol hours. 
-
-```{r item-chart, child= 'report_embeds/report_timespent_ficard_gang_stop_item.Rmd'}
-```
-
-### B. This time translates to wasted public dollars.
-
-`r lorem::ipsum(paragraphs = 1,sentences=NULL, avg_words_per_sentence=10)`
-
 
 # RECOMMENDATIONS
 
-1. Alternative investments that actually increase safety
-2. Enact the Protect Act
-3. Others...
+The City should address the problems discussed above by no longer viewing SDPD as an institution that makes Southeast San Diego safer. Rather, SDPD undermines community wellbeing, and inhibits opportunities to thrive, in Southeast San Diego–especially for people of color. To address these issues, provided below are a comprehensive set of equity-centered recommendations that should be adopted. 
+
+## 1. Reinvest Dollars Wasted on Gang Profiling in Equity-Centered Safety Programs
+
+Long-term solutions to improve safety in Southeast San Diego should be grounded in investments that address the root causes of safety risks. Continuing to double-down on law enforcement and incarceration only serves to produce recidivism and disproportionately harm people of color. Rather than annually wasting millions of public dollars on ineffective and racially biased gang profiling, the City should shift public dollars to programs that address fundamental needs of community members in Southeast San Diego, including affordable housing, jobs that pay living wages, workforce development, and food security. For example, research shows that permanent supportive housing and guaranteed basic income programs targeted to historically under-resourced communities can reduce safety risks.^[https://slate.com/news-and-politics/2022/03/how-cash-transfer-programs-prevent-violent-crime.html] This would be far more effective than criminalizing Black and Latinx people in Southeast San Diego. In addition, community-based organizations that serve Southeast San Diego have a deep understanding of the unique challenges community members face. Their experience and expertise as trusted messengers and catalysts for safety should be leveraged by providing them with greater resources to help advance safety. 
+
+## 2. Enact the PrOtect Act
+
+The City should enact the PrOtect (Preventing Over-policing through Equitable Community Treatment) Act.^[https://prismic-io.s3.amazonaws.com/protect/c8a963b8-93e3-482c-abc5-2f5763b1cd82_PrOTECT+Ordinance+%28v.+8.4+web%29.pdf] Developed as a priority of the Coalition for Police Accountability & Transparency, the PrOtect Act aims to prevent racially biased stops and searches. Its key provisions include requiring officers to have probable cause to stop a person (including for people on probation or parole), require probable cause for searches, prohibiting questioning for offenses beyond the offense that gives rise to a stop, holding officers accountable for violations of those restrictions, and publicly reporting data on stops.^[https://d3n8a8pro7vhmx.cloudfront.net/alliancesandiego/pages/204/attachments/original/1617815407/PrOTECT_Factsheet_%282%29.pdf?1617815407]
+
+## 3. Acknowledge Harms Caused by Gang Profiling and Apologize to Southeast San Diego Community Members
+
+The City and SDPD should issue a public apology for harms inflicted upon Southeast community members through racially biased gang profiling. While an apology alone is insufficient to fully address past harms, it is a key reparative stepping stone.^[https://oag.ca.gov/system/files/media/ch16-ca-reparations.pdf 
+ https://www.americanprogress.org/article/truth-and-reconciliation] With roots in South African apartheid, there is a lengthy history of governmental apologies for dehumanizing atrocities. For example, in 2023, the Chief of Police of the Seattle Police Department (SPD) provided a formal public apology for SPD’s violent response to protesters demanding justice for police violence.^[https://ny1.com/nyc/all-boroughs/ap-top-news/2023/04/19/panel-seattle-police-should-apologize-for-protest-violence] Along the same line, in 2016, the President of the International Association of Chiefs of Police (IACP)–the largest police management organization in the U.S.–issued a formal apology at the IACP’s annual conference in San Diego. He declared “For our part, the first step is for law enforcement and the IACP to acknowledge and apologize for the action of the past and the role that our profession has played in society’s historical mistreatment of communities of color.”^[https://www.washingtonpost.com/news/true-crime/wp/2016/10/17/head-of-u-s-police-chiefs-apologizes-for-historic-mistreatment-of-minorities/]
+
+## 4. Remove All Gang Units from Southeast San Diego
+
+SDPD’s gang units are notorious for inflicting many of the most harmful actions inflicted on community members in Southeast San Diego. As explained above, this includes not only unwarranted stops that undermine safety and waste public dollars, but also harassment, trauma, uses of force, and other forms of dehumanizing treatment. Thus, that gang unit should be prohibited from patrolling in Southeast San Diego or altogether disbanded. Any issues related to gangs would be better addressed through the City increasing investments in community-based organizations and service providers that specialize in gang intervention and violence prevention.
+
+## 5. Enhance SPDP Accountability
+
+SDPD officers who have harmed community members in Southeast San Diego through racial profiling, harassment, uses of force and other forms of physical, mental, and trauma should be held accountable for their actions.
+
+## 6. Increase SDPD Transparency
+
+SDPD declined to provide stop data sought by Catalyst California through a public records request. The data sought would have enabled a more complete analysis of gang profiling by SDPD. The Department’s lack of transparency masks the extent of gang profiling by SDPD and attendant racially biased harms. SDPD’s secrecy regarding stop data that should be made publicly available erodes public trust. 
+
+## 7. Decriminalize Non-Safety Related Quality-of-Life Issues
+
+While this report focuses on SDPD’s gang profiling activities, many of the stops that give rise to gang profiling are based on minor, non-safety related issues, such as vehicle equipment or administrative violations, or quality-of-life concerns that do not harm others (such as the presence of people who are unhoused). The City should thoroughly examine offenses that give rise to gang profiling and eliminate any local ordinances or municipal violations used for profiling that pose little-to-no safety risks. 
+
+
+# CONCLUSION
+
+Community safety in Southeast San Diego is undermined by SDPD’s racially biased gang profiling. Data and stories from community members show that Black and Latinx are disproportionately harmed and forced to endure severe physical, mental, and emotional trauma. To add, SDPD harmful and unproductive gang profiling wastes tremendous public resources that should be better invested in equity- and care-centered safety programs that do not rely on law enforcement. The City should address these issues by adopting the comprehensive set recommendations provided above.
 
 
 # AUTHORS

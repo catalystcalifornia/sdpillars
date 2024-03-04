@@ -39,7 +39,7 @@ df1<-df1%>%
 ```{r, include=FALSE}
 
 # add methodnote
-methodnote <- "Analysis for all officer-initiated stops resulting in a field interview card only in each SDPD division. Officers spent a total of 118,970.3 hours on officer-initiated stops that resulted in a field interview card only in 2022."
+methodnote <- "Analysis for all officer-initiated stops resulting in a field interview card only in each SDPD division. Officers spent a total of 1,982.8 hours on officer-initiated stops that resulted in a field interview card only in 2022."
 
 # create caption
 caption_text <- paste("<br>", sourcenote, methodnote)
