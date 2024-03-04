@@ -18,9 +18,7 @@ person <- dbGetQuery(con, "SELECT * FROM rel_persons")
 person_re<-dbGetQuery(con, "SELECT * FROM rel_persons_recode")
 
 beat_div_xwalk<-dbGetQuery(con, "SELECT * FROM sdpd_beat_div_xwalk")%>%
-  filter(beat!=999)%>%
-  group_by(beat, beat_name)%>%
-  slice(1)
+  filter(beat!=999)
 
 div<-dbGetQuery(con, "SELECT * FROM sangis_sdpd_divisions_2023")
 
