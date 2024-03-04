@@ -50,7 +50,7 @@ df <- arrange(df, match(df$ordered_labels, levels(df$ordered_labels)))
 group_colors_item <- c("#211447", "#3A207D","#8E7ACA", "#BDAFE9", "#FFD28F", "#FFE680", "#F0FF85", "#BABABA", "#D6D6D6")
 
 # add methodnote 
-methodnote <- "Analysis for all officer-initiated stops made by officers assigned to gang enforcement. Officers assigned to gang enforcement spent a total of 10,975.6 hours on officer-initiated stops in 2022."
+methodnote <- "Analysis for all officer-initiated stops made by officers assigned to gang enforcement. Officers assigned to gang enforcement spent a total of 182.9 hours on officer-initiated stops in 2022."
 
 # create caption 
 caption_text <- paste("<br>", sourcenote, methodnote)

@@ -28,7 +28,7 @@ df<-pop%>%
 # pop denominator--------
 
 # TITLE 
-title_text <- paste0("SDPD disproportionately conducts field interviews for Black people living in San Diego")
+title_text <- paste0("SDPD disproportionately subjects Black people to field interviews")
 
 # SUBTITLE
 subtitle_text <- paste0("Number of people stopped with field interview cards per 1K people of the same race")
