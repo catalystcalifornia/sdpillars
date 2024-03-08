@@ -257,7 +257,10 @@ In addition, an analysis of hours spent by SDPD officers assigned to gang enforc
 
 In the adopted budget for fiscal year 2022, the city’s general fund expenditures on SDPD were the largest for any department, totaling $593.3 million. That amount was far more than the combined expenditures on other agencies that help build long-term community safety–$358.4 million. For example, the budget for Park & Recreation was $133.9 million, Transportation was $82.5 million, Libraries was $60.7 million, Environmental Services was $58.8 million, and Economic Development was $22.5 million.^[(See page 97 of https://www.sandiego.gov/sites/default/files/fy22ab_v1generalfundexpenditures.pdf)] 
 
-[insert bar graph of SD budget]
+
+```{r bar-chart, child= 'report_embeds/report_city_budget_bar.Rmd'}
+```
+
 
 While the City’s budget is not publicly disaggregated by SDPD divisions for fiscal year 2022, in 2021 the City’s Independent Budget Analyst produced an in-depth analysis which showed that the SDPD’s total fiscal year 2021 budget was $568.2 million. Amongst that, SDPD’s patrol operations—the part of the SDPD typically responsible for conducting stops—accounted for $238.6 million in general fund expenditures.^[(Pg. 6 of 2021 In-depth analysis - https://www.sandiego.gov/sites/default/files/iba-report-20-21.pdf)] Within that, the Southeastern Division of SDPD patrol operations–which conducts the vast majority of stops in its area–cost $26.2 million.^[(Id. at A-7).] In addition to the Southeastern Division, SDPD has  three special units for gang profiling, including the Street Gang Unit, Gang Intervention Unit, and Special Operations Unit.^[https://www.sandiego.gov/sites/default/files/iba-report-20-21.pdf] The units cost  $16.8 million.^[(Id. at A-64-66).]
 
