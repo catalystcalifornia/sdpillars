@@ -8,7 +8,6 @@ output:
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
 ```{r, include=FALSE}
-
 library(RPostgreSQL)
 library(tidyverse)
 source("W:\\RDA Team\\R\\credentials_source.R")
@@ -17,18 +16,19 @@ source("chart_functions.R")
 # add budget data
 programs<-c("Police","Fire-Rescue","Other","Citywide Program Expenditures","Parks & Recreation","Transportation","City Attorney","Library","Environmental Services","Stormwater","Facilities Services","Economic Development")
 budget<-c(593.3,308.7,168.6,150.3,133.9,82.5,68.8,60.7,58.8,51.6,23.6,22.5)
-
 df<-data.frame(programs,budget)
-
 # remove extra rows
 df_final<-df%>%filter(programs!='Other' & programs!='Citywide Program Expenditures')
 
+# custom bar colors coloring
+# get number of programs in chart
+n_programs <- length(df_final$programs)
+bar_colors <- c(meteorite, replicate(n_programs-1, lavender))
 
 ```
 
 
 ```{r, include=FALSE}
-
 # add methodnote
 methodnote <- "Other and Citywide Program expenditures respectively comprised $168.6 and $150.3 million of the city's general fund in 2022. City of San Diego, Review of FY 2022 Proposed Budget. Available at https://www.sandiego.gov/sites/default/files/12-10_iba_review_of_fiscal_year_2022_proposed_budget.pdf."
 
@@ -40,64 +40,46 @@ top_finding<-"The city's expenditures on SDPD were the largest for any departmen
 subtitle<-"The City of San Diego's fiscal year 2022 adopted general fund expenditures by department (in millions)"
 
 # tooltip
-
 tooltip_text<- paste0("The city's general fund expenditures on <b>{point.programs}</b> totaled <b>${point.budget} million</b> in fiscal year 2022.")
 
 # Final Graph----------------
-
 # set ordering
-
-chart<-df_final%>% arrange(desc(budget))%>%
-  hchart('column', hcaes(x = programs, y = budget),
-         tooltip =  list(headerFormat='',pointFormat=tooltip_text))%>%
-         hc_chart(events = list(load = JS("function() {
-        const chart = this;
-        chart.series[0].data.forEach(function(point) {
-          if (point.y <= 500) {
-            point.update({
-              color: meteorite
-            })
-          }
-
-          if (point.y > 500) {
-            point.update({
-              color: lavender
-            })
-          }
-        });
-      }
-    ")
-  ),marginRight=120) %>%
-  hc_colors(c(meteorite))%>%
-   hc_title(
-      text = top_finding) %>%
-    
-    hc_subtitle(
-      text = subtitle) %>%
-    
-    hc_caption(
-      text = caption_text) %>%
+chart <- df_final %>% 
   
-   hc_xAxis(title = list(text = ""),
-                          labels=list(position="bottom",
-                                      style=list(fontSize="12px")))%>%
-   hc_yAxis(title = list(text = paste0(""),
-                          labels = list(style=list(fontSize="12px"))),max=700)%>%
-      hc_add_theme(cc_theme)%>%
-    # hc_chart(
-    #   marginRight=120) %>%
+  arrange(desc(budget)) %>%
   
-  hc_legend(enabled = TRUE, 
-              # reversed =  TRUE,
-              x=20)%>% 
-    
-    hc_exporting(
-      enabled = TRUE, sourceWidth=900, sourceHeight=600, 
-      chartOptions=list(plotOptions=list(series=list(dataLabels=list(enabled=TRUE,format='${point.budget:.1f}')))),
-      filename = paste0(subtitle,"_Catalyst California, catalystcalifornia.org, 2023."),
-      buttons=list(contextButton=list(menuItems=list('downloadPNG', 'downloadSVG',
+  hchart('column', 
+         hcaes(x = programs, y = budget, color=bar_colors),
+         tooltip =  list(headerFormat='', pointFormat=tooltip_text)) %>%
+  
+  hc_title(text = top_finding) %>%
+  
+  hc_subtitle(text = subtitle) %>%
+  
+  hc_caption(text = caption_text) %>%
+  
+  hc_xAxis(title = list(text = "",
+                        labels = list(position="bottom",
+                                      style=list(fontSize="12px")))) %>%
+  
+  hc_add_theme(cc_theme) %>%
+  
+  hc_yAxis(max=700,
+           tickPixelInterval=100,
+           tickAmount=7,
+           title = list(text = "",
+                        labels = list(style=list(fontSize="12px")))) %>%
+  
+  hc_legend(enabled = TRUE,
+            x=20) %>% 
+  
+  hc_exporting(enabled = TRUE, 
+               sourceWidth=900, sourceHeight=600, 
+               chartOptions=list(plotOptions=list(
+                 series=list(dataLabels=list(enabled=TRUE,format='${point.budget:.1f}')))),
+               filename = paste0(subtitle,"_Catalyst California, catalystcalifornia.org, 2023."),
+               buttons=list(contextButton=list(menuItems=list('downloadPNG', 'downloadSVG',
                                                      'downloadXLS', 'downloadCSV'))))
-
 
 ```
 
