@@ -417,7 +417,7 @@ L.Map.addInitHook(function () {
     document.querySelector('.rate-nh-twoormor').innerHTML = '21.6'
     document.querySelector('.count-nh-white').innerHTML = '82'
     document.querySelector('.rate-nh-white').innerHTML = '9.6'
-    }, 250)
+    }, 500)
   })
     // hide default leaflet popup
     map.on('popupopen', (e) => {

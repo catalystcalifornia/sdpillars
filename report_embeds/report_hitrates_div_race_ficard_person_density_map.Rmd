@@ -298,7 +298,7 @@ L.Map.addInitHook(function () {
     document.querySelector('.yes-contraband-prc-rate').innerHTML = '22.5'
     document.querySelector('.no-contraband-count').innerHTML = '763'
     document.querySelector('.no-contraband-prc-rate').innerHTML = '75.5'
-    }, 250)
+    }, 500)
   })
     // hide default leaflet popup
     map.on('popupopen', (e) => {
