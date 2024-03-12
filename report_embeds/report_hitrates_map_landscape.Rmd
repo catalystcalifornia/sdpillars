@@ -1,0 +1,333 @@
+---
+title: ""
+output:
+  html_document:
+    css: "W:\\RDA Team\\R\\cc_charts.css"
+---
+<!-- link to Google Font -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    
+```{r, include=FALSE}
+knitr::opts_chunk$set(echo=FALSE, message=FALSE, warning=FALSE)
+
+#### Load libraries ####
+library(usethis)
+library(tidyverse)
+library(sf)
+library(leaflet)
+library(sp)
+library(htmltools) # for html escape
+library(magrittr)
+library(RPostgreSQL)
+library(htmlwidgets)
+library(stringr)
+  
+source("W:\\RDA Team\\R\\credentials_source.R")
+source("chart_functions.R")
+  
+pillars_conn <- connect_to_db("rjs_pillars")
+```
+
+```{r}
+#### Map: Data Prep ###
+## load in race metadata
+metadata_race_labels <-  dbGetQuery(pillars_conn, "SELECT * FROM metadata_race_labels") %>% 
+  select(race_base, race_label_short, race_label_long)
+  
+## Load in RJS Pillars data ##
+df_long <- dbGetQuery(pillars_conn, "SELECT * FROM data.report_hitrates_div_race_ficard_person") %>% 
+  filter(race == "total")
+
+div <- st_read(pillars_conn, query =  "SELECT * FROM data.sangis_sdpd_divisions_2023") 
+  
+## change division name to sentence case
+df_long$div_name <- str_to_title(df_long$div_name)
+div$div_name <- str_to_title(div$div_name)
+  
+## add contraband count/contraband prc rate
+df_long <- df_long %>% 
+  mutate(contraband_count = (stop_count-no_contraband_count), 
+         contraband_prc_rate = (100-no_contraband_prc_rate))
+  
+# transform for leaflet
+div <- st_transform(div, 4326)
+  
+# go from long to wide
+df_wide <- df_long %>% 
+  pivot_wider(names_from = race,
+              values_from = stop_count:no_contraband_prc_rate,
+              names_sep = "_")
+  
+# merge division sf by df: this is only for the shapefile
+div_wide_sf <- div %>% 
+  left_join(df_wide)
+  
+  
+# the dot density needs the data to be long
+div_long_sf <- div %>% 
+  left_join(df_long)
+
+### Calculate dot density count ###
+no_contraband_dots = as_dot_density(div_long_sf,
+                                    value = "no_contraband_count",
+                                    values_per_dot = 5, ## each dot represents
+                                    group = "race")
+    
+contraband_dots = as_dot_density(div_long_sf,
+                                 value = "contraband_count",
+                                 values_per_dot = 5, ## each dot represents
+                                 group = "race")
+```
+
+```{r}
+### Map components prep
+
+## Set CC Brand Colors for contraband layers
+# Base Color 00
+meteorite <- c('#3A207D') # no contraband
+papaya <- c('#F25922') # contraband
+
+## Create data content for popup
+# This stores the values we plan to insert into the custom popup (i.e., not the full content of the custom popup like in rate_popup)
+# Take note of the naming structure in the html tags: [data-][variable-name]
+# Another note: multiple point density maps will be on the report page, will need to use a unique prefix for common data values so they behave correctly
+# in this case, added pd2 prefix to ALL division-name and division-number references (the other map will get a pd1 prefix, etc.)
+# It's important to only use hyphens (no underscores or other symbols to denote space between words)
+# We'll use the names in the html tags when formatting popup behavior in JS (end of script)
+data_popup <- paste0("<div class='pd-2'> <div class='leaflet-data-pd2' data-pd2-division-name='", div_wide_sf$div_name,
+               "' data-pd2-division-number='", div_wide_sf$div_num,
+               "' data-stop-count-total='", div_wide_sf$stop_count_total,
+               "' data-yes-contraband-count='", div_wide_sf$contraband_count,
+               "' data-yes-contraband-prc-rate='", round(div_wide_sf$contraband_prc_rate, digits = 1),
+               "' data-no-contraband-count='", div_wide_sf$no_contraband_count_total,
+               "' data-no-contraband-prc-rate='", round(div_wide_sf$no_contraband_prc_rate_total, digits = 1),
+               "'></div></div>")
+
+## Create full content (data and text) in an html string for the custom popup
+# We are using <div> "class" names (e.g. popup-instruction, division-header) 
+# to apply CSS styling (end of script, before JS)
+# We are using <span> "class" names (e.g. data-emphasis, division-name) 
+# to style with CSS AND insert the data stored in data_popup
+# Note: the <span> "class" names are using the SAME naming as in the data_popup (only difference is no "data-" prefix) - this makes things clear and convenient for JS coding (end of script)
+rate_popup <- "<div class='leaflet-popup-scrolled'><div class='popup-instruction'>Please click on a San Diego police division to see stop data below. Note: 1 dot = 5 stops with field interview and search.</div><div class='division-details'><div class ='division-header'><span class='pd2-division-name'></span> Division (Division <span class='pd2-division-number'></span>)</div>Out of the <span class='data-emphasis'><span class='stop-count-total'></span> people</span> searched following a field interview:
+<br><br>
+SDPD found no contraband or evidence on <span class='data-emphasis no-contraband-color'><span class='no-contraband-count no-contraband-color'></span> people</span>, meaning SDPD  subjected <span class='data-emphasis no-contraband-color'><span class='no-contraband-prc-rate no-contraband-color'></span>%</span> of people to unnecessary searches.
+<br><br>
+SDPD found contraband/evidence on <span class='data-emphasis yes-contraband-color'><span class='yes-contraband-count yes-contraband-color'></span> people</span>, a hit rate of <span class='data-emphasis yes-contraband-color'><span class='yes-contraband-prc-rate yes-contraband-color'></span>%</span>.
+</div><div class='legend'><span class='no-contraband-dot'></span> No Contraband Found <br><span class='yes-contraband-dot'></span> Yes Contraband Found</div></div>"
+
+```
+
+```{r}
+### Build map
+map <- leaflet(width = "100%", height = "450px",
+               options = leafletOptions(zoomControl = FALSE, minZoom=9.8, maxZoom=9.8, attributionControl=FALSE)) %>%
+  ## add provider tiles
+  addProviderTiles("CartoDB.Positron") %>%
+  
+  ## add Division polygons
+  # add polygon layer below (zIndex) markers - if the white fillColor is on top of the marker colors they will get washed out (dull)
+  addPolygons(data = div_wide_sf, label=~htmlEscape(paste0(div_name, " Division ")),
+              # polygon fill arguments
+              fillColor="white", 
+              #polygon line arguments
+              color="black", weight=2, opacity = 1, smoothFactor = 0.5,
+              # want to connect this to the data_popup (i.e. where we pull data values in)
+              popup = ~paste0(data_popup),
+              highlight = highlightOptions(color="darkgrey", weight = 2, opacity = 1,
+                                           # Use these settings otherwise highlight will overlap/change marker colors
+                                           bringToFront=TRUE, sendToBack = TRUE)) %>%
+  
+  ## add no contraband stop markers
+  addCircleMarkers(data = no_contraband_dots, group = "No Contraband Found",
+                   label = NULL, weight = 3,  opacity = 0, fillOpacity = 1, 
+                   radius = 2, fillColor=meteorite, stroke = TRUE,
+                   # keep this so that markers are layered on top of polygons 
+                   # but do not impact our ability to click on the polygon
+                   options = pathOptions(clickable = FALSE)) %>% 
+    
+  ## add contraband stop markers
+  addCircleMarkers(data = contraband_dots, group = "Yes Contraband Found",
+                   label = NULL, weight = 3, opacity = 0, fillOpacity = 1,
+                   radius = 2, fillColor=papaya,  stroke = TRUE,
+                   # keep this so that markers are layered on top of polygons 
+                   # but do not impact our ability to click on the polygon
+                   options = pathOptions(clickable = FALSE)) %>%
+
+  ## Add selection control for contraband/no contraband layers
+  addLayersControl(overlayGroups = c("No Contraband Found", "Yes Contraband Found"),
+                   options = layersControlOptions(collapsed = FALSE)) %>%
+    
+  ## add custom popup with full content
+  addControl(html=rate_popup, position = "topleft") %>%
+
+  ## Set view
+  setView(lng = -117.14395, # pan left (more neg)/right (more pos)
+          lat = 32.82823, # pan up/down
+          zoom = 9.8)
+  
+```
+  
+<h3 class="leaflet-map-title">SDPD conducts the highest number of unnecessary searches during field interview card stops in the Southeastern Division</h3>
+<h4 class="leaflet-map-subtitle">People searched during field interviews by division and search result</h4>
+    
+    
+```{r}
+map
+```
+<div align="left" style="line-height: 12px;"><span style="font-size: 10px;">Searches are randomly placed within each division and do not indicate the exact location of the search.</span> <span style=' font-size: 10px;'>Catalyst California's calculations based on City of San Diego's Police Stop Data (2022); <u>[Catalyst California](https://www.catalystcalifornia.org)</u>, 2023. Analysis for all officer-initiated stops that resulted in a field interview card completed and a search.</span> </div>
+
+
+<style type="text/css">
+
+.division-header {
+   margin-bottom: 8px; 
+   font-weight: 700; 
+   color: #000000;
+   font-size: 14px; 
+}
+
+.division-details {
+  border-bottom: 1px solid #000000;
+  padding-bottom: 8px;
+  margin-bottom: 8px;
+  border-top: 1px solid #000000;
+  padding-top: 8px;
+  margin-top: 8px;
+
+}
+
+.yes-contraband-color {
+  color: #F25922;
+}
+
+.no-contraband-color {
+  color: #3A207D;
+}
+
+.leaflet-popup-scrolled {
+  max-height: 475px;
+  opacity: 1;
+  border-bottom: 0;
+  border-top: 0;
+}
+
+.info {
+  background: white;
+  opacity: 1;
+  border-radius: 0;
+}
+
+.leaflet-left {
+  width: 33%;
+}
+
+.leaflet-left .leaflet-control {
+  font-size: 12px;
+  margin-left: 0;
+  border-left: 1px solid #ddd;
+  border-top: 1px solid #ddd;
+  border-bottom: 1px solid #ddd;
+}
+
+.leaflet-right .leaflet-control {
+  margin-right: 0;
+}
+
+.leaflet-top .leaflet-control {
+  margin-top: 0;
+}
+
+.leaflet-control-container {
+  color: #000000;
+}
+
+.hidden {
+  display: none;
+}
+
+.popup-instruction {
+  font-style: italic;
+  font-weight: 400; 
+  font-size: 12px; 
+  line-height: 16px;
+  color: #000000;
+  <!-- border-bottom: 1px solid #000000; -->
+  <!-- padding-bottom: 16px; -->
+  <!-- margin-bottom: 16px; -->
+}
+
+.legend {
+  color: #000000;
+}
+
+<!-- .legend-note { -->
+<!--   font-style: italic; -->
+<!--   font-size: 12px; -->
+<!--   font-weight: 400; -->
+<!-- } -->
+
+.no-contraband-dot {
+  height: 12px;
+  width: 12px;
+  background-color: #3A207D;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.yes-contraband-dot {
+  height: 12px;
+  width: 12px;
+  background-color: #F25922;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.data-emphasis {
+  font-size: 12px; 
+  font-weight: 600;
+}
+
+</style>
+
+```{js}
+var mapsPlaceholder = [];
+L.Map.addInitHook(function () {
+  mapsPlaceholder.push(this);
+  mapsPlaceholder.forEach(map => {
+    // pre-populate map pop-up (when map loads/before user clicks anywhere)
+    map.on('load', (e) => {
+    setTimeout(() => {
+    document.querySelector('.pd2-division-name').innerHTML = 'Southeastern'
+    document.querySelector('.pd2-division-number').innerHTML = '4'
+    document.querySelector('.stop-count-total').innerHTML = '984'
+    document.querySelector('.yes-contraband-count').innerHTML = '221'
+    document.querySelector('.yes-contraband-prc-rate').innerHTML = '22.5'
+    document.querySelector('.no-contraband-count').innerHTML = '763'
+    document.querySelector('.no-contraband-prc-rate').innerHTML = '77.5'
+    }, 500)
+  })
+    // hide default leaflet popup
+    map.on('popupopen', (e) => {
+    let popupsPd2 = document.querySelectorAll('.leaflet-data-pd2');
+    // console.log(popups);
+
+    document.querySelectorAll('.pd-2').forEach(pd2 => {
+    pd2.parentElement.parentElement.parentElement.classList.add('hidden')
+  })
+  
+  // populate custom pop-up when user clicks map
+  //console.log('click')
+  let popupPd2 = popupsPd2[popupsPd2.length-1]
+  document.querySelector('.pd2-division-name').innerHTML = popupPd2.getAttribute('data-pd2-division-name')
+  document.querySelector('.pd2-division-number').innerHTML = popupPd2.getAttribute('data-pd2-division-number')
+  document.querySelector('.stop-count-total').innerHTML = popupPd2.getAttribute('data-stop-count-total')
+  document.querySelector('.yes-contraband-count').innerHTML = popupPd2.getAttribute('data-yes-contraband-count')
+  document.querySelector('.yes-contraband-prc-rate').innerHTML = popupPd2.getAttribute('data-yes-contraband-prc-rate')
+  document.querySelector('.no-contraband-count').innerHTML = popupPd2.getAttribute('data-no-contraband-count')
+  document.querySelector('.no-contraband-prc-rate').innerHTML = popupPd2.getAttribute('data-no-contraband-prc-rate')
+
+})})});
+
+```
