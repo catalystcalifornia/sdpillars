@@ -30,13 +30,13 @@ bar_colors <- c(meteorite, replicate(n_programs-1, lavender))
 
 ```{r, include=FALSE}
 # add methodnote
-methodnote <- "Other and Citywide Program expenditures respectively comprised $168.6 and $150.3 million of the city's general fund in 2022. City of San Diego, Review of FY 2022 Proposed Budget. Available at https://www.sandiego.gov/sites/default/files/12-10_iba_review_of_fiscal_year_2022_proposed_budget.pdf."
+methodnote <- "Other and Citywide Program expenditures respectively comprised $168.6 and $150.3 million of the city's general fund in 2022. Source: Andrea Tevlin, Independent Budget Analyst, Review of the FY 2022 Proposed Budget, IBA Report No. 21-10, Office of the Independent Budget Analyst, at 101 (April 2021), https://www.sandiego.gov/sites/default/files/12-10_iba_review_of_fiscal_year_2022_proposed_budget.pdf"
 
 # create caption
 caption_text <- paste("<br>", methodnote)
 
 # add title and subtitle
-top_finding<-"The city's expenditures on SDPD were the largest for any department"
+top_finding<-"City expenditures on SDPD were the largest for any department"
 subtitle<-"The City of San Diego's fiscal year 2022 adopted general fund expenditures by department (in millions)"
 
 # tooltip
@@ -67,8 +67,8 @@ chart <- df_final %>%
   hc_yAxis(max=700,
            tickPixelInterval=100,
            tickAmount=7,
-           title = list(text = "",
-                        labels = list(style=list(fontSize="12px")))) %>%
+           title = list(text = ""),
+                        labels = list(style=list(fontSize="12px"),format="${value}")) %>%
   
   hc_legend(enabled = TRUE,
             x=20) %>% 
