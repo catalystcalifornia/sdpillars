@@ -1,0 +1,775 @@
+---
+title: "San Diego RIPA Data Pillars Project"
+subtitle: "Stop Duration Outlier Analysis"
+author: "Catalyst California"
+output:
+  html_document:
+    css: "W:\\RDA Team\\R\\cc_brandguide.css"
+    toc: yes
+    toc_depth: 2
+    toc_float: yes
+    code_folding: hide
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+---
+
+The SD Pillars project includes an analysis of how long SDPD officers are spending on different types of police stops. This requires a separate stop duration outlier analysis in order to control for stop duration times that are clear outliers in the data. These outliers can be due to data entry error or an officer forgetting to input a stop time and allowing the timer to run on after the stop has concluded. 
+
+The goal of this outlier analysis is to identify which stops have stop duration times that are outliers, and then cap those stop duration times appropriately. We do this using a regression model that controls for various factors that influence a stop duration time. 
+
+
+```{r setup, include=FALSE}
+
+knitr::opts_chunk$set(comment = FALSE, message = FALSE, warning = FALSE)
+
+
+library(broom)
+library(RPostgreSQL)
+library(dplyr)
+library(tidyr)
+library(tidyverse)
+library(stringr)
+library(chron)
+library(foreign)
+library(MASS)
+require(foreign)
+require(nnet)
+require(ggplot2)
+require(reshape2)
+library(fastDummies)
+library(olsrr)
+library(rlang)
+library(Hmisc)
+library(caTools)
+library(corrplot)
+library(car)
+library(quantmod)
+library(Hmisc)
+library(ggcorrplot)
+library(corrplot)
+library(jtools)
+library(gtsummary)
+library(lubridate)
+library(formattable)
+library(flextable)
+library(sf)
+library(sp)
+
+#connect to postgres
+
+source("W:\\RDA Team\\R\\credentials_source.R")
+
+con <- connect_to_db("rjs_pillars")
+
+# pull in tables from postgres that we need
+
+stops<-dbGetQuery(con, "SELECT * FROM rel_stops")
+persons<-dbGetQuery(con, "SELECT * FROM rel_persons") #person-level, has age
+race<-dbGetQuery(con, "SELECT * FROM rel_stops_race") #stop-level
+reason<-dbGetQuery(con, "SELECT * FROM rel_stops_reason")
+result<-dbGetQuery(con, "SELECT * FROM rel_stops_result")
+action<-dbGetQuery(con, "SELECT * FROM rel_stops_actions")
+contra<-dbGetQuery(con, "SELECT * FROM rel_stops_searches")
+property<-dbGetQuery(con, "SELECT * FROM rel_propertyseized")
+
+div<-dbGetQuery(con, "SELECT * FROM sangis_sdpd_divisions_2023")%>%
+  select(-geom)
+beats<-st_read(con, query = "SELECT * FROM sangis_sdpd_beats_2023")%>%
+  mutate(beat=as.character(beat))
+
+#### Prep person-level count data ####
+
+# We want to create a continuous variable for total number of people in a stop 
+
+num_person_stopped<-persons%>%
+  group_by(stop_id)%>%
+  mutate(num_persons_stop=n())%>%
+  slice(1)%>%
+  select(stop_id, num_persons_stop)
+
+#### Prep age-data ####
+
+# We are first going to prep an age-table that makes age a continuous variable. 
+# We are doing this by taking the age table and for stops with multiple people, taking the average age of all persons stopped
+
+age<-persons%>%
+  group_by(stop_id)%>%
+  mutate(age_avg=mean(perceived_age))%>%
+  slice(1)%>%
+  select(stop_id, age_avg)
+
+# now we have a stops-level age table
+
+#### Prep sdpd divisions data ####
+
+# Now lets attach sdpd divisions to the stops data so we can use divisions in the model
+
+# Prep beats and stop crosswalk
+
+# join divisions to the beats table just to get the full division name
+
+beats_div<-beats%>%
+  left_join(div%>%select(div_num, div_name), by=c("div"="div_num"))%>%
+  select(beat, name, div, div_name)%>%
+    as.data.frame()%>%
+  select(-geom)%>%
+  rename('beat_name' = 'name')%>%
+  group_by(beat)%>%
+  slice(1)%>%
+  mutate(beat_name=ifelse(beat %in% "511", 'BARRIO LOGAN', beat_name))%>% # there was a data entry error where beat=511 showed up twice, once with the beat_name included, and once where beat_name was NA. So I manually re-added the beat_name
+  ungroup()
+
+# join updated beats-div crosswalk to stops data
+
+stops<-stops%>%
+  left_join(beats_div%>%select(beat, div, div_name), by=c("beat"="beat"))%>%
+  mutate(div=ifelse(beat_name %in% 'La Jolla Village 125', 1, div))%>%
+  mutate(div_name=ifelse(beat_name %in% 'La Jolla Village 125', "NORTHERN", div_name))
+
+
+#### Prep property seized data ####
+
+# deduplicate the data
+
+# focus first on isolating stop_ids where property was seized, then unduplicating that data (since people with more than 1 property seized will show up multiple times in the data). Then slicing so only 1 stop_id remains even if more than 1 person in the stop had property seized. 
+
+property_yes<-property%>%
+  mutate_all(na_if,"")%>%
+  filter(!is.na(type_of_property_seized))%>%
+  group_by(stop_id,person_id)%>%
+  summarise(type_of_property_seized=n())%>%
+  group_by(stop_id)%>%
+  slice(1)
+
+stopid_yes<-property_yes$stop_id #extract the stop_ids that had property seized regardless of count
+
+# then isolate only stops where there was NO property seized
+
+property_none<-property%>%
+mutate_all(na_if,"")%>%
+filter(!stop_id %in% stopid_yes)%>%
+  group_by(stop_id)%>%
+  slice(1)%>%
+  mutate(type_of_property_seized=as.numeric(type_of_property_seized))
+
+# final combine: should have a df where each stop is 1 row, and create a binary 1/0 column for if any property was seized at all during that stop (1) or no property was seized at all in that stop (0)
+
+property_final<-rbind(property_yes, property_none)%>%
+  mutate(property=ifelse(is.na(type_of_property_seized), 0, 1))%>%
+  select(stop_id, property)
+
+# test there are no duplicate stop_ids remaining in the table
+# property_final[duplicated(property_final$stop_id),]
+
+# test stop_id: 100427
+
+#### Join all stops-level data ####
+
+# Add column just for year of stop to stops table
+stops$year = substr(stops$date_stop, 1, 4)
+
+# create stops table that is just for year 2022
+
+stops<-stops%>%
+  filter(year==2022)
+
+# Join the number_people_stops to stop table
+
+stops<-stops%>%
+  left_join(num_person_stopped)
+
+# Join stops table to reasons,results,action, contraband, property seized,age and race tables
+
+stops<-stops%>%
+  left_join(reason)%>%
+  left_join(result)%>%
+  left_join(action)%>%
+  left_join(race)%>%
+  left_join(age)%>%
+  left_join(property_final)%>%
+  left_join(contra) # we should end up with 86632 obs which is how many unique stops there are 
+
+# Select all columns we need
+
+stops<-stops%>%
+  select(stop_id, stopduration, stop_in_response_to_cfs, beat, beat_name, div, div_name, num_persons_stop, stop_reason_simple, stop_reason_list, stop_result_simple, stop_result_list, actions_count, action_taken, handcuffed, removed_from_vehicle, detained, use_of_force, search, property, contraband, contraband_count, stop_nh_race, race_count, aian_flag, nhpi_flag, sswana_flag,age_avg)
+
+#### Recode NAs ####
+
+# sum(is.na(stops)) #5662 NAs
+
+# sum(is.na(stops$stop_nh_race)) #16 NAs
+
+# sum(is.na(stops$div_name)) #2799 NA div names that we know are from beat=999 or beat=125
+
+# sum(is.na(stops$div)) #2799
+
+# there are 16 rows where stop_nh_race == NA -these are people with 6+ perceived number of races.
+# QA UPDATE 9/22: Lets recode them as 'nh_twoormor'
+
+stops<-stops%>%
+  mutate(stop_nh_race=ifelse(is.na(stop_nh_race), 'nh_twoormor', stop_nh_race))
+
+#lets recode the NA division names as well
+
+stops<-stops%>%
+  mutate(div_name=ifelse(is.na(div_name), 'Unknown', div_name))%>%
+  mutate(div=ifelse(is.na(div), 'Unknown', div))
+
+# test that worked:
+sum(is.na(stops$div)) 
+
+# see what the remaining NAs are
+
+na<-stops[!complete.cases(stops), ]
+
+# need to recode the aian/mesa/nhpi flags too because those were the rows where the number of perceived threshold was met
+
+stops<-stops%>%
+  mutate(aian_flag=ifelse(is.na(aian_flag), 0, aian_flag))%>%
+    mutate(nhpi_flag=ifelse(is.na(nhpi_flag), 0, nhpi_flag))%>%
+      mutate(sswana_flag=ifelse(is.na(sswana_flag), 0, sswana_flag))
+
+#see how many NAs are left
+
+# sum(is.na(stops)) #0 left!
+
+```
+
+```{r}
+
+#### Create dummy version of stop table  ####
+
+# Categorical variables need to become separate 1/0 dummy columns for the model
+
+stops_d<-stops%>%
+  dummy_cols(select_columns = c("div_name","stop_nh_race","stop_reason_simple", "stop_result_simple"))
+
+# clean up the column names remaining
+
+names(stops_d)<- tolower(names(stops_d)) # make all colnames lowercase
+colnames(stops_d) = gsub(" ", "_", colnames(stops_d)) # remove all spaces and make underscore
+colnames(stops_d) = gsub("-", "", colnames(stops_d)) # remove hyphens
+
+# check no NAs still
+
+sum(is.na(stops_d)) #0
+
+# pull list of new cols
+
+vars_d<-as.data.frame(colnames(stops_d))
+
+# extract dummy columns we are not keeping: these are the reference groups within each larger category (division, race, stop reason, stop result)
+
+vars_remove<-grep("div_name_southeastern|stop_nh_race_nh_white|stop_reason_simple_traffic_violation|stop_result_simple_no_action",  colnames(stops_d))
+
+
+# then remove the selected dummy variables we are not keeping 
+stops_d<-stops_d[,-vars_remove]
+
+# update list of variables in stops_d
+
+vars_d<-as.data.frame(colnames(stops_d))
+
+# rename extra long columns
+
+stops_d<-stops_d%>%
+  
+  
+  ### stop reason cols
+  
+  rename("stop_reason_simple_consent_search"="stop_reason_simple_consensual_encounter_resulting_in_a_search")%>%
+    rename("stop_reason_simple_school_policy"="stop_reason_simple_determine_whether_the_student_violated_school_policy")%>%
+    rename("stop_reason_simple_truant"="stop_reason_simple_investigation_to_determine_whether_the_person_was_truant")%>%
+    rename("stop_reason_simple_warrant"="stop_reason_simple_knowledge_of_outstanding_arrest_warrant/wanted_person")%>%
+      rename("stop_reason_simple_parole"="stop_reason_simple_known_to_be_on_parole_/_probation_/_prcs_/_mandatory_supervision")%>%
+        rename("stop_reason_simple_reasonable_suspicion"="stop_reason_simple_reasonable_suspicion")%>%
+          rename("stop_reason_simple_twoormore"="stop_reason_simple_two_or_more_reasons")%>%
+  
+  ### stop result cols
+  
+    rename("stop_result_simple_citation"="stop_result_simple_citation_for_infraction")%>%
+   rename("stop_result_simple_guardian"="stop_result_simple_contacted_parent/legal_guardian_or_other_person_responsible_for_the_minor")%>%
+    rename("stop_result_simple_arrest_warrant"="stop_result_simple_custodial_arrest_pursuant_to_outstanding_warrant")%>%
+      rename("stop_result_simple_arrest_nowarrant"="stop_result_simple_custodial_arrest_without_warrant")%>%
+      rename("stop_result_simple_fieldinterviewcard"="stop_result_simple_field_interview_card_completed")%>%
+      rename("stop_result_simple_citerelease"="stop_result_simple_infield_cite_and_release")%>%
+    rename("stop_result_simple_transport"="stop_result_simple_noncriminal_transport_or_caretaking_transport")%>%
+      rename("stop_result_simple_psychiatric"="stop_result_simple_psychiatric_hold")%>%
+  rename("stop_result_simple_schooladmin"="stop_result_simple_referral_to_school_administrator")%>%
+      rename("stop_result_simple_twoormore"="stop_result_simple_two_or_more_results")%>%
+    rename("stop_result_simple_warning"="stop_result_simple_warning_(verbal_or_written)")
+
+# make sure no trailing or empty spaces in colnames
+
+names(stops_d) <- gsub(" ", "", names(stops_d))
+
+# update list of variables in dummy df 
+
+vars_d<-as.data.frame(colnames(stops_d))
+
+```
+
+
+# Create and run model
+
+Below is a list of the variables we used in this model. Note that most of the variables match what we used in the LB RIPA outlier analysis. The exception to this is 1) Age of person stopped, 2) Officer assignment and 3) Officer division. 
+
+Variable | Type of variable
+------------- | -------------
+Stop duration | Dependent variable
+Stop action | Independent variable
+Stop in response to call for service | Independent variable
+Age of person stopped | Independent variable
+Race of person stopped | Independent variable (categorical)
+Stop reason | Independent variable (categorical)
+Stop result | Independent variable (categorical)
+Number of people stopped | Independent variable (continuous)
+Person remove from vehicle | Independent variable (categorical)
+Person detained | Independent variable (categorical)
+Use of force | Independent variable (categorical)
+Person handcuffed | Independent variable (categorical)
+Search took place | Independent variable
+Property or Contraband seized | Independent variable (categorical)
+Officer division | Independent variable (categorical)
+
+The following are the categorical variables that are not already dummy variables (1/0) and require establishing a reference group.
+
+Categorical Variable | Reference group
+------------- | -------------
+Stop reason | Traffic violation
+Stop result | No action
+Race of person stopped | NH White
+Officer division | Southeastern
+
+```{r}
+model<-lm(log(stopduration) ~ 
+            
+stop_in_response_to_cfs+
+  num_persons_stop+
+   actions_count+
+  
+# action_taken+ 
+  handcuffed+
+removed_from_vehicle+
+detained+
+use_of_force+
+    # property+
+  contraband+
+   search+
+  # contraband_count
+  
+   # aian_flag+ 
+   # nhpi_flag+ # note that this had a VIF of '6.229575' which is too high so removing this from the model
+   # sswana_flag+ # note that this had a VIF of '17.96978';' which is way too high so removing this from the model
+  
+  age_avg+
+  
+  div_name_central+
+  div_name_eastern+
+  div_name_midcity+
+div_name_northeastern+
+  div_name_northern+
+  div_name_northwestern+
+  div_name_southern+
+div_name_western+
+  div_name_unknown+
+
+  
+stop_nh_race_latinx +
+stop_nh_race_nh_aian+
+stop_nh_race_nh_asian+
+stop_nh_race_nh_black+
+stop_nh_race_nh_multi_race+
+stop_nh_race_nh_nhpi+
+ stop_nh_race_nh_sswana+ 
+stop_nh_race_nh_twoormor+ 
+
+  
+
+stop_reason_simple_consent_search+
+stop_reason_simple_school_policy+
+stop_reason_simple_truant+
+stop_reason_simple_warrant+
+stop_reason_simple_parole+
+ stop_reason_simple_reasonable_suspicion+
+stop_reason_simple_twoormore+
+
+  stop_result_simple_citation+
+stop_result_simple_guardian+
+stop_result_simple_arrest_warrant+
+stop_result_simple_arrest_nowarrant+
+stop_result_simple_fieldinterviewcard+
+stop_result_simple_citerelease+
+stop_result_simple_transport+
+stop_result_simple_psychiatric+
+stop_result_simple_schooladmin+
+stop_result_simple_twoormore+
+  stop_result_simple_warning,
+
+            data = stops_d)
+
+```
+
+## VIF Values
+
+Test for multicollinearity among independent variables: calculate Variance Influence Factor (VIF) scores of independent variables in model
+    + As a rule of thumb, a VIF value that exceeds 5 or 10 indicates a problematic amount of collinearity (James et al. 2014).
+    
+```{r}
+
+# Test for multicolinearity: Visualize variance influence factors (VIF) 
+
+vif_values <- vif(model) 
+
+vif_values # all variables pass the VIF test because none have a vif value of 5< 
+
+```
+
+## Regression Summary
+
+The regression summary table shows us the p values for all our independent variables. Note some have high p values (>.10) and are therefore not statistically significant at a 90% confidence interval. This could be because these variables have a small n, or these variables do not occur often. 
+
+The current model has a R^2 of 52% which is a good indication that our model is robust. This means that 52% of variance in stop duration times is explained by our model. 
+
+Also note that the current model has 0 NA or missing values. This is the result of data cleaning and recoding done prior running the model. Specifically, NA values from people who were preceived as 6 or more races, and NA values from unknow SDPD divisions were all recoded accordingly to avoid NA values in the model. 
+
+The diagnostic plots give us a sense of how robust our working model is and if any adjustments are needed. See this [reference link for understanding diagnostic plots](http://www.sthda.com/english/articles/39-regression-model-diagnostics/161-linear-regression-assumptions-and-diagnostics-in-r-essentials/#:~:text=Regression%20diagnostics%20plots%20can%20be,creates%20a%20ggplot2%2Dbased%20graphics.&text=The%20diagnostic%20plots%20show%20residuals,check%20the%20linear%20relationship%20assumptions.) and what we want them to look like in order to feel confident about our model.
+
+```{r}
+#summarize result 
+
+summ(model) 
+
+# plot diagnostics
+par(mfrow=c(2,2))
+plot(model)
+
+```
+
+# Identifying Outliers 
+
+We use these guiding rules to determine which stop duration times are outliers from our model:
+
+Key reference material: Belsley, D.A.; Kuh, E., Welsh, R. E. (1980). Regression Diagnostics: Identifying Influential Data and Sources of Collinearity. Rules of Thumb" used to identify potential outliers: (k=number of IVs; N= Sample size) NOTE: These ‘rules’ are not a hard-and-fast rule, but rather a guideline only! ALWAYS produce a plot/histogram or sample quantiles of your outlier measures
+
+Measure	Cut-off Value:
+
+* abs(standardized resid)	> 2 (or 3)
+* leverage	>(2k,2)/N
+* abs(Dffits)	> 2/sqrt(k,1/N)
+* abs(Dfbetas)	> 2/sqrt(N)
+* Cook’s D	> 4/N
+
+Source: http://rstudio-pubs-static.s3.amazonaws.com/477250_8b19e334ad1245c9b9259e9c5db36089.html#7_identifying_outliers
+
+
+```{r}
+
+# reference: http://rstudio-pubs-static.s3.amazonaws.com/477250_8b19e334ad1245c9b9259e9c5db36089.html#7_identifying_outliers 
+
+# calculate each unit of measure for outlier threshold analysis 
+
+model_all_metrics <- augment(model) 
+
+```
+
+
+# Identifying and Capping outliers using Predictive Interval
+
+* Resource, CI vs Predicted Interval: https://towardsdatascience.com/confidence-intervals-vs-prediction-intervals-7b296ae58745
+* Resource: https://rpubs.com/aaronsc32/regression-confidence-prediction-intervals
+
+```{r}
+
+#### Calculate Predicted Value (pv) and Predicted Value Confidence Intervals####
+
+ # Create a dataframe that has a identifier value column we will use to add in the predicted values
+
+pv<-stops%>%
+  select(stop_id)
+
+# Then calculate the predicted value of stop_duration. Because this is a logarithmic model, the predicted values are logs
+
+pv[c("pv_log", "lwr_log", "upr_log")]<-predict(model, newdata=stops_d, interval="prediction")
+
+# Add a new column taking the inverse of the logarithmic predicted value and confidence intervals to revert stop_time and CI predicted values to non-log form
+
+pv<-pv%>%mutate(pv=exp(pv_log),
+                          lwr=exp(lwr_log),
+                          upr=exp(upr_log))
+
+# join the pv table to stops table
+
+stops<-stops%>%
+  left_join(pv, by = c("stop_id" = "stop_id"))
+
+# select columns of interest
+
+final_cap<-stops%>%
+select(c("stop_id", "stopduration", "pv", "lwr", "upr", "pv_log", "upr_log", "lwr_log"))
+
+#### Determine outlier based off lwr and upr prediction value intervals ####
+
+# create column indicating if that row requires a upper or lower cap, then implement cap
+
+final_cap<-final_cap%>%
+ mutate(cap_type=ifelse(stopduration>upr, "high",
+                         ifelse(stopduration<lwr, "low", "none")))%>%
+  mutate(stop_duration_capped=ifelse(cap_type=="high", upr,
+                              ifelse(cap_type=="low", lwr,
+                                     stopduration)))
+
+# rearrange column order 
+
+col_order <- c("stop_id", "stopduration", "stop_duration_capped", "cap_type",  "pv", "lwr","upr", "pv_log", "lwr_log", "upr_log")
+
+final_cap <- final_cap[, col_order]
+
+#### Explore results: ####
+
+# table(final_cap$cap_type)
+
+# sum(is.na(final_cap$stop_duration_capped)) # 0 NAs
+
+high<-final_cap%>%
+  filter(cap_type=='high')
+
+low<-final_cap%>%
+  filter(cap_type=='low')
+
+```
+
+# Descriptive Stats Testing
+
+Take the stop duration capped values created using the Predicted Value Confidence Interval method and run some descriptive stats 
+
+## Original Stop Times: Officer-initiated Stop Counts and Time Stats across All Units
+
+```{r}
+
+# prep data 
+
+df<-stops%>%
+  select(stop_id, stop_in_response_to_cfs, stopduration)%>%
+  mutate(Total=sum(stopduration,na.rm=TRUE))%>%
+  group_by(stop_in_response_to_cfs)%>%
+  mutate(Count=sum(stopduration,na.rm=TRUE),
+         'Percent Mins'=Count/Total*100,
+         'Average Stop Time (Mins)' = mean(stopduration, na.rm = FALSE),
+            'Median Stop Time (Mins)'=   median(stopduration,na.rm = FALSE),
+             'Min Stop Time (Mins)'=min(stopduration,na.rm = FALSE),
+            'Max Stop Time (Mins)'=max(stopduration,na.rm = FALSE),
+             'Total Time (Mins)'= Total,
+         'Count Mins'=Count
+         )%>%
+  slice(1)%>%
+  select(-c(stop_id, stopduration,Count,Total))%>%
+  mutate(stop_in_response_to_cfs=ifelse(stop_in_response_to_cfs %in% 0, 'No', 'Yes'))%>%
+  rename('Call for Service'='stop_in_response_to_cfs')%>%
+   relocate('Count Mins', .after = 'Call for Service')%>%
+  mutate(Assignment = 'All units')%>%
+   relocate("Assignment", .before = 'Call for Service')
+
+#create and style flextable
+
+  flextable(df) %>% 
+colformat_double(j = c("Count Mins", "Percent Mins", "Average Stop Time (Mins)",'Median Stop Time (Mins)',
+                       'Min Stop Time (Mins)','Max Stop Time (Mins)', 'Total Time (Mins)'), digits = 1)%>% 
+  set_caption('Original Times: Stop Time by Response to Service Call for All Units in 2022') %>% 
+  theme_vanilla() 
+
+```
+
+## With Capped Stop Times: Officer-initiated Stop Counts and Time Stats across All Units
+
+```{r}
+
+df<-stops%>%
+  select(stop_id, stop_in_response_to_cfs, stopduration)%>%
+  left_join(final_cap)%>%
+  mutate(Total=sum(stop_duration_capped,na.rm=TRUE))%>%
+  group_by(stop_in_response_to_cfs)%>%
+  mutate(Count=sum(stop_duration_capped,na.rm=TRUE),
+         'Percent Mins'=Count/Total*100,
+         'Average Stop Time (Mins)' = mean(stop_duration_capped, na.rm = FALSE),
+            'Median Stop Time (Mins)'=   median(stop_duration_capped,na.rm = FALSE),
+             'Min Stop Time (Mins)'=min(stop_duration_capped,na.rm = FALSE),
+            'Max Stop Time (Mins)'=max(stop_duration_capped,na.rm = FALSE),
+             'Total Time (Mins)'= Total,
+         'Count Mins'=Count
+         )%>%
+  slice(1)%>%
+  select(2, 14:20)%>%
+  mutate(stop_in_response_to_cfs=ifelse(stop_in_response_to_cfs %in% 0, 'No', 'Yes'))%>%
+    rename('Call for Service'='stop_in_response_to_cfs')%>%
+     relocate('Count Mins', .after = 'Call for Service')%>%
+  mutate(Assignment = 'All units')%>%
+  relocate("Assignment", .before = 'Call for Service')
+
+
+         
+#create and style flextable
+
+  flextable(df) %>% 
+colformat_double(j = c("Count Mins", "Percent Mins", "Average Stop Time (Mins)",'Median Stop Time (Mins)',
+                       'Min Stop Time (Mins)','Max Stop Time (Mins)', 'Total Time (Mins)'), digits = 1)%>% 
+  set_caption('Capped Times: Stop Time by Response to Service Call for All Units') %>% 
+  theme_vanilla() 
+
+```
+
+
+## Original Stop Times: Officer-initiated Stop Counts and Time Stats across SDPD Divisions
+
+```{r}
+
+df<-stops%>%
+  select(stop_id, div_name, stop_in_response_to_cfs, stopduration)%>%
+  group_by(div_name)%>%
+  mutate(Total=sum(stopduration,na.rm=TRUE))%>%  
+  mutate(div_name=ifelse(div_name %in% 'Unknown', 'UNKNOWN DIVISION', div_name))%>%
+  group_by(div_name,stop_in_response_to_cfs)%>%
+  mutate(Count=sum(stopduration,na.rm=TRUE),
+         'Percent Mins'=Count/Total*100,
+         'Average Stop Time (Mins)' = mean(stopduration, na.rm = FALSE),
+            'Median Stop Time (Mins)'=   median(stopduration,na.rm = FALSE),
+             'Min Stop Time (Mins)'=min(stopduration,na.rm = FALSE),
+            'Max Stop Time (Mins)'=max(stopduration,na.rm = FALSE),
+            'Total Time (Mins)'= Total,
+         'Count Mins'=Count
+         )%>%
+  slice(1)%>%
+select(-c(stop_id, stopduration,Count,Total))%>%  mutate(stop_in_response_to_cfs=ifelse(stop_in_response_to_cfs %in% 0, 'No', 'Yes'))%>%
+  rename('Call for Service'='stop_in_response_to_cfs')%>%
+  rename('Division Name' = 'div_name')%>%
+      relocate('Count Mins', .after = 'Call for Service')%>%
+  mutate(Assignment = 'All units')%>%
+  relocate("Assignment", .before = 'Call for Service')
+
+
+#create and style flextable
+
+  flextable(df) %>%
+colformat_double(j = c("Count Mins", "Percent Mins", "Average Stop Time (Mins)",'Median Stop Time (Mins)',
+                       'Min Stop Time (Mins)','Max Stop Time (Mins)', 'Total Time (Mins)'), digits = 1)%>%
+  set_caption('Original Times: Stop Counts and Rates by Response to Service Call by Division') %>%
+  theme_vanilla()
+
+```
+
+## With Capped Stop Times: Officer-initiated Stop Counts and Time Stats across SDPD Divisions
+
+```{r}
+
+df<-final_cap%>%
+  left_join(stops%>%
+              select(stop_id, div_name, stop_in_response_to_cfs))%>%
+  group_by(div_name)%>%
+  mutate(Total=sum(stop_duration_capped,na.rm=TRUE))%>%  
+  mutate(div_name=ifelse(div_name %in% 'Unknown', 'UNKNOWN DIVISION', div_name))%>%
+  group_by(div_name,stop_in_response_to_cfs)%>%
+  mutate(Count=sum(stop_duration_capped,na.rm=TRUE),
+         'Percent Mins'=Count/Total*100,
+         'Average Stop Time (Mins)' = mean(stop_duration_capped, na.rm = FALSE),
+            'Median Stop Time (Mins)'=   median(stop_duration_capped,na.rm = FALSE),
+             'Min Stop Time (Mins)'=min(stop_duration_capped,na.rm = FALSE),
+            'Max Stop Time (Mins)'=max(stop_duration_capped,na.rm = FALSE),
+            'Total Time (Mins)'= Total,
+         'Count Mins'=Count
+         )%>%
+  slice(1)%>%
+select(11:13, 15:21)%>%
+  mutate(stop_in_response_to_cfs=ifelse(stop_in_response_to_cfs %in% 0, 'No', 'Yes'))%>%
+  rename('Call for Service'='stop_in_response_to_cfs')%>%
+  rename('Division Name' = 'div_name')%>%
+      relocate('Count Mins', .after = 'Call for Service')%>%
+  mutate(Assignment = 'All units')%>%
+  relocate("Assignment", .before = 'Call for Service')
+
+
+#create and style flextable
+
+  flextable(df) %>%
+colformat_double(j = c("Count Mins", "Percent Mins", "Average Stop Time (Mins)",'Median Stop Time (Mins)',
+                       'Min Stop Time (Mins)','Max Stop Time (Mins)', 'Total Time (Mins)'), digits = 1)%>%
+  set_caption('Capped Times: Stop Counts and Rates by Response to Service Call by Division') %>%
+  theme_vanilla()
+
+
+
+
+```
+
+
+```{r, include=FALSE, eval=FALSE}
+
+#### Finalize Table and Push to Postgres ####
+
+# dont need the log pv/lwr/upr values
+
+df_final<-final_cap%>%
+  select(1:7)
+
+# make sure no trailing spaces anywhere
+
+names(df_final) <- gsub(" ", "", names(df_final))
+
+df_final[df_final == " "] <- ""
+
+# set column types
+
+charvect = rep("numeric", ncol(df_final)) #create vector that is "varchar" for the number of columns in df
+
+charvect <- replace(charvect, c(1,4), c("varchar"))
+
+# add df colnames to the character vector
+
+names(charvect) <- colnames(df_final)
+
+# push to postgres
+
+dbWriteTable(con,  "rel_stop_duration_capped", df_final, 
+             overwrite = TRUE, row.names = FALSE,
+             field.types = charvect)
+
+# add meta data
+
+table_comment <- paste0("COMMENT ON TABLE rel_stop_duration_capped  IS 'Table by unique stop ID of stops and stop duration times with lower and upper stop duration outliers flagged and capped using upper and lower predicted interval threshold values of stop duration predicted value. All stops are from 2022. Variables that are used to cap the stop duration times are:  Stop action | Independent variable
+Stop in response to call for service | Independent variable
+Age of person stopped | Independent variable
+Race of person stopped | Independent variable (categorical)
+Stop reason | Independent variable (categorical)
+Stop result | Independent variable (categorical)
+Number of people stopped | Independent variable (continuous)
+Removed from vehicle | Independent variable (categorical)
+Person detained | Independent variable (categorical)
+Use of force | Independent variable (categorical)
+Handcuffed | Independent variable (categorical)
+Search took place | Independent variable
+Property or Contraband seized | Independent variable (categorical)
+Officer division | Independent variable (categorical)
+
+Full methodology can be found in R script: W:\\Project\\RJS\\Pillars\\R\\Data and Geo Prep\\duration_outlier_analysis.Rmd Or in the RMD HTML page: W:\\Project\\RJS\\Pillars\\R\\Data and Geo Prep\\duration_outlier_analysis.html
+QA document: 
+W:\\Project\\RJS\\Pillars\\Documentation\\QA_Duration_Outlier_Analysis.docx';
+
+COMMENT ON COLUMN rel_stop_duration_capped.stop_id IS 'Stop ID';
+COMMENT ON COLUMN rel_stop_duration_capped.stopduration IS 'Original stop duration';
+COMMENT ON COLUMN rel_stop_duration_capped.stop_duration_capped IS 'Stop duration where outlier stop durations have either a lower or higher cap implemented. If stop has a stop duration that is not an outlier than the original stop duration is used.';
+COMMENT ON COLUMN rel_stop_duration_capped.cap_type IS 'Flag if stop duration time cap is a upper or lower cap. This only applies to stop durations that were outliers. If the stop duration was an outlier and the stop duration time > predicted value upper predicted interval threshold value, then it is an upper cap type. If the stop duration time < predicted value of the lower predicted interval threshold value, then it is a lower cap type.';
+COMMENT ON COLUMN rel_stop_duration_capped.pv IS 'Predicted Value of the Stop Duration using Logistic Regression Model. Refer to QA doc for full methodology on how model was made. ';
+COMMENT ON COLUMN rel_stop_duration_capped.upr IS 'Predicted value predicted interval upper value';
+COMMENT ON COLUMN rel_stop_duration_capped.lwr IS 'Predicted value predicted interval lower value';
+;")
+
+# send table comment + column metadata
+dbSendQuery(conn = con, table_comment)
+
+# add indices
+
+dbSendQuery(con, paste0("create index rel_stop_duration_capped_stop_id on data.rel_stop_duration_capped (stop_id);"))
+
+
+
+
+```
