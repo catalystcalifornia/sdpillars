@@ -10,14 +10,17 @@
   <ol>
     <li>
       <a href="#about-the-project">About The Project</a></li>
-    <li><a href="#acknowledgements">Acknowledgements</a></li>
+    <li>
+      <a href="#acknowledgements">Acknowledgements</a></li>
+    <li>
+      <a href="#built-with">Built With</a></li>
     <li><a href="#getting-started">Getting Started</a>
-          <ul>
+      <ul>
         <li><a href="#prerequisites">Prerequisites</a></li>
       </ul>
     </li>
     <li><a href="#data-methodology">Data Methodology</a>
-          <ul>
+      <ul>
         <li><a href="#data-sources">Data Sources</a></li>
         <li><a href="#data-limitations">Data Limitations</a></li>
       </ul>
@@ -59,7 +62,7 @@ The following individuals contributed to the framing and writing of the report:
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
-## Built with
+## Built With
 
 <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/R_logo.svg/1086px-R_logo.svg.png?20160212050515" alt="R" height="32px"/> &nbsp; <img  src="https://upload.wikimedia.org/wikipedia/commons/d/d0/RStudio_logo_flat.svg" alt="RStudio" height="32px"/> &nbsp; <img  src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Git-logo.svg/768px-Git-logo.svg.png?20160811101906" alt="RStudio" height="32px"/>
 
@@ -194,7 +197,7 @@ A world where systems are designed for justice and support equitable access to r
 
 ## Partners
 
-![Pillars of the Community logo](W:\Project\RJS\Pillars\Documentation\Pillars-of-the-Community_Logo.png){width=50%}
+![](W:\Project\RJS\Pillars\Documentation\Pillars-of-the-Community_Logo.png){width=50%}
 
 [Website](https://www.potcsd.org/)
 
