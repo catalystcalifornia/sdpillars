@@ -191,13 +191,13 @@ A world where systems are designed for justice and support equitable access to r
 
 [Click here to view Catalyst California's Projects on GitHub](https://github.com/catalystcalifornia)
 
-![](W:\RDA Team\Communications\CC Logos\Logos Catalyst California-14.png){width=50%}
+![Catalyst California logo](W:\RDA Team\Communications\CC Logos\Logos Catalyst California-14.png)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 ## Partners
 
-![](W:\Project\RJS\Pillars\Documentation\Pillars-of-the-Community_Logo.png){width=50%}
+![Pillars of the Community logo](W:\Project\RJS\Pillars\Documentation\Pillars-of-the-Community_Logo.png)
 
 [Website](https://www.potcsd.org/)
 
