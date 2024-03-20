@@ -58,7 +58,7 @@ The following individuals contributed to the data analysis and visualizations th
 The following individuals contributed to the framing and writing of the report:
 
 * [Chauncee Smith, Catalyst California](https://www.catalystcalifornia.org/who-we-are/staff/chauncee-smith)
-* [Mitchelle Woodson, Pillars of the Community](https://www.potcsd.org/about-us)
+* [Mitchelle Woodson, Esq., Pillars of the Community](https://www.potcsd.org/about-us)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -177,7 +177,7 @@ For data-related inquiries:
 
 * [Elycia Mulholland Graves](https://www.linkedin.com/in/elycia-mulholland-graves-54578258/) - egraves[at]catalystcalifornia.org 
 
-* [Jennifer Zhang](www.linkedin.com/in/jenniferzhang3) - jzhang[at]catalystcalifornia.org
+* [Jennifer Zhang](https://www.linkedin.com/in/jenniferzhang3/) - jzhang[at]catalystcalifornia.org
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
