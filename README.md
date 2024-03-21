@@ -58,7 +58,7 @@ The following individuals contributed to the data analysis and visualizations th
 The following individuals contributed to the framing and writing of the report:
 
 * [Chauncee Smith, Catalyst California](https://www.catalystcalifornia.org/who-we-are/staff/chauncee-smith)
-* [Mitchelle Woodson, Pillars of the Community](https://www.potcsd.org/about-us)
+* [Mitchelle Woodson, Esq., Pillars of the Community](https://www.potcsd.org/about-us)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -132,7 +132,7 @@ library(usethis)
 
 ## Data Methodology
 
-This report evaluates SDPD gang profiling by analyzing 2022 data collected and reported by SDPD pursuant to the Racial and Identity Profiling Act (“RIPA”) of 2015. For each stop made by law enforcement, RIPA data includes information that can be analyzed for evidence of profiling—including characteristics about the person stopped (e.g., race, gender, and age), the stop location, the length of the stop, the reason for the stop, and the result of the stop. This report uses RIPA data to evaluate SDPD’s gang profiling activities. Key RIPA indicators include the officer assignment field (under “gang enforcement”), and the stop result field (under “field interview card”). You can access our full methodology [here](https://github.com/catalystcalifornia/lbripa/blob/main/Methodology_Racial_Bias_LBPD_2023.pdf).
+This report evaluates SDPD gang profiling by analyzing 2022 data collected and reported by SDPD pursuant to the Racial and Identity Profiling Act (“RIPA”) of 2015. For each stop made by law enforcement, RIPA data includes information that can be analyzed for evidence of profiling—including characteristics about the person stopped (e.g., race, gender, and age), the stop location, the length of the stop, the reason for the stop, and the result of the stop. This report uses RIPA data to evaluate SDPD’s gang profiling activities. Key RIPA indicators include the officer assignment field (under “gang enforcement”), and the stop result field (under “field interview card”). You can access our full methodology [here](https://github.com/catalystcalifornia/sdpillars/blob/main/Methodology_Gang_Profiling_SDPD.pdf).
 
 ### Data Sources
 
@@ -156,7 +156,7 @@ Geographic Data
 
 ### Data Limitations
 
-As with all data, the findings seen in this analysis are dependent on the quality of the data collected. We strongly encourage readers and data analysts to consider the limitations of RIPA data when interpreting findings or using RIPA data. For instance, RIPA data are collected under state regulations for all law enforcement agencies, but this at times limits the applicability of data elements at the local level. For this project, this translated to officer assignment types collected under RIPA poorly correlating with SDPD units that conduct gang profiling. RIPA data are also based on officers’ reports. The information attached to each stop is solely based on officer disclosure and perceptions. For example, officers report what they perceive as the race(s) of the people they stopped, rather than having the people they stopped self-report their race(s). We encourage researchers using RIPA data to ground truth trends seen in the data with community to identify discrepancies between the data collected and everyday community experiences. For a full discussion of limitations, please see our [Methodology document](https://github.com/catalystcalifornia/lbripa/blob/main/Methodology_Racial_Bias_LBPD_2023.pdf)
+As with all data, the findings seen in this analysis are dependent on the quality of the data collected. We strongly encourage readers and data analysts to consider the limitations of RIPA data when interpreting findings or using RIPA data. For instance, RIPA data are collected under state regulations for all law enforcement agencies, but this at times limits the applicability of data elements at the local level. For this project, this translated to officer assignment types collected under RIPA poorly correlating with SDPD units that conduct gang profiling. RIPA data are also based on officers’ reports. The information attached to each stop is solely based on officer disclosure and perceptions. For example, officers report what they perceive as the race(s) of the people they stopped, rather than having the people they stopped self-report their race(s). We encourage researchers using RIPA data to ground truth trends seen in the data with community to identify discrepancies between the data collected and everyday community experiences. For a full discussion of limitations, please see our [Methodology document](https://github.com/catalystcalifornia/sdpillars/blob/main/Methodology_Gang_Profiling_SDPD.pdf)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -177,7 +177,7 @@ For data-related inquiries:
 
 * [Elycia Mulholland Graves](https://www.linkedin.com/in/elycia-mulholland-graves-54578258/) - egraves[at]catalystcalifornia.org 
 
-* [Jennifer Zhang](www.linkedin.com/in/jenniferzhang3) - jzhang[at]catalystcalifornia.org
+* [Jennifer Zhang](https://www.linkedin.com/in/jenniferzhang3/) - jzhang[at]catalystcalifornia.org
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -191,13 +191,13 @@ A world where systems are designed for justice and support equitable access to r
 
 [Click here to view Catalyst California's Projects on GitHub](https://github.com/catalystcalifornia)
 
-![Catalyst California logo](W:\RDA Team\Communications\CC Logos\Logos Catalyst California-14.png)
+<img src="W:\RDA Team\Communications\CC Logos\Logos Catalyst California-14.png" alt="Catalyst California Logo" height="50%"/>
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 ## Partners
 
-![Pillars of the Community logo](W:\Project\RJS\Pillars\Documentation\Pillars-of-the-Community_Logo.png)
+<img src="W:\Project\RJS\Pillars\Documentation\Pillars-of-the-Community_Logo.png" alt="Pillars of the Community Logo" height="50%"/>
 
 [Website](https://www.potcsd.org/)
 
