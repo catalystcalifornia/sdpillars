@@ -107,7 +107,12 @@ chart<-df1 %>%
     
     hc_exporting(
       enabled = TRUE, sourceWidth=900, sourceHeight=600, 
-      chartOptions=list(plotOptions=list(series=list(dataLabels=list(enabled=TRUE,format='{point.rate:.1f}%')))),
+      chartOptions=list(
+        plotOptions=list(
+          series=list(
+            dataLabels=list(
+              enabled=TRUE,
+              format='{point.value:.1f}%')))),
       filename = paste0(subtitle,"_Catalyst California, catalystcalifornia.org, 2023."),
       buttons=list(contextButton=list(menuItems=list('downloadPNG', 'downloadSVG',
                                                      'downloadXLS', 'downloadCSV'))))
