@@ -56,7 +56,7 @@ df %>%
   hc_chart(height = 480) %>%
   hc_exporting(
     enabled = TRUE, sourceWidth=900, sourceHeight=600, 
-    chartOptions=list(plotOptions=list(series=list(dataLabels=list(enabled=TRUE, format='{point.hours_rate_cap:.1f}%')))),
+    chartOptions=list(plotOptions=list(series=list(dataLabels=list(enabled=TRUE, format='{point.rate:.1f}%')))),
     filename = paste0("Percentage of searches by whether contraband or evidence was found","_Catalyst California, catalystcalifornia.org, 2023."),
     buttons=list(contextButton=list(menuItems=list('downloadPNG', 'downloadSVG',
                                                      'downloadXLS', 'downloadCSV')))
