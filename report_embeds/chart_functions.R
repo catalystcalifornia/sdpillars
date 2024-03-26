@@ -312,8 +312,11 @@ fx_bubblepopchart <- function(
       chartOptions=list(plotOptions=list(
         series=list(
           dataLabels=list(
-            enabled=TRUE, format=paste0(export_data_label))))),
-      filename = paste0(subtitle,"_Catalyst California, catalystcalifornia.org, 2023.")
+            enabled=TRUE, 
+            format=paste0(export_data_label))))),
+      filename = paste0(subtitle,"_Catalyst California, catalystcalifornia.org, 2023."),
+      buttons=list(contextButton=list(menuItems=list('downloadPNG', 'downloadSVG',
+                                                     'downloadXLS', 'downloadCSV')))
     )}
 
 
@@ -409,12 +412,17 @@ fx_itemchart <- function(
               labelFormat = paste0('{name} <span style="opacity: 0.4">{', y, ':.1f}</span>'))  %>%
     hc_tooltip(headerFormat="",
                pointFormat = tooltip_text) %>%
-    hc_exporting(enabled = TRUE, sourceWidth=900, sourceHeight=600,
-               chartOptions=list(plotOptions=list(series=list(dataLabels=list(enabled=TRUE,                                                           
-                                                                              format=paste0(list(pointFormat=paste0('{point.', y,':.1f}')))))),
-               filename = paste0(subtitle,"_Catalyst California, catalystcalifornia.org, 2023."))) %>%
     hc_chart(
       marginRight=50,
-      height = 480)
+      height = 480) %>%
+    hc_exporting(enabled = TRUE, sourceWidth=900, sourceHeight=600,
+               chartOptions=list(
+                 plotOptions=list(
+                   series=list(
+                     dataLabels=list(enabled=TRUE,
+                                     format=paste0(list(pointFormat=paste0('{point.', y,':.1f}'))))))),
+                 filename = paste0(subtitle,"_Catalyst California, catalystcalifornia.org, 2023."),
+                 buttons=list(contextButton=list(menuItems=list('downloadPNG', 'downloadSVG',
+                                                              'downloadXLS', 'downloadCSV')))) 
 }
   
