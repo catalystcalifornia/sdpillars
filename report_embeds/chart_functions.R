@@ -304,7 +304,8 @@ fx_bubblepopchart <- function(
     
     hc_add_theme(cc_theme)%>%
     
-    hc_chart(inverted = T) %>%
+    hc_chart(inverted = T,
+             height = 480) %>%
     
     hc_exporting(
       enabled = TRUE, sourceWidth=900, sourceHeight=600,
