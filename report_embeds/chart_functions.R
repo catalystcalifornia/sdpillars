@@ -224,8 +224,7 @@ fx_bubblepopchart <- function(
     subtitle= "",
     tooltip_text="",
     caption = "",
-    yaxis_label = "''",
-    export_data_label="") {
+    yaxis_label = "''") {
   
   yaxis_label_JS <- paste0("function() {
         	return this.value +", yaxis_label, "}")
@@ -304,15 +303,19 @@ fx_bubblepopchart <- function(
     
     hc_add_theme(cc_theme)%>%
     
-    hc_chart(inverted = T) %>%
+    hc_chart(inverted = T,
+             height = 480) %>%
     
     hc_exporting(
       enabled = TRUE, sourceWidth=900, sourceHeight=600,
       chartOptions=list(plotOptions=list(
         series=list(
           dataLabels=list(
-            enabled=TRUE, format=paste0(export_data_label))))),
-      filename = paste0(subtitle,"_Catalyst California, catalystcalifornia.org, 2023.")
+            enabled=TRUE, 
+            format=paste0(list(pointFormat=paste0('{point.', y,':.1f}'))))))),
+      filename = paste0(subtitle,"_Catalyst California, catalystcalifornia.org, 2023."),
+      buttons=list(contextButton=list(menuItems=list('downloadPNG', 'downloadSVG',
+                                                     'downloadXLS', 'downloadCSV')))
     )}
 
 
@@ -408,11 +411,17 @@ fx_itemchart <- function(
               labelFormat = paste0('{name} <span style="opacity: 0.4">{', y, ':.1f}</span>'))  %>%
     hc_tooltip(headerFormat="",
                pointFormat = tooltip_text) %>%
-    hc_exporting(enabled = TRUE, sourceWidth=900, sourceHeight=600,
-               chartOptions=list(plotOptions=list(series=list(dataLabels=list(enabled=TRUE,                                                           
-                                                                              format=paste0(list(pointFormat=paste0('{point.', y,':.1f}')))))),
-               filename = paste0(subtitle,"_Catalyst California, catalystcalifornia.org, 2023."))) %>%
     hc_chart(
-      marginRight=50)
+      marginRight=50,
+      height = 480) %>%
+    hc_exporting(enabled = TRUE, sourceWidth=900, sourceHeight=600,
+               chartOptions=list(
+                 plotOptions=list(
+                   series=list(
+                     dataLabels=list(enabled=TRUE,
+                                     format=paste0(list(pointFormat=paste0('{point.', y,':.1f}'))))))),
+                 filename = paste0(subtitle,"_Catalyst California, catalystcalifornia.org, 2023."),
+                 buttons=list(contextButton=list(menuItems=list('downloadPNG', 'downloadSVG',
+                                                              'downloadXLS', 'downloadCSV')))) 
 }
   

@@ -73,6 +73,8 @@ chart <- df_final %>%
   hc_legend(enabled = TRUE,
             x=20) %>% 
   
+  hc_chart(height = 480) %>%
+  
   hc_exporting(enabled = TRUE, 
                sourceWidth=900, sourceHeight=600, 
                chartOptions=list(plotOptions=list(

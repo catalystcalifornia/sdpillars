@@ -118,7 +118,7 @@ SDPD found no contraband or evidence on <span class='data-emphasis no-contraband
 <br><br>
 SDPD found contraband/evidence on <span class='data-emphasis yes-contraband-color'><span class='yes-contraband-count yes-contraband-color'></span> people</span>, a hit rate of <span class='data-emphasis yes-contraband-color'><span class='yes-contraband-prc-rate yes-contraband-color'></span>%</span>.
 <br><br>
-<div class='legend'><div class='legend-note'>1 dot = 5 field interview card stops and a search</div><br><span class='no-contraband-dot'></span> No Contraband Found <br><span class='yes-contraband-dot'></span> Yes Contraband Found</div></div></div><br>"
+<div class='legend'><div class='legend-note'>1 dot = 5 field interview card stops with searches</div><br><span class='no-contraband-dot'></span> No Contraband Found <br><span class='yes-contraband-dot'></span> Yes Contraband Found</div></div></div><br>"
 
 ```
 
