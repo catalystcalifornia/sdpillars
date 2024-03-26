@@ -89,7 +89,8 @@ chart<-hchart(df,
     
     hc_colors(group_colors) %>%
     hc_chart(
-      marginRight=120) %>%
+      marginRight=120,
+      height=480) %>%
     
     hc_exporting(
       enabled = TRUE, sourceWidth=900, sourceHeight=600, 

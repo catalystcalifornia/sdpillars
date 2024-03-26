@@ -98,7 +98,8 @@ chart<-df1 %>%
                           labels = list(style=list(fontSize="12px"))))%>%
       hc_add_theme(cc_theme)%>%
     hc_chart(
-      marginRight=120) %>%
+      marginRight=120,
+      height=480) %>%
   
   hc_legend(enabled = TRUE, 
               # reversed =  TRUE,
