@@ -414,6 +414,7 @@ fx_itemchart <- function(
                                                                               format=paste0(list(pointFormat=paste0('{point.', y,':.1f}')))))),
                filename = paste0(subtitle,"_Catalyst California, catalystcalifornia.org, 2023."))) %>%
     hc_chart(
-      marginRight=50)
+      marginRight=50,
+      height = 480)
 }
   
