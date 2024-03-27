@@ -1,7 +1,7 @@
 # San Diego RIPA Report
 
 
-<li><a href="https://www.catalystcalifornia.org/campaign-tools/maps-and-data/racial-bias-in-policing-an-in-depth-analysis-of-stopping">Link to online report</a></li>
+<li><a href="https://www.catalystcalifornia.org/campaign-tools/maps-and-data/end-gang-profiling-in-southeast-san-diego-data-and-stories-from-community-members">Link to online report</a></li>
 
 <br>
 
