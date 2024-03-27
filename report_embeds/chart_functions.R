@@ -224,7 +224,8 @@ fx_bubblepopchart <- function(
     subtitle= "",
     tooltip_text="",
     caption = "",
-    yaxis_label = "''") {
+    yaxis_label = "''",
+    export_data_label="") {
   
   yaxis_label_JS <- paste0("function() {
         	return this.value +", yaxis_label, "}")
@@ -312,7 +313,7 @@ fx_bubblepopchart <- function(
         series=list(
           dataLabels=list(
             enabled=TRUE, 
-            format=paste0(list(pointFormat=paste0('{point.', y,':.1f}'))))))),
+            format=paste0(export_data_label))))),
       filename = paste0(subtitle,"_Catalyst California, catalystcalifornia.org, 2023."),
       buttons=list(contextButton=list(menuItems=list('downloadPNG', 'downloadSVG',
                                                      'downloadXLS', 'downloadCSV')))
