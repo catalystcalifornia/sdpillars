@@ -50,7 +50,9 @@ chart <- fx_bubblepopchart(
   subtitle= subtitle_text,
   tooltip_text=tooltip_text,
   caption = caption_text,
-  yaxis_label = "''" # format for your y axis labels
+  yaxis_label = "''", # format for your y axis labels
+  export_data_label=list(pointFormat='{point.rate:.1f}%')
+
 )
 
 dbDisconnect(pillars_conn)
