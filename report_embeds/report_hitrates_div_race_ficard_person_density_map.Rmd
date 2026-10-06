@@ -126,8 +126,16 @@ SDPD found contraband/evidence on <span class='data-emphasis yes-contraband-colo
 ### Build map
 map <- leaflet(width = "100%", height = "600px",
                options = leafletOptions(zoomControl = FALSE, minZoom=10, maxZoom=10)) %>%
-  ## add provider tiles
-  addProviderTiles("CartoDB.Positron") %>%
+  # new code: add base map
+    addTiles(
+      urlTemplate = paste0("https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png?key=", carto_key),
+      attribution = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>, &copy; <a href="https://carto.com/attributions">CARTO</a>'
+    ) %>%
+    addTiles(
+      urlTemplate = paste0("https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}.png?key=", carto_key),
+      # attribution = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>, &copy; <a href="https://carto.com/attributions">CARTO</a>',
+      options = providerTileOptions(pane = "markerPane") # retain unique setting 
+    ) %>%
   
   ## add Division polygons
   # add polygon layer below (zIndex) markers - if the white fillColor is on top of the marker colors they will get washed out (dull)
